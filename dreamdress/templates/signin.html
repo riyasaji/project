@@ -1,0 +1,165 @@
+
+{% extends 'base.html' %}
+{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dream Dress Login</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 120vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .container h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+            color: #333;
+        }
+
+        .form-group {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-top: 5px;
+            font-size: 16px;
+        }
+
+        .form-group label {
+            position: absolute;
+            left: 15px;
+            top: 15px;
+            transition: all 0.3s ease;
+            pointer-events: none;
+            color: #999;
+        }
+
+        .form-group input[type="text"]:focus+.label,
+        .form-group input[type="email"]:focus+.label,
+        .form-group input[type="password"]:focus+.label {
+            top: -10px;
+            font-size: 12px;
+            color: #ff3366;
+        }
+
+        .form-group input[type="submit"] {
+            width: 100%;
+            background-color: #ff3366;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .form-group input[type="submit"]:hover {
+            background-color: #ff1a4d;
+        }
+
+        .login-link {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #555;
+        }
+
+        .login-link a {
+            color: #ff3366;
+            text-decoration: none;
+        }
+        .google-signin-btn {
+            background-color: #4285F4;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+            text-align: center;
+        }
+
+        .google-signin-btn:hover {
+            background-color: #3c79e6;
+        }
+
+        /* Optional: Add some margin or other styles as needed */
+        .google-signin-btn-container {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Welcome back to Dream Dress</h2>
+        <form action="#" method="POST">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="email" id="email" name="email" placeholder="Email" required>
+            </div>
+            <div class="form-group">
+                <input type="password" id="password" name="password" placeholder="Password" required>
+            </div>
+            <div class="form-group">
+                <a href="#">Forgot Password?</a>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Login">
+            </div>
+        </form>
+		<div class="form-group">
+           <p>OR </p>
+            </div>
+        <div class="google-signin-btn-container">
+        <button class="google-signin-btn">Sign in with Google</button>
+        </div>
+        <div class="login-link">
+            Don't have an account? <a href="">Create one</a>
+        </div>
+    </div>
+	<script>
+		// Remove placeholder when user starts typing and restore it when the input is empty
+ const inputs = document.querySelectorAll('input');
+ inputs.forEach(input => {
+	 const label = input.nextElementSibling;
+	 input.addEventListener('input', () => {
+		 if (input.value.trim() !== '') {
+			 label.style.display = 'none';
+		 } else {
+			 label.style.display = 'block';
+		 }
+	 });
+ });
+</script>
+
+</body>
+{% endblock %}
+</html>
+
+
