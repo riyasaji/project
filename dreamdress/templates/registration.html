@@ -1,12 +1,14 @@
 
 {% extends 'base.html' %}
 {% block content %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous"> -->
     <title>Dream Dress Registration</title>
     <style>
         body {
@@ -119,39 +121,48 @@
 <body>
     <div class="container">
         <h2>Create Your Dream Dress Account</h2>
-        <form action="#" method="post">
+        {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">{{ message }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        <form action="#" method="post" id="registrationForm">
 			{% csrf_token %}
             <div class="form-group">
-                <input type="text" id="fullname" name="username" required>
-                <label class="label">Full Name</label>
+                <input type="text" id="username" name="username" required>
+                <label class="label">Username</label>
+                <span id="usernameError"></span>
             </div>
             <div class="form-group">
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email">
                 <label class="label">Email</label>
+                <span id="emailError"></span>
             </div>
             <div class="form-group">
                 <input type="password" id="password" name="password" required>
                 <label class="label">Password</label>
+                <span id="passwordError" style="color: red;"></span>
             </div>
             <div class="form-group">
                 <input type="password" id="confirmpassword" name="confirmpassword" required>
                 <label class="label">Confirm Password</label>
+                <span id="confrimPasswordError"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create Account">
             </div>
         </form>
-		{% for messages in messages %}
-		<h3 style="color:darkred">{{messages}}</h3>
         <div class="login-link">
-            Already have an account? <a href="">Login here</a>
+            Already have an account? <a href="{% url 'signin' %}">Login here</a>
         </div>
 		<p>OR</p>
 		<div class="google-signin-btn-container">
         <button class="google-signin-btn">Sign in with Google</button>
         </div>
     </div>
-    {% endfor%}
+  
 
     <script>
                // Remove placeholder when user starts typing and restore it when the input is empty
@@ -167,6 +178,27 @@
             });
         });
     </script> 
+
+
+<!-- <script>
+ // Function to validate the username
+function validateUsername() {
+    const usernameInput = document.getElementById('fullname');
+    const usernameError = document.getElementById('username_error');
+    const usernamePattern = /^[a-zA-Z][a-zA-Z0-9]*$/; // Username pattern: starts with a letter, followed by letters or numbers
+
+    if (usernameInput.value.trim() === '') {
+        usernameError.textContent = 'Username is required';
+    } else if (usernameInput.value.includes(' ')) {
+        usernameError.textContent = 'Spaces are not allowed';
+    } else if (!usernamePattern.test(usernameInput.value)) {
+        usernameError.textContent = 'Username should start with a letter and consist of letters or numbers';
+    } else {
+        usernameError.textContent = ''; // Clear any previous error message
+    }
+}
+</script> -->
+<script src="{% static 'js/formvalidation.js' %}"></script>
 </body>
 {% endblock %} 
 </html>

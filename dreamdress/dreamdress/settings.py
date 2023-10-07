@@ -24,7 +24,6 @@ SECRET_KEY = 'django-insecure-xwn_)bvvut5hi(04i*5@(6^b+&*1_ek91qncv)-f!)4td9^fpc
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
 ALLOWED_HOSTS = []
 
 
@@ -125,3 +124,7 @@ STATICFILES_DIRS=[
 # https://docs.djangoproject.com/en/4.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL='users.tbl_user'
+
+
