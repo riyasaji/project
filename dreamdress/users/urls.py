@@ -27,12 +27,15 @@ urlpatterns = [
     path('logout/',views.user_logout, name='logout'),
     path('signin/registration/', views.registration, name='registration'),
     path('registration/signin/', views.signin, name='signin'),
+    path('check_email/',views.check_email,name='check_email'),
+    path('check_username/',views.check_username,name='check_username'),
     # path('demo/',views.demo),
     #path('forgot_password/',views.ForgetPassword, name='forgot_password'),
     # path('change_password/<token>/',views.Change_Password, name='change_password'),
-    # path('password_reset/', PasswordResetView.as_view(), name='password_reset'),
-    # path('password_reset/done/', PasswordResetDoneView.as_view(), name='password_reset_done'),
-    # path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
-    # path('reset/done/', PasswordResetCompleteView.as_view(), name='password_reset_complete')
-     
+    path('password_reset/', PasswordResetView.as_view(), name='password_reset'),
+    path('password_reset/done/', PasswordResetDoneView.as_view(), name='password_reset_done'),
+    path('reset/<uidb64>/<token>/', PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
+    path('reset/done/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
+
+    path('activate/<uidb64>/<token>',views.ActivateAccountView.as_view(),name='activate'),
 ]
