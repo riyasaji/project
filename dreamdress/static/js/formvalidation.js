@@ -14,6 +14,28 @@ document.addEventListener("DOMContentLoaded", function(){
     emailInput.addEventListener("input", validateEmail);
     passwordInput.addEventListener("input",validatePassword);
     confirmPasswordInput.addEventListener("input", validateConfirmPassword);
+
+    registrationForm.addEventListener("submit", function(e) {
+        // Clear existing error messages before re-validating
+        const usernameError = document.getElementById("usernameError");
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+        const confirmPasswordError = document.getElementById("confrimPasswordError");
+
+        usernameError.textContent = '';
+        emailError.textContent = '';
+        passwordError.textContent = '';
+        confirmPasswordError.textContent = '';
+
+        validateUsername();
+        validateEmail();
+        validatePassword();
+        validateConfirmPassword();
+
+        if (usernameError.textContent || emailError.textContent || passwordError.textContent || confirmPasswordError.textContent) {
+            e.preventDefault(); // Prevent form submission if there are errors
+        }
+    });
 });
 
 function validateUsername(){
@@ -24,7 +46,7 @@ function validateUsername(){
 
     if (!regEx.test(username)){
         usernameError.style.color="red";
-        usernameError.textContent="Invalid Username";
+        usernameError.textContent="Username cannot conatain space, and cannot start from numbers!!";
     }else{
         //send ajax request
         fetch(`/check_username/?username=${username}`)
@@ -84,7 +106,7 @@ function validatePassword(){
 
     if (!passwordPattern.test(password)){
         // passwordError.style.color="red";
-        passwordError.textContent="Invalid Password";
+        passwordError.textContent="Password must contain atleast 8 characters , contain atleast one numbers, captial letter and special characters";
     }else{
         console.log("Correct");
         passwordError.textContent = "";
@@ -103,3 +125,5 @@ function validateConfirmPassword(){
         confrimPasswordError.textContent='';
     }
 }
+
+
