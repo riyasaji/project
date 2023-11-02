@@ -11,7 +11,7 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #e8d7dbf6;
             margin: 0;
             padding: 0;
             display: flex;
@@ -26,6 +26,9 @@
             border-radius: 10px;
             box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
             text-align: center;
+            max-width: 400px; /* Set your desired maximum width */
+            width: 100%; /* Ensures the container takes the specified width */
+            margin: 0 auto; 
         }
 
         .container h2 {
@@ -116,6 +119,7 @@
 </head>
 
 <body>
+    {% load socialaccount %}
     <div class="container">
         {% for message in messages %}
         <div class="alert alert-{{message.tags}} alert-dismissible fade show" role="alert">
