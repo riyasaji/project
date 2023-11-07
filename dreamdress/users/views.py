@@ -6,7 +6,7 @@ from django.contrib.auth import login,authenticate,logout
 from .models import tbl_user
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
-
+from django.contrib import messages
 
 from django.shortcuts import render,redirect
 from django.http import HttpResponse,JsonResponse
@@ -99,6 +99,7 @@ def signin(request):
             login(request,user)
             return redirect('home')
         else:
+            messages.error(request,'Email and Password Invalid')
             return redirect('signin')
 
     return render(request,'signin.html')
@@ -133,4 +134,13 @@ def check_email(request):
     email= request.GET.get('email','')
     email_exists = tbl_user.objects.filter(email=email).exists()
     return JsonResponse({'exists': email_exists})
+
+def dashboard(request):
+    return render(request,'dashboard.html')
+    
+    
+def update_profile(request):
+    return render(request,'update_profile.html')
+
+
     

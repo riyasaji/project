@@ -38,4 +38,6 @@ urlpatterns = [
     path('reset/done/', PasswordResetCompleteView.as_view(), name='password_reset_complete'),
 
     path('activate/<uidb64>/<token>',views.ActivateAccountView.as_view(),name='activate'),
+    path('dashboard/',views.dashboard,name='dashboard'),
+    path('update_profile/',views.update_profile,name='update_profile'),
 ]
