@@ -142,5 +142,13 @@ def dashboard(request):
 def update_profile(request):
     return render(request,'update_profile.html')
 
+def seller_registeration(request):
+    return render(request,'seller_registeration.html')
+
+def shop(request):
+    return render(request,'shop.html')
+
+def add_product(request):
+    return render(request,'add_prod.html')
 
     

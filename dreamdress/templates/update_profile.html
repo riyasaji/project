@@ -1,1 +1,407 @@
-<p>hii</p>
+
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Registration Form</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+        }
+
+        /* CSS for Form Container */
+        .form-container {
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f7f7f7;
+            border: 1px solid #e1e1e1;
+            border-radius: 10px; /* Add rounded corners */
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Form fields styling */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="tel"],
+        .form-group input[type="email"],
+        .form-group input[type="file"],
+        .form-group select,
+        .form-group textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        /* CSS for Buttons */
+        .btn {
+            background-color: #258dfc;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #16f716;
+        }
+
+        /* CSS for Name Fields */
+        .name-fields {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .name-fields input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        /* CSS for City and State Fields */
+        .city-state-fields {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .city-state-fields input[type="text"] {
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        /* Error message styling */
+        .error-message {
+            color: red;
+            margin-top: 5px;
+        }
+    </style>
+    {% endblock style %}
+    {% block form %}
+</head>
+<body>
+    <center>
+    <div class="form-container">
+        <h2 style="text-align: center; color: #258dfc;">Update Profile</h2><br>
+        <form action="/myauth/update-profile/" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <!-- profile_image -->
+
+      <div class="edit-left">
+    <div class="profile-picture">
+        {% if user.profile.profile_picture %}
+            <img src="{{ user.profile.profile_picture.url }}" alt="Profile Picture" style="width: 150px; height: 150px; border-radius: 50%;">
+        {% else %}
+            <!-- Display a placeholder or default image if no profile picture exists -->
+            <img src="{% static 'assets/img/pro.png' %}" alt="Default Profile Picture" style="width: 150px; height: 150px; border-radius: 50%;">
+        {% endif %}
+    </div>
+</div>
+
+<!-- Allow the user to upload a new profile picture -->
+<div class="form-group">
+    <label for="profile_picture">Upload a new profile picture</label>
+    <input type="file" name="profile_picture" accept="image/*">
+</div><br>
+
+
+
+            <!-- First Name and Last Name in a single line -->
+            <div class="form-group name-fields">
+                <label for="first_name"></label>
+                <input type="text" id="first_name" name="first_name" required placeholder="First Name" value="{{ user.first_name }}">
+                <div class="error-message" id="first_name_error"></div>
+            </div>
+
+            <div class="form-group name-fields">
+                <label for="last_name"></label>
+                <input type="text" id="last_name" name="last_name" required placeholder="Last Name" value="{{ user.last_name }}">
+                <div class="error-message" id="last_name_error"></div>
+            </div>
+            
+            <!-- Email -->
+            <div class="form-group">
+                <label for="email"></label>
+                <input type="email" id="email" name="email" required placeholder="Enter your email address"  value="{{ user.email }}">
+                <div class="error-message" id="email_error"></div>
+            </div>
+
+            <!-- Phone Number -->
+            <div class="form-group">
+                <label for="phone"></label>
+                <input type="tel" id="phone" name="phone"  placeholder="Enter your phone number" value="{{user.profile.phone}}">
+                <div class="error-message" id="phone_error"></div>
+            </div>
+            
+            <!-- Alternate Phone Number -->
+            <div class="form-group">
+                <label for="alt_phone"></label>
+                <input type="tel" id="alt_phone" name="alt_phone" placeholder="Enter your alternate phone number" value="{{user.profile.alt_phone}}">
+                <div class="error-message" id="alt_phone_error"></div>
+            </div>
+            
+            <!-- Pincode -->
+            <div class="form-group">
+                <label for="pincode"></label>
+                <input type="text" id="pincode" name="pincode"  placeholder="Enter your pincode" value="{{user.profile.pincode}}" >
+                <div class="error-message" id="pincode_error"></div>
+            </div>
+
+            <!-- City and State on the same line -->
+            <div class="form-group city-state-fields">
+                <input type="text" id="state" name="state"  placeholder="State" value="{{user.profile.state}}">
+                
+                <input type="text" id="city" name="city" placeholder="City" value="{{user.profile.city}}">
+
+                <div class="error-message" id="state_error"></div>
+                <div class="error-message" id="city_error"></div>
+            </div>
+
+            <!-- House name or Building Name -->
+            <div class="form-group">
+                <label for="building_name"></label>
+                <input type="text" id="building_name" name="building_name"  placeholder="Enter house/building name" value="{{user.profile.building_name}}">
+                <div class="error-message" id="building_name_error"></div>
+            </div>
+
+            <!-- Road Name or Area -->
+            <div class="form-group">
+                <label for="road_area"></label>
+                <input type="text" id="road_area" name="road_area"  placeholder="Enter road name/area" value="{{user.profile.road_area}}">
+                <div class="error-message" id="road_area_error"></div>
+            </div>
+
+            <!-- Submit Button -->
+            <div>
+                <button type="submit" class="btn" id="submit-button">Update</button>
+
+            </div>
+            <div class="mt-3 text-center">
+                Back To Home <a href="{% url 'home' %}"">Back</a>
+            </div>
+        </form>
+    </div>
+</center>
+
+
+<!-- JavaScript for inline validation -->
+<script>
+    // Function to validate the first name
+    function validateFirstName() {
+        const firstNameInput = document.getElementById('first_name');
+        const firstNameError = document.getElementById('first_name_error');
+        const firstNamePattern = /^[A-Za-z]+$/; // Only letters allowed
+
+        if (firstNameInput.value.trim() === '') {
+            firstNameError.textContent = 'First Name is required';
+        } else if (firstNameInput.value.includes(' ')) {
+            firstNameError.textContent = 'Spaces are not allowed';
+        } else if (!firstNamePattern.test(firstNameInput.value)) {
+            firstNameError.textContent = 'Only letters are allowed';
+        } else {
+            firstNameError.textContent = ''; // Clear any previous error message
+        }
+    }
+
+    // Function to validate the last name
+    function validateLastName() {
+        const lastNameInput = document.getElementById('last_name');
+        const lastNameError = document.getElementById('last_name_error');
+        const lastNamePattern = /^[A-Za-z]+$/; // Only letters allowed
+
+        if (lastNameInput.value.trim() === '') {
+            lastNameError.textContent = 'Last Name is required';
+        } else if (lastNameInput.value.includes(' ')) {
+            lastNameError.textContent = 'Spaces are not allowed';
+        } else if (!lastNamePattern.test(lastNameInput.value)) {
+            lastNameError.textContent = 'Only letters are allowed';
+        } else {
+            lastNameError.textContent = ''; // Clear any previous error message
+        }
+    }
+      // Function to validate the email
+      function validateEmail() {
+        const emailInput = document.getElementById('email');
+        const emailError = document.getElementById('email_error');
+        const emailPattern = /^[a-z0-9]+([.][a-z0-9]+)*@[a-z0-9.-]+\.[a-z]{2,4}$/;
+
+        if (emailInput.value.trim() === '') {
+            emailError.textContent = 'Email is required';
+        } else if (!emailPattern.test(emailInput.value)) {
+            emailError.textContent = 'Invalid email format,Only Lowercase letters are allowed';
+        } else if (emailInput.value.includes('..')) {
+            emailError.textContent = 'Consecutive dots are not allowed in the email';
+        } else {
+            // Additional server-side email existence validation can be performed here if needed.
+            emailError.textContent = ''; // Clear any previous error message
+        }
+    }
+
+
+      // Function to validate phone number and alternate phone number
+      function validatePhoneNumber(inputId, errorId) {
+        const phoneInput = document.getElementById(inputId);
+        const phoneError = document.getElementById(errorId);
+        const phonePattern = /^[1-9]\d{9}$/; // 10 digits, starts with 1-9
+
+        if (phoneInput.value.trim() === '') {
+            phoneError.textContent = 'Phone number is required';
+        } else if (!phonePattern.test(phoneInput.value)) {
+            phoneError.textContent = 'Invalid phone number format, only 10 digits are allowed';
+        } else if (phoneInput.value.includes('0000')) {
+            phoneError.textContent = 'Consecutive zeros are not allowed';
+        } else {
+            phoneError.textContent = ''; // Clear any previous error message
+        }
+    }
+
+
+   // Function to validate the pincode
+function validatePincode() {
+    const pincodeInput = document.getElementById('pincode');
+    const pincodeError = document.getElementById('pincode_error');
+    const pincodePattern = /^\d{6}$/; // 6 digits
+
+    if (pincodeInput.value.trim() === '') {
+        pincodeError.textContent = 'Pincode is required';
+    } else if (!pincodePattern.test(pincodeInput.value)) {
+        pincodeError.textContent = 'Pincode must have exactly 6 digits';
+    } else if (/0{3,}/.test(pincodeInput.value)) {
+        pincodeError.textContent = 'Pincode cannot have consecutive zeros';
+    } else {
+        pincodeError.textContent = ''; // Clear any previous error message
+    }
+}
+
+
+   // Function to validate the state
+   function validateState() {
+        const stateInput = document.getElementById('state');
+        const stateError = document.getElementById('state_error');
+        const statePattern = /^[A-Za-z]+$/; // Only letters allowed
+
+        if (stateInput.value.trim() === '') {
+            stateError.textContent = 'State is required';
+        } else if (!statePattern.test(stateInput.value)) {
+            stateError.textContent = 'Only letters are allowed, spaces are not allowed';
+        } else {
+            stateError.textContent = ''; // Clear any previous error message
+        }
+    }
+//validate city
+    function validateCity() {
+    const cityInput = document.getElementById('city');
+    const cityError = document.getElementById('city_error');
+    const cityPattern = /^[A-Za-z]+$/; // Only letters are allowed
+
+    if (cityInput.value.trim() === '') {
+        cityError.textContent = 'City is required';
+    } else if (!cityPattern.test(cityInput.value)) {
+        cityError.textContent = 'Only letters are allowed, spaces are not allowed';
+    } else {
+        cityError.textContent = ''; // Clear any previous error message
+    }
+}
+
+
+
+      // Function to validate the house name (only letters are allowed)
+      function validateHouseName() {
+        const houseNameInput = document.getElementById('building_name');
+        const houseNameError = document.getElementById('building_name_error');
+        const houseNamePattern = /^[A-Za-z]+$/; // Only letters allowed
+
+        if (houseNameInput.value.trim() === '') {
+            houseNameError.textContent = 'House Name is required';
+        } else if (!houseNamePattern.test(houseNameInput.value)) {
+            houseNameError.textContent = 'Only letters are allowed, spaces are not allowed';
+        } else {
+            houseNameError.textContent = ''; // Clear any previous error message
+        }
+    }
+
+
+   // Function to validate the road name
+   function validateRoadName() {
+        const roadNameInput = document.getElementById('road_area');
+        const roadNameError = document.getElementById('road_area_error');
+        const roadNamePattern = /^[A-Za-z0-9\s]+$/; // Letters, spaces, and digits allowed
+
+        if (roadNameInput.value.trim() === '') {
+            roadNameError.textContent = 'Road Name/Area is required';
+        } else if (!roadNamePattern.test(roadNameInput.value)) {
+            roadNameError.textContent = 'Only letters, spaces, and digits are allowed';
+        } else if (/^\d+$/.test(roadNameInput.value)) {
+            roadNameError.textContent = 'Cannot be only digits';
+        } else {
+            roadNameError.textContent = ''; // Clear any previous error message
+        }
+    }
+
+
+ 
+
+    // Add event listeners to trigger validation on input change
+    document.getElementById('first_name').addEventListener('input', validateFirstName);
+    document.getElementById('last_name').addEventListener('input', validateLastName);
+    document.getElementById('email').addEventListener('input', validateEmail);
+    document.getElementById('pincode').addEventListener('input', validatePincode);
+    document.getElementById('state').addEventListener('input', validateState);
+    document.getElementById('city').addEventListener('input', validateCity);
+    document.getElementById('building_name').addEventListener('input', validateHouseName);
+    document.getElementById('road_area').addEventListener('input', validateRoadName);
+
+
+
+
+        // Add event listeners to trigger validation on input change for phone number and alternate phone number
+        document.getElementById('phone').addEventListener('input', function() {
+        validatePhoneNumber('phone', 'phone_error');
+    });
+
+    document.getElementById('alt_phone').addEventListener('input', function() {
+        validatePhoneNumber('alt_phone', 'alt_phone_error');
+    });
+
+
+// Function to check if there are any error messages in the form
+function checkFormErrors() {
+    const errorMessages = document.querySelectorAll('.error-message');
+    for (const errorMessage of errorMessages) {
+        if (errorMessage.textContent) {
+            return true; // There are errors, prevent submission
+        }
+    }
+    return false; // No errors, allow submission
+}
+
+// Event listener for form submission
+document.getElementById('submit-button').addEventListener('click', function (e) {
+    if (checkFormErrors()) {
+        e.preventDefault(); // Prevent form submission if there are errors
+    }
+});
+
+    
+
+
+     
+
+</script>
+
+
+</body>
+</html>

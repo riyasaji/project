@@ -40,4 +40,8 @@ urlpatterns = [
     path('activate/<uidb64>/<token>',views.ActivateAccountView.as_view(),name='activate'),
     path('dashboard/',views.dashboard,name='dashboard'),
     path('update_profile/',views.update_profile,name='update_profile'),
+    path('shop/',views.shop,name='shop'),
+    path('seller_registeration/',views.seller_registeration,name='seller_registeration'),
+    path('add_product/',views.add_product,name='add_product'),
+    
 ]
