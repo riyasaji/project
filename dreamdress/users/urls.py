@@ -43,5 +43,9 @@ urlpatterns = [
     path('shop/',views.shop,name='shop'),
     path('seller_registeration/',views.seller_registeration,name='seller_registeration'),
     path('add_product/',views.add_product,name='add_product'),
+    path('details/',views.details,name='details'),
+    path('cart/',views.cart,name='cart'),
+    path('checkout/',views.checkout,name='checkout'),
+     path('contact/',views.contact,name='contact'),
     
 ]
