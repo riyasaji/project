@@ -165,3 +165,6 @@ def contact(request):
 
 def base(request):
     return render(request,'base.html')
+
+def customer_dashboard(request):
+    return render(request,'customer_dashboard.html')

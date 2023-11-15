@@ -47,6 +47,13 @@ urlpatterns = [
     path('cart/',views.cart,name='cart'),
     path('checkout/',views.checkout,name='checkout'),
     path('contact/',views.contact,name='contact'),
-     path('base/',views.base,name='base'),
+    path('base/',views.base,name='base'),
+    path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     
 ]
+
+from django.conf import settings
+from django.conf.urls.static import static
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
