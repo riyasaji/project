@@ -24,6 +24,7 @@ from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.utils.encoding import force_bytes,force_str
 from django.template.loader import render_to_string
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
@@ -138,9 +139,34 @@ def check_email(request):
 def dashboard(request):
     return render(request,'dashboard.html')
     
-    
-def update_profile(request):
-    return render(request,'update_profile.html')
+@login_required
+def profile_update(request):
+    if request.method == 'POST':
+        user = request.user 
+
+        # Update the user's profile information
+        user.first_name = request.POST.get('firstName')
+        user.last_name = request.POST.get('lastName')
+        user.email = request.POST.get('email')
+        user.save()
+
+        user_profile, created = tbl_user.objects.get_or_create(user=user)
+         # Update the profile fields based on the form data
+        user_profile.phone_number = request.POST.get('phoneNumber')
+        if request.FILES.get('profileImage'):
+            user_profile.profile_image = request.FILES['profileImage']
+            user_profile.save()
+
+
+        messages.success(request, 'Profile updated successfully')
+        return redirect('dashboard')  # Redirect to the user's profile page
+
+
+    return render(request, 'update_profile.html')
+
+
+
+  
 
 def seller_registeration(request):
     return render(request,'seller_registeration.html')

@@ -52,7 +52,8 @@
                             <span class="input-group-text bg-transparent text-primary">
                                 <i class="fa fa-search"></i>
                             </span>
-							<span class="input-group-text bg-transparent text-primary"><i class="fa fa-user">Hello, {{ user.username }}</i>  </span>
+                            <span> </span>
+							<!--<span class="input-group-text bg-transparent text-primary"><i class="fa fa-user">Hello, {{ user.username }}</i>  </span>-->
                         </div>
                     </div>
                 </form>
@@ -62,9 +63,11 @@
                     <i class="fas fa-heart text-primary"></i>
                     <span class="badge">0</span>
                 </a>-->
+                
                 <a href="" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
                     <span class="badge">0</span>
+                    <span class="input-group-text bg-transparent text-primary"><i class="fa fa-user">Hello, {{ user.username }}</i>  </span>
                 </a>
             </div>
         </div>
@@ -125,7 +128,7 @@
                             <a href="contact" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0">
-                            <a href="{% url 'update_profile' %}" class="nav-item nav-link">Update Profile</a>
+                            <a href="{% url 'customer_dashboard' %}" class="nav-item nav-link">Dashboard</a>
                             <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
                         </div>
                     </div>
