@@ -4,6 +4,7 @@ from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout
 from .models import tbl_user
+from .models import UserProfile
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.contrib import messages
@@ -26,7 +27,9 @@ from django.utils.encoding import force_bytes,force_str
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 
-# Create your views here.
+from django.contrib.auth.hashers import check_password
+from django.contrib.auth import update_session_auth_hash
+from django.shortcuts import render, redirect
 
 #email
 from django.conf import settings
@@ -141,28 +144,44 @@ def dashboard(request):
     
 @login_required
 def profile_update(request):
+    user = request.user  # Assuming the authenticated user
+
+    try:
+        user_profile = UserProfile.objects.get(user=user)
+    except UserProfile.DoesNotExist:
+        # Handle the case where the profile doesn't exist for the user
+        user_profile = None
+
     if request.method == 'POST':
-        user = request.user 
+         first_name = request.POST.get('firstName')
+         last_name = request.POST.get('lastName')
+         email = request.POST.get('email')
+         phone_number = request.POST.get('phoneNumber')
+         profile_image = request.FILES.get('profileImage')
+          # Update user's basic information
+         user.first_name = first_name
+         user.last_name = last_name
+         user.email = email
+         user.save()
+                # Update or create user profile
+         if user_profile:
+            user_profile.phone_number = phone_number
+            if profile_image:
+                user_profile.profile_image = profile_image
+         else:
+            user_profile = UserProfile(user=user, phone_number=phone_number, profile_image=profile_image)
+         user_profile.save()
 
-        # Update the user's profile information
-        user.first_name = request.POST.get('firstName')
-        user.last_name = request.POST.get('lastName')
-        user.email = request.POST.get('email')
-        user.save()
+         messages.success(request, 'Profile updated successfully')
+         return redirect('customer_dashboard')  # Redirect to the user's profile page
 
-        user_profile, created = tbl_user.objects.get_or_create(user=user)
-         # Update the profile fields based on the form data
-        user_profile.phone_number = request.POST.get('phoneNumber')
-        if request.FILES.get('profileImage'):
-            user_profile.profile_image = request.FILES['profileImage']
-            user_profile.save()
+    # Pass user and user_profile objects to the template for rendering
+    context = {
+        'user': user,
+        'user_profile': user_profile
+    }
 
-
-        messages.success(request, 'Profile updated successfully')
-        return redirect('dashboard')  # Redirect to the user's profile page
-
-
-    return render(request, 'update_profile.html')
+    return render(request, 'update_profile.html', context)
 
 
 
@@ -194,3 +213,34 @@ def base(request):
 
 def customer_dashboard(request):
     return render(request,'customer_dashboard.html')
+
+def change_password(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        current_password = request.POST.get('currentPassword')
+        new_password = request.POST.get('newPassword')
+        confirm_password = request.POST.get('confirmPassword')
+
+        # Check if the new password and confirm password match
+        if new_password != confirm_password:
+            error_message = "New password and confirm password do not match."
+            return render(request, 'change_password.html', {'error_message': error_message})
+
+        # Check if the current password matches the user's password
+        if not check_password(current_password, request.user.password):
+            error_message = "Current password is incorrect."
+            return render(request, 'change_password.html', {'error_message': error_message})
+
+        # Update the user's password
+        request.user.set_password(new_password)
+        request.user.save()
+
+        # Update the session hash to keep the user logged in
+        update_session_auth_hash(request, request.user)
+        
+        # Redirect to a success page or a profile page
+        return redirect('customer_dashboard')
+
+    return render(request, 'change_password.html')
+
+
+  

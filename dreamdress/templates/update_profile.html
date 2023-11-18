@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -17,7 +18,7 @@
             <div class="col-md-6">
                 <div class="card shadow p-4" style="background-color: #ffffff;">
                     <h2 class="text-center mb-4" style="color: #941755;">Update Profile</h2>
-                    <form method="post" enctype="multipart/form-data">
+                    <form method="post" enctype="multipart/form-data" id="updateForm">
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="profileImage" style="color: #941755;">Profile Image:</label>
@@ -25,16 +26,18 @@
                         </div>
                         <div class="form-group">
                             <label for="firstName" style="color: #941755;">First Name:</label>
-                            <input type="text" class="form-control" id="firstName" name="firstName" value="{{ user_profile.first_name }}" >
+                            <input type="text" class="form-control" id="firstName" name="firstName" value="{{ user.first_name }}" >
+							<span id="firstNameError" class="text-danger"></span> <!-- Display error message here -->
 				        </div>
 						<div class="form-group">
 							<label for="lastName" style="color: #941755;">Last Name:</label>
-							<input type="text" class="form-control" id="lastName" name="lastName" value="{{ user_profile.last_name }}">
+							<input type="text" class="form-control" id="lastName" name="lastName" value="{{ user.last_name }}">
+							<span id="lastNameError" class="text-danger"></span> <!-- Display error message here -->
                         </div>
                         <!-- Add similar form-group blocks for other fields -->
 						 <div class="form-group">
 							<label for="email" style="color: #941755;">Email Address:</label>
-							<input type="email" class="form-control" id="email" name="email" value="{{ user_profile.email }}" disabled">
+							<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
 						</div>
 						<!--<div class="form-group">
 							<label for="altEmail" style="color: #941755;">Alternate Email Address:</label>
@@ -42,7 +45,8 @@
 						</div>-->
 						<div class="form-group">
 							<label for="phoneNumber"style="color: #941755;">Phone Number:</label>
-							<input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="{{ user_profile.phoneNumber }}">
+							<input type="tel" class="form-control" id="phoneNumber" name="phoneNumber" value="{{ user_profile.phone_number }}">
+							<span id="phoneNumberError" class="text-danger"></span> <!-- Display error message here -->
 						</div>
 						<!--<div class="form-group">
 							<label for="altPhoneNumber" style="color: #941755;">Alternate Phone Number:</label>
@@ -80,10 +84,8 @@
             </div>
         </div>
     </div>
-
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+	<script src="{% static '/js/UpdateProfilevalidation.js' %}"></script>
+	
 </body>
 
 </html>

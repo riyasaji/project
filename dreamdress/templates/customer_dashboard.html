@@ -108,7 +108,7 @@
         <!-- Sidebar -->
         <div class="list-group">
           <a href="{% url 'update_profile' %}" class="list-group-item list-group-item-action">Update Profile</a>
-          <a href="#" class="list-group-item list-group-item-action">Change Password</a>
+          <a href="{% url 'change_password' %}"" class="list-group-item list-group-item-action">Change Password</a>
           <a href="#" class="list-group-item list-group-item-action">Your Orders</a>
           <a href="#" class="list-group-item list-group-item-action">Payments</a>
           <a href="#" class="list-group-item list-group-item-action">Settings</a>
@@ -135,6 +135,25 @@
             <a href="#" class="btn btn-outline-secondary">Check Later</a>
           </div>
         </div>
+
+        {% if messages %}
+    <ul class="messages" id="messages" style="color: red;">
+        {% for message in messages %}
+            <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    <script>
+        setTimeout(function() {
+            var messages = document.getElementById('messages');
+            if (messages) {
+                messages.style.display = 'none'; // Hide the messages after 30 seconds
+            }
+        }, 10000); // 30 seconds in milliseconds
+    </script>
+{% endif %}
+
+<!-- Your profile page content -->
+
       </div>
     </div>
   </div>
