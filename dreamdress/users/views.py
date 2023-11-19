@@ -236,7 +236,8 @@ def change_password(request):
 
         # Update the session hash to keep the user logged in
         update_session_auth_hash(request, request.user)
-        
+
+        messages.success(request, 'Password Changed Successfully')
         # Redirect to a success page or a profile page
         return redirect('customer_dashboard')
 

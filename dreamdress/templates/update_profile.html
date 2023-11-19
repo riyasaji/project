@@ -22,7 +22,8 @@
                         {% csrf_token %}
                         <div class="form-group">
                             <label for="profileImage" style="color: #941755;">Profile Image:</label>
-                            <input type="file" class="form-control-file" id="profileImage" name="profileImage">
+                            <input type="file" class="form-control-file" id="profileImage" name="profileImage" accept=".jpg, .jpeg, .png, .gif">
+							<span id="profileImageError" class="text-danger"></span>
                         </div>
                         <div class="form-group">
                             <label for="firstName" style="color: #941755;">First Name:</label>
@@ -37,7 +38,7 @@
                         <!-- Add similar form-group blocks for other fields -->
 						 <div class="form-group">
 							<label for="email" style="color: #941755;">Email Address:</label>
-							<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+							<input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly>
 						</div>
 						<!--<div class="form-group">
 							<label for="altEmail" style="color: #941755;">Alternate Email Address:</label>

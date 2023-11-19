@@ -1,66 +1,60 @@
-document.addEventListener("DOMContentLoaded", function(){
-    const firstNameInput = document.getElementById("firstName");
-    const lastNameInput = document.getElementById("lastName");
-    const phoneNumberInput = document.getElementById("phoneNumber");
+document.getElementById('updateForm').addEventListener('submit', function(event) {
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const phoneNumber = document.getElementById('phoneNumber').value.trim();
+    const profileImage = document.getElementById('profileImage').value.trim();
 
-    firstNameInput.addEventListener("input", validateFirstName);
-    lastNameInput.addEventListener("input", validateLastName);
-    phoneNumberInput.addEventListener("input", validatePhoneNumber);
+    // Validate First Name
+    if (!/^[A-Za-z]+$/.test(firstName)) {
+        document.getElementById('firstNameError').textContent = 'First Name should only contain letters';
+        event.preventDefault();
+    } else {
+        document.getElementById('firstNameError').textContent = '';
+    }
 
-    updateForm.addEventListener("submit", function(e) {
-        // Clear existing error messages before re-validating
-        const firstNameError = document.getElementById("firstNameError");
-        const lastNameError = document.getElementById("lastNameError");
-        const phoneNumberError = document.getElementById("phoneNumberError");
+    // Validate Last Name
+    if (!/^[A-Za-z]+$/.test(lastName)) {
+        document.getElementById('lastNameError').textContent = 'Last Name should only contain letters';
+        event.preventDefault();
+    } else {
+        document.getElementById('lastNameError').textContent = '';
+    }
 
-        firstNameError.textContent = '';
-        lastNameError.textContent = '';
-        phoneNumberError.textContent = '';
+    // Validate Email
+    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailPattern.test(email)) {
+        document.getElementById('emailError').textContent = 'Enter a valid email address';
+        event.preventDefault();
+    } else {
+        document.getElementById('emailError').textContent = '';
+    }
 
-        validateFirstName();
-        validateLastName();
-        validatePhoneNumber();
+    // Validate Profile Image (check if it's an image file)
+    const fileInput = document.getElementById('profileImage');
+    const allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+    if (fileInput && !allowedExtensions.exec(profileImage)) {
+        document.getElementById('profileImageError').textContent = 'Please upload an image file (jpg, jpeg, png, gif)';
+        event.preventDefault();
+    } else {
+        document.getElementById('profileImageError').textContent = '';
+    }
 
-        if (firstNameError.textContent || lastNameError.textContent || phoneNumberError.textContent) {
-            e.preventDefault(); // Prevent form submission if there are errors
+    // Validate Phone Number
+    const phonePattern = /^(?!([\d])\1{9})\d{10}$/;
+    if (!phonePattern.test(phoneNumber)) {
+        document.getElementById('phoneNumberError').textContent = 'Phone Number should be 10 digits';
+        event.preventDefault();
+    } else {
+        document.getElementById('phoneNumberError').textContent = '';
+    }
+
+    // Prevent form submission if any error messages exist
+    const errorMessages = document.querySelectorAll('.text-danger');
+    for (let i = 0; i < errorMessages.length; i++) {
+        if (errorMessages[i].textContent !== '') {
+            event.preventDefault();
+            break;
         }
-    });
+    }
 });
-
-function validateFirstName() {
-    const regEx = /^[A-Za-z][A-Za-z\s]*$/;
-    const firstNameError = document.getElementById("firstNameError");
-    const firstName = firstNameInput.value.trim();
-
-    if (!regEx.test(firstName)) {
-        firstNameError.style.color = "red";
-        firstNameError.textContent = "First name should start with a letter and contain only letters or spaces!";
-    } else {
-        firstNameError.textContent = "";
-    }
-}
-
-function validateLastName() {
-    const regEx = /^[A-Za-z]+$/;
-    const lastNameError = document.getElementById("lastNameError");
-    const lastName = lastNameInput.value.trim();
-
-    if (!regEx.test(lastName)) {
-        lastNameError.style.color = "red";
-        lastNameError.textContent = "Last name should contain only letters!";
-    } else {
-        lastNameError.textContent = "";
-    }
-}
-
-function validatePhoneNumber() {
-    const phoneNumberError = document.getElementById("phoneNumberError");
-    const phoneNumber = phoneNumberInput.value.trim();
-
-    if (!/^\d{10}$/.test(phoneNumber) || /^(.)\1+$/.test(phoneNumber)) {
-        phoneNumberError.style.color = "red";
-        phoneNumberError.textContent = "Phone number must be 10 digits and not all digits should be the same!";
-    } else {
-        phoneNumberError.textContent = "";
-    }
-}
