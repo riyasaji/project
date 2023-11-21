@@ -69,12 +69,15 @@ def registration(request):
             messages.success(request,'Email Already Exists')
             return redirect('registration')
         password=request.POST['password']
-        user=tbl_user(username=username,email=email)
+        user_type = request.POST.get('user_type') 
+        user=tbl_user(username=username,email=email,user_type=user_type)
+        
         user.set_password(password)
         
         #authentication
         user.is_active=False
         user.save()
+        
         current_site=get_current_site(request)  
         email_subject="Activate your account"
         message=render_to_string('activate.html',{
