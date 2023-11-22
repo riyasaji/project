@@ -39,6 +39,7 @@ class Seller(models.Model):
     from users.models import tbl_user
     user = models.OneToOneField(tbl_user, on_delete=models.CASCADE)
     full_name = models.CharField(max_length=100)
+    phone_number= models.CharField(max_length=10)
     government_identity = models.CharField(max_length=100)
     pan_number = models.CharField(max_length=20)
     business_name = models.CharField(max_length=100)

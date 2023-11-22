@@ -23,9 +23,9 @@ font-family: "Poppins", sans-serif;
 --background-color4: #cad7fda4;
 --primary-color: #4b49ac;
 --secondary-color: #0c007d;
---Border-color: #3f0097;
---one-use-color: #3f0097;
---two-use-color: #5500cb;
+--Border-color: #d50f5e;
+--one-use-color: #d50f5e;
+--two-use-color: #d50f5e;
 }
 body {
 background-color: var(--background-color4);
@@ -211,13 +211,13 @@ gap: 30px;
 }
 
 .option1 {
-border-left: 5px solid #010058af;
+border-left: 5px solid #d50f5e;
 background-color: var(--Border-color);
 color: white;
 cursor: pointer;
 }
 .option1:hover {
-border-left: 5px solid #010058af;
+border-left: 5px solid #d50f5e;
 background-color: var(--Border-color);
 }
 .box {
@@ -282,20 +282,20 @@ display: flex;
 align-items: center;
 justify-content: space-between;
 padding: 20px 20px 10px 20px;
-border-bottom: 2px solid rgba(0, 20, 151, 0.59);
+border-bottom: 2px solid rgba(181, 8, 123, 0.59);
 }
 
 .recent-Articles {
 font-size: 30px;
 font-weight: 600;
-color: #5500cb;
+color: #d50f5e;
 }
 
 .view {
 height: 35px;
 width: 90px;
 border-radius: 8px;
-background-color: #5500cb;
+background-color: #d50f5e;
 color: white;
 font-size: 15px;
 border: none;
@@ -340,6 +340,34 @@ background-color: rgb(0, 177, 0);
 color: white;
 border-radius: 4px;
 }
+.user-list-item {
+    /* Your CSS styles here */
+    /* For example: */
+    padding: 5px;
+    margin: 5px 0;
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+.recent-users {
+            width: 80%;
+            margin: 20px auto;
+        }
+
+.recent-users ul {
+	list-style-type: none;
+}
+
+.user-list-item {
+	background-color: #f9f9f9;
+	padding: 10px;
+	margin-bottom: 10px;
+	border-radius: 5px;
+	box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	color: #333;
+}
+
+      
 </style>
 
     
@@ -349,7 +377,8 @@ border-radius: 4px;
 	<meta name="viewport"
 		content="width=device-width, 
 				initial-scale=1.0">
-	<title>Admin Dashboard</title>
+	<title>DreamDress Admin </title>
+	<link href="/static/img/favicon.png" rel="icon">
 	<link rel="stylesheet"
 		href="style.css">
 	<link rel="stylesheet"
@@ -379,7 +408,7 @@ border-radius: 4px;
 			</div>
 		</div>
 
-		<div class="message">
+		<!--<div class="message">
 			<div class="circle"></div>
 			<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183322/8.png"
 				class="icn"
@@ -389,7 +418,7 @@ border-radius: 4px;
 					class="dpicn"
 					alt="dp">
 			</div>
-		</div>
+		</div>-->
 
 	</header>
 
@@ -405,24 +434,26 @@ border-radius: 4px;
 					</div>
 
 					<div class="option2 nav-option">
+						
 						<img src="/static/img/customer.png"
 							class="nav-img"
 							alt="articles">
-						<h3> Customers</h3>
+							<a href="{% url 'customer_list' %}"><h3>Customers</h3></a>
 					</div>
 
 					<div class="nav-option option3">
+						
 						<img src="/static/img/seller.png"
 							class="nav-img"
 							alt="report">
-						<h3>Seller</h3>
+							<a href="{% url 'seller_list' %}"><h3>Seller</h3></a>
 					</div>
 
 					<div class="nav-option option4">
 						<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/6.png"
 							class="nav-img"
 							alt="institution">
-						<h3>Approvals</h3>
+						<a href="#">Approvals</a>
 					</div>
 
 					<div class="nav-option option5">
@@ -443,7 +474,7 @@ border-radius: 4px;
 						<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210183321/7.png"
 							class="nav-img"
 							alt="logout">
-						<h3>Logout</h3>
+						<a href="{% url 'logout' %}">Logout</a>
 					</div>
 
 				</div>
@@ -467,8 +498,8 @@ border-radius: 4px;
 
 				<div class="box box1">
 					<div class="text">
-						<h2 class="topic-heading">60.5k</h2>
-						<h2 class="topic">Article Views</h2>
+						<h2 class="topic-heading">{{ sellers_count }}</h2>
+						<h2 class="topic">Seller </h2>
 					</div>
 
 					<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210184645/Untitled-design-(31).png"
@@ -477,8 +508,8 @@ border-radius: 4px;
 
 				<div class="box box2">
 					<div class="text">
-						<h2 class="topic-heading">150</h2>
-						<h2 class="topic">Likes</h2>
+						<h2 class="topic-heading">{{ user_count }}</h2>
+						<h2 class="topic">Users</h2>
 					</div>
 
 					<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210185030/14.png"
@@ -488,28 +519,37 @@ border-radius: 4px;
 				<div class="box box3">
 					<div class="text">
 						<h2 class="topic-heading">320</h2>
-						<h2 class="topic">Comments</h2>
+						<h2 class="topic">Approvals</h2>
 					</div>
 
 					<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210184645/Untitled-design-(32).png"
 						alt="comments">
 				</div>
 
-				<div class="box box4">
+				<!--<div class="box box4">
 					<div class="text">
 						<h2 class="topic-heading">70</h2>
 						<h2 class="topic">Published</h2>
 					</div>
 
 					<img src="https://media.geeksforgeeks.org/wp-content/uploads/20221210185029/13.png" alt="published">
-				</div>
+				</div>-->
 			</div>
 
 			<div class="report-container">
 				<div class="report-header">
 					<h1 class="recent-Articles">Recent Users</h1>
 					<button class="view">View All</button>
-				</div>				 
+				</div>	
+				<div class="recent-users">
+					<ul>
+						{% for user in recent_users %}
+						{% if not user.is_superuser %}
+							<li class="user-list-item">{{ user.username }}</li> 
+							{% endif %} <!-- Display user information as needed -->
+						{% endfor %}
+					</ul>
+				</div>			 
 
 					</div>
 				</div>

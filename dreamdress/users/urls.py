@@ -45,11 +45,16 @@ urlpatterns = [
     path('add_product/',views.add_product,name='add_product'),
     path('details/',views.details,name='details'),
     path('cart/',views.cart,name='cart'),
+    path('seller_waiting/',views.seller_waiting,name='seller_waiting'),
+    path('seller_dashboard/',views.seller_dashboard,name='seller_dashboard'),
     path('checkout/',views.checkout,name='checkout'),
     path('contact/',views.contact,name='contact'),
+    path('admin_authenticate/',views.admin_authenticate,name='admin_authenticate'),
     path('base/',views.base,name='base'),
     path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     path('change_password/',views.change_password,name='change_password'),
+    path('customers/', views.customer_list, name='customer_list'),
+    path('sellers/', views.seller_list, name='seller_list'),
     
 ]
 

@@ -64,12 +64,15 @@ def registration(request):
         if tbl_user.objects.filter(username=username).exists():
             messages.success(request,'Username Already Exists')
             return redirect('registration')
+        
         email=request.POST['email']
         if tbl_user.objects.filter(email=email).exists():
             messages.success(request,'Email Already Exists')
             return redirect('registration')
+        
         password=request.POST['password']
         user_type = request.POST.get('user_type') 
+        
         user=tbl_user(username=username,email=email,user_type=user_type)
         
         user.set_password(password)
@@ -93,7 +96,15 @@ def registration(request):
         EmailThread(email_message).start()
         messages.info(request,"Active your account by clicking the link send to your email")
 
-        return redirect('signin')
+        if user_type == 'customer':
+            messages.info(request, "Activate your account by clicking the link sent to your email")
+            return redirect('signin')
+        elif user_type == 'seller':
+            # Create Seller instance if the user is a seller
+            Seller.objects.create(user=user)
+            # Redirect seller to seller update page
+            messages.info(request, "Activate your account by clicking the link sent to your email")
+            return redirect('seller_registeration')
     else:
         return render(request,'registration.html')
 
@@ -103,8 +114,23 @@ def signin(request):
         password=request.POST['password']
         user=authenticate(request,username=username, password=password)
         if user is not None:
-            login(request,user)
-            return redirect('home')
+            if user.is_active:
+                if user.is_superuser:
+                    return redirect('dashboard')
+                if user.user_type == 'seller':
+                    seller = Seller.objects.get(user=user)
+                    if seller.is_approved:  # Check if the seller is approved by admin
+                        login(request, user)
+                        return redirect('seller_dashboard')
+                    else:
+                        messages.error(request, 'Your account is pending approval by the admin.')
+                        return redirect('signin')
+                else:
+                        login(request, user)
+                        return redirect('home')
+            else:
+                messages.error(request, 'Your account is not active.')
+                return redirect('signin')
         else:
             messages.error(request,'Email and Password Invalid')
             return redirect('signin')
@@ -142,10 +168,28 @@ def check_email(request):
     email_exists = tbl_user.objects.filter(email=email).exists()
     return JsonResponse({'exists': email_exists})
 
+
 def dashboard(request):
-    return render(request,'dashboard.html')
+    recent_users = tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
+    return render(request,'dashboard.html', {'recent_users': recent_users})
+
+def customer_list(request):
+    customers = tbl_user.objects.filter(user_type='customer')  # Fetch customers
+    return render(request, 'customerList_admin.html', {'customers': customers})
+
+def seller_list(request):
+    sellers = tbl_user.objects.filter(user_type='seller')  # Fetch sellers
+    return render(request, 'sellerList_admin.html', {'sellers': sellers})
+
+def seller_count_view(request):
+    sellers_count = Seller.objects.count()
+    return render(request, 'sellerList_admin.html', {'sellers_count': sellers_count})
+
+def user_count_view(request):
+    user_count = tbl_user.objects.count()
+    return render(request, 'customerList_admin.html', {'user_count': user_count})
     
-@login_required
+@login_required(login_url='signin')
 def profile_update(request):
     user = request.user  # Assuming the authenticated user
 
@@ -189,9 +233,62 @@ def profile_update(request):
 
 
   
+from django.shortcuts import render, redirect
+from .models import Seller  # Import your Seller model
 
 def seller_registeration(request):
-    return render(request,'seller_registeration.html')
+    if request.method == 'POST':
+        # Access form data directly from request.POST and request.FILES
+        full_name = request.POST.get('name')
+        email = request.POST.get('email')
+        username = request.POST.get('username')
+        government_identity = request.POST.get('governmentIdentity')
+        pan_number = request.POST.get('panNumber')
+        business_name = request.POST.get('businessName')
+        business_address = request.POST.get('businessAddress')
+        business_email = request.POST.get('businessEmail')
+        business_phone = request.POST.get('businessPhone')
+        business_registration_number = request.POST.get('businessRegistrationNumber')
+        gst_number = request.POST.get('vatNumber')
+        certificate_pdf = request.FILES.get('certificatePdf')
+        bank_account_number = request.POST.get('bankAccountNumber')
+        bank_name = request.POST.get('bankName')
+        bank_branch = request.POST.get('bankBranch')
+        ifsc_code = request.POST.get('ifscCode')
+        # Fetch other form fields similarly
+
+        # Create a Seller instance with form data
+        seller = Seller(
+            full_name=full_name,
+            email=email,
+            username=username,
+            government_identity=government_identity,
+            pan_number=pan_number,
+            business_name=business_name,
+            business_address=business_address,
+            business_email=business_email,
+            business_phone=business_phone,
+            business_registration_number=business_registration_number,
+            gst_number=gst_number,
+            certificate_pdf=certificate_pdf,
+            bank_account_number=bank_account_number,
+            bank_name=bank_name,
+            bank_branch=bank_branch,
+            ifsc_code=ifsc_code,
+            # Assign other fields similarly
+        )
+        seller.save()
+        return redirect('seller_waiting')  # Redirect to the waiting page after successful registration
+    
+    return render(request, 'seller_registeration.html')
+
+
+def seller_waiting(request):
+    return render(request,'seller_waiting.html')
+
+
+def seller_dashboard(request):
+    return render(request,'seller_dashboard.html')
 
 def shop(request):
     return render(request,'shop.html')
@@ -216,6 +313,20 @@ def base(request):
 
 def customer_dashboard(request):
     return render(request,'customer_dashboard.html')
+
+def admin_authenticate(request):
+    if request.method == 'POST':
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+    
+        user = authenticate(username=username, password=password)
+
+        if user is not None and user.is_staff and user.username == 'admin':
+            login(request, user)
+            return redirect('dashboard')  # Replace 'dashboard' with your admin dashboard URL name
+
+    return redirect('signin')
 
 def change_password(request):
     if request.method == 'POST' and request.user.is_authenticated:

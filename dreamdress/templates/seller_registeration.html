@@ -123,17 +123,13 @@
             </div>
             <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" required><br>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly><br>
             </div>
             <div class="form-group">
                 <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" required><br>
+                <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly><br>
             </div>
             <!--<div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" class="form-control" id="password" name="password" required><br>
-            </div>
-            <div class="form-group">
                 <label for="confirmPassword">Confirm Password:</label>
                 <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required><br>
             </div>-->
