@@ -42,6 +42,7 @@ urlpatterns = [
     path('profile_update/',views.profile_update,name='update_profile'),
     path('shop/',views.shop,name='shop'),
     path('seller_registeration/',views.seller_registeration,name='seller_registeration'),
+    path('seller_updateProfile/',views.seller_updateProfile,name='seller_updateProfile'),
     path('add_product/',views.add_product,name='add_product'),
     path('details/',views.details,name='details'),
     path('cart/',views.cart,name='cart'),

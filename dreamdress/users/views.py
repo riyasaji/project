@@ -71,7 +71,7 @@ def registration(request):
             return redirect('registration')
         
         password=request.POST['password']
-        user_type = request.POST.get('user_type') 
+        user_type = 'customer' 
         
         user=tbl_user(username=username,email=email,user_type=user_type)
         
@@ -95,18 +95,9 @@ def registration(request):
         email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
         EmailThread(email_message).start()
         messages.info(request,"Active your account by clicking the link send to your email")
-
-        if user_type == 'customer':
-            messages.info(request, "Activate your account by clicking the link sent to your email")
-            return redirect('signin')
-        elif user_type == 'seller':
-            # Create Seller instance if the user is a seller
-            Seller.objects.create(user=user)
-            # Redirect seller to seller update page
-            messages.info(request, "Activate your account by clicking the link sent to your email")
-            return redirect('seller_registeration')
+        return redirect('signin')
     else:
-        return render(request,'registration.html')
+        return render(request,'registration')
 
 def signin(request):
     if request.method=='POST':
@@ -177,6 +168,7 @@ def customer_list(request):
     customers = tbl_user.objects.filter(user_type='customer')  # Fetch customers
     return render(request, 'customerList_admin.html', {'customers': customers})
 
+#seller view
 def seller_list(request):
     sellers = tbl_user.objects.filter(user_type='seller')  # Fetch sellers
     return render(request, 'sellerList_admin.html', {'sellers': sellers})
@@ -236,12 +228,13 @@ def profile_update(request):
 from django.shortcuts import render, redirect
 from .models import Seller  # Import your Seller model
 
-def seller_registeration(request):
+def seller_updateProfile(request):
     if request.method == 'POST':
         # Access form data directly from request.POST and request.FILES
-        full_name = request.POST.get('name')
-        email = request.POST.get('email')
-        username = request.POST.get('username')
+        first_name = request.POST['first_name']
+        last_name = request.POST['last_name']
+        # email = request.POST.get('email')
+        # username = request.POST.get('username')
         government_identity = request.POST.get('governmentIdentity')
         pan_number = request.POST.get('panNumber')
         business_name = request.POST.get('businessName')
@@ -255,32 +248,106 @@ def seller_registeration(request):
         bank_name = request.POST.get('bankName')
         bank_branch = request.POST.get('bankBranch')
         ifsc_code = request.POST.get('ifscCode')
-        # Fetch other form fields similarly
+        
+        if Seller.objects.filter(business_email=business_email).exclude(user=request.user).exists():
+            messages.warning(request, "Email is already taken")
+            return redirect('seller_update_profile')
+        
+        # Validate phone number
+        if Seller.objects.filter(phone=business_phone).exclude(user=request.user).exists():
+            messages.warning(request, "Phone number is already taken")
+            return redirect('seller_update_profile')
+        
+        # If the email is different from the current user's email, update the email and send an activation email
+        if business_email != request.user.email:
+            user = request.user
+            user.email = business_email
+            user.is_active = False  # Make the user inactive
+            user.save()
+            current_site = get_current_site(request)  
+            email_subject = "Activate your account"
+            message = render_to_string('auth/activate.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': generate_token.make_token(user)
+            })
+
+            email_message = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [email])
+            EmailThread(email_message).start()
+            messages.info(request, "Activate your account by clicking the link sent to your email")
+            logout(request)
+            return redirect('signin')
+        
+        # Update the SellerProfile model fields
+        user = request.user
+        user.first_name = first_name
+        user.last_name = last_name
+        user.save()
 
         # Create a Seller instance with form data
-        seller = Seller(
-            full_name=full_name,
-            email=email,
-            username=username,
-            government_identity=government_identity,
-            pan_number=pan_number,
-            business_name=business_name,
-            business_address=business_address,
-            business_email=business_email,
-            business_phone=business_phone,
-            business_registration_number=business_registration_number,
-            gst_number=gst_number,
-            certificate_pdf=certificate_pdf,
-            bank_account_number=bank_account_number,
-            bank_name=bank_name,
-            bank_branch=bank_branch,
-            ifsc_code=ifsc_code,
-            # Assign other fields similarly
-        )
-        seller.save()
-        return redirect('seller_waiting')  # Redirect to the waiting page after successful registration
-    
-    return render(request, 'seller_registeration.html')
+        seller_profile, created = Seller.objects.get_or_create(user=user)
+        seller_profile.government_identity = government_identity
+        seller_profile.pan_number = pan_number
+        seller_profile.business_name = business_name
+        seller_profile.business_address = business_address
+        seller_profile.business_email = business_email
+        seller_profile.business_phone = business_phone
+        seller_profile.business_registration_number = business_registration_number
+        seller_profile.gst_number = gst_number
+        seller_profile.certificate_pdf = certificate_pdf
+        seller_profile.bank_account_number = bank_account_number
+        seller_profile.bank_name = bank_name
+        seller_profile.bank_branch = bank_branch
+        seller_profile.ifsc_code = ifsc_code
+        # Assign other fields similarly
+        seller_profile.save()
+
+        messages.success(request, 'Profile updated and Pending for Approval')
+        return redirect('signin')  # Redirect to the waiting page after successful registration
+    else:
+        return render(request, 'seller_updateProfile',{'user': request.user})
+
+def seller_registeration(request):
+     if request.method=='POST':
+        username=request.POST['username']
+        if tbl_user.objects.filter(username=username).exists():
+            messages.success(request,'Username Already Exists')
+            return redirect('registration')
+        
+        email=request.POST['email']
+        if tbl_user.objects.filter(email=email).exists():
+            messages.success(request,'Email Already Exists')
+            return redirect('registration')
+        
+        password=request.POST['password']
+        user_type = 'seller' 
+        
+        user=tbl_user.objects.create_user(username=username,email=email,user_type=user_type)
+        
+        user.set_password(password)
+        
+        #authentication
+        user.is_active=False
+        user.save()
+        
+        current_site=get_current_site(request)  
+        email_subject="Activate your account"
+        message=render_to_string('activate.html',{
+                   'user':user,
+                   'domain':current_site.domain,
+                   'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+                   'token':generate_token.make_token(user)
+
+
+            })
+
+        email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
+        EmailThread(email_message).start()
+        messages.info(request,"Active your account by clicking the link send to your email")
+        return redirect('signin')
+     else:
+            return render(request,'seller_registeration')
 
 
 def seller_waiting(request):

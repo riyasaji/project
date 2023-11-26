@@ -1,197 +1,258 @@
-<!DOCTYPE html>
+{% load static %}
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seller Registration</title>
-    <link href="/static/img/favicon.png" rel="icon">
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <meta charset="utf-8">
+    <title>DreamDress</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="Free HTML Templates" name="keywords">
+    <meta content="Free HTML Templates" name="description">
+    
     <style>
-         body {
-            font-family: Arial, sans-serif;
-            background-color: #f8f9fa;
-            padding-top: 60px;
-        }
-
-        .navbar {
-            background-color: #af1855;
-            color: white;
-        }
-
-        .navbar-brand {
-            color: white;
-        }
-
-        .navbar-nav .nav-link {
-            color: white;
-        }
-
-        .form-section {
-            background-color: white;
-            border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin: 20px auto;
-            padding: 20px;
-			width: 60%; /* Set the width of the form */
-        }
-
-        .form-section h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            padding-bottom: 10px;
-        }
-
         .container {
-            max-width: 450px;
-        }
+        background-color: #fff;
+        padding: 40px;
+        border-radius: 10px;
+        box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        max-width: 400px; /* Set your desired maximum width */
+        width: 100%; /* Ensures the container takes the specified width */
+        margin: 0 auto; 
+    }
 
-        .form-group {
-            margin-bottom: 20px;
-        }
+    .container h2 {
+        margin-bottom: 20px;
+        font-size: 24px;
+        color: #333;
+    }
 
-        .form-control {
-            border-radius: 5px;
-        }
+    .form-group {
+        position: relative;
+        margin-bottom: 20px;
+    }
 
-        .btn-primary {
-            background-color: #d50f5e;
-            border: none;
-        }
+    .form-group input[type="text"],
+    .form-group input[type="email"],
+    .form-group input[type="password"] {
+        width: calc(100% - 22px);
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        margin-top: 5px;
+        font-size: 16px;
+    }
 
-        .btn-primary:hover {
-            background-color: #a90f4d;
-        }
-        .center-btn {
-            text-align: center;
-        }
+    .form-group label {
+        position: absolute;
+        left: 15px;
+        top: 15px;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        color: #999;
+    }
+
+    .form-group input[type="text"]:focus+.label,
+    .form-group input[type="email"]:focus+.label,
+    .form-group input[type="password"]:focus+.label {
+        top: -10px;
+        font-size: 12px;
+        color: #ff3366;
+    }
+
+    .form-group input[type="submit"] {
+        width: 100%;
+        background-color: #ff3366;
+        color: white;
+        border: none;
+        padding: 15px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+    }
+
+    .form-group input[type="submit"]:hover {
+        background-color: #ff1a4d;
+    }
+
+    .login-link {
+        margin-top: 20px;
+        font-size: 14px;
+        color: #555;
+    }
+
+    .login-link a {
+        color: #ff3366;
+        text-decoration: none;
+    }
+    .google-signin-btn {
+        background-color: #4285F4;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+        text-align: center;
+    }
+
+    .google-signin-btn:hover {
+        background-color: #3c79e6;
+    }
+
+    /* Optional: Add some margin or other styles as needed */
+    .google-signin-btn-container {
+        margin-top: 20px;   
+    }
+    .messages .error {
+        color: red;
+    }
+
     </style>
+
+
+    <!-- Favicon -->
+    <link href="{% static '/img/favicon.png' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="{% static '/css/style1.css' %}" rel="stylesheet"> 
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static '/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static '/css/style.css' %}" rel="stylesheet">
 </head>
+
 <body>
-        <nav class="navbar navbar-expand-lg navbar-dark">
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav ml-auto">
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#personal-info">Personal Information</a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link" href="#business-info">Business Information</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#legal-info">Legal Information</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#banking-info">Banking Information</a>
-                </li>
-                <!--<li class="nav-item">
-                    <a class="nav-link" href="#shipping-info">Shipping and Return Information</a>
-                </li>-->
-                <!--<li class="nav-item">
-                    <a class="nav-link" href="#product-info">Product Information</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#identity-verification">Identity Verification</a>
-                </li>-->
-                <!--<li class="nav-item">
-                    <a class="nav-link" href="#terms-conditions">Terms and Conditions</a>
-                </li>-->
-            </ul>
-        </div>
-        <!-- Right-aligned links -->
-        <div class="navbar-nav ml-auto">
-            <li class="nav-item">
-                <a class="nav-link" href="{% url 'home' %}">Home</a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="#">Signin</a>
-            </li>
-        </div>
-    </nav>
-
-    <form method="post">
-        <div class="form-section" id="personal-info">
-            <h2>Personal Information</h2>
+    <!-- Topbar Start -->
+        <div class="row align-items-center py-3 px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a href="" class="text-decoration-none">
+                    <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Dream</span>Dress</h1>
+                </a>
+                <div class="container-fluid">
+                    <div class="col-lg-6 col-6 text-left">
+                     <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                         <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                             <div class="navbar-nav mr-auto py-0">
+                                 <a href="{% url 'index' %}" class="nav-item nav-link active">Home</a>
+                                 <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
+                                 <a href="{% url 'details' %}" class="nav-item nav-link">Detail</a>
+                                 <div class="nav-item dropdown">
+                                     <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
+                                     <div class="dropdown-menu rounded-0 m-0">
+                                         <a href="{% url 'cart' %}" class="dropdown-item">Shopping Cart</a>
+                                         <a href="{% url 'checkout' %}" class="dropdown-item">Checkout</a>
+                                     </div>
+                                 </div>
+                                 <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+                             </div>
+                             <!--<div class="navbar-nav ml-auto py-0">
+                                 <a href="signin" class="nav-item nav-link">Login</a>
+                                 <a href="registration" class="nav-item nav-link">Register</a>
+                                 <a href="seller_registeration" class="nav-item nav-link">Become a Seller</a>
+                             </div>-->
+                         </div>
+                     </nav>
+                     </div>
+                     </div>
+             </div>
+            </div> 
+    {% load socialaccount %}
+    <div class="container">
+        <h2>Create Your Account</h2>
+        {% if messages %}
+        <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %} style="color: red;">{{ message }}</li>
+        {% endfor %}
+        </ul>
+        {% endif %}
+        <form action="#" method="post" id="registrationForm">
+			{% csrf_token %}
             <div class="form-group">
-                <label for="name">Full Name:</label>
-                <input type="text" class="form-control" id="name" name="name" required><br>
+                <input type="text" id="username" name="username" required>
+                <label class="label">Username</label>
+                <span id="usernameError"></span>
             </div>
             <div class="form-group">
-                <label for="email">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly><br>
+                <input type="email" id="email" name="email">
+                <label class="label">Email</label>
+                <span id="emailError"></span>
             </div>
             <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" readonly><br>
-            </div>
-            <!--<div class="form-group">
-                <label for="confirmPassword">Confirm Password:</label>
-                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required><br>
-            </div>-->
-            <div class="form-group">
-                <label for="username">Goverment Identity:</label>
-                <input type="text" class="form-control" id="username" name="username" required><br>
+                <input type="password" id="password" name="password" required>
+                <label class="label">Password</label>
+                <span id="passwordError" style="color: red;"></span>
             </div>
             <div class="form-group">
-                <label for="username">PAN Number:</label>
-                <input type="text" class="form-control" id="username" name="username" required><br>
+                <input type="password" id="confirmpassword" name="confirmpassword" required>
+                <label class="label">Confirm Password</label>
+                <span id="confrimPasswordError"></span>
             </div>
+            <div class="form-group">
+                <!--<select id="user_type" name="user_type">
+                    <option value="customer">Customer</option>
+                    <option value="seller">Seller</option>
+                </select>-->
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create Account">
+            </div>
+        </form>
+        <div class="login-link">
+            Already have an account? <a href="{% url 'signin' %}">Login here</a>
         </div>
-
-        <div class="form-section" id="business-info">
-		 <h2>Business Information</h2>
-            <label for="businessName">Business Name:</label>
-			<input type="text" class="form-control" id="businessName" name="businessName" required> <br>
-			<label for="businessName">Business Address:</label>
-			<input type="text" class="form-control" id="businessName" name="businessAddress" required> <br>
-			<label for="businessEmail">Business Email:</label>
-			<input type="email" class="form-control id="businessEmail" name="businessEmail" required><br>
-			<label for="businessPhone">Business Phone Number:</label>
-			<input type="tel" class="form-control id="businessPhone" name="businessPhone" required><br>
+		<p>OR</p>
+		<div class="google-signin-btn-container">
+        <a href="{% provider_login_url 'google' %}?next=/" class="btn btn-info" role="button">Sign in with Google</a>
         </div>
+    </div>
+  
 
-        <div class="form-section" id="legal-info">
-		<h2>Legal Information</h2>
-            <label for="businessRegistrationNumber">Business Registration Number:</label>
-			<input type="text" class="form-control id="businessRegistrationNumber" name="businessRegistrationNumber" required><br>
-			<label for="vatNumber">GST Number:</label>
-			<input type="text" class="form-control  id="vatNumber" name="vatNumber" required><br>
-			<label for="certificatePdf">Certificate PDF:</label>
-			<input type="file" class="form-control-file" id="certificatePdf" name="certificatePdf" accept=".pdf" required><br>
-        </div>
+    <script>
+               // Remove placeholder when user starts typing and restore it when the input is empty
+        const inputs = document.querySelectorAll('input');
+        inputs.forEach(input => {
+            const label = input.nextElementSibling;
+            input.addEventListener('input', () => {
+                if (input.value.trim() !== '') {
+                    label.style.display = 'none';
+                } else {
+                    label.style.display = 'block';
+                }
+            });
+        });
+    </script> 
 
-        <div class="form-section" id="banking-info">
-		<h2>Banking Information</h2>
-            <label for="bankAccountNumber">Bank Account Number:</label>
-                <input type="text" class="form-control id="bankAccountNumber" name="bankAccountNumber" required><br>
-                <label for="bankName">Bank Name:</label>
-                <input type="text" class="form-control id="bankName" name="bankName" required><br>
-                <label for="bankBranch">Bank Branch:</label>
-                <input type="text" class="form-control id="bankBranch" name="bankBranch" required><br>
-                <label for="ifscCode">IFSC Code:</label>
-                <input type="text" class="form-control id="ifscCode" name="ifscCode" required><br>
-        </div>
 
-        <!-- Other sections like Shipping, Product Info, Identity Verification can follow the same structure -->
+<!-- <script>
+ // Function to validate the username
+function validateUsername() {
+    const usernameInput = document.getElementById('fullname');
+    const usernameError = document.getElementById('username_error');
+    const usernamePattern = /^[a-zA-Z][a-zA-Z0-9]*$/; // Username pattern: starts with a letter, followed by letters or numbers
 
-        <!-- Single checkbox form for terms & conditions -->
-        <div class="form-section">
-         <div class="form-group form-check">
-			<input type="checkbox" class="form-check-input" id="approvalCheck" name="approvalCheck" required>
-			<label class="form-check-label" for="approvalCheck"> I understand that submitting false information may lead to rejection of my application.</label>
-			</div>
-	     <button type="submit" class="btn btn-primary">Submit</button>
-        </div>
-        </div>
-    </form>
-
-    <!-- Bootstrap JS and dependencies -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Your JavaScript code for handling form submission or navigation -->
+    if (usernameInput.value.trim() === '') {
+        usernameError.textContent = 'Username is required';
+    } else if (usernameInput.value.includes(' ')) {
+        usernameError.textContent = 'Spaces are not allowed';
+    } else if (!usernamePattern.test(usernameInput.value)) {
+        usernameError.textContent = 'Username should start with a letter and consist of letters or numbers';
+    } else {
+        usernameError.textContent = ''; // Clear any previous error message
+    }
+}
+</script> -->
+<script src="{% static 'js/formvalidation.js' %}"></script>
 </body>
+
 </html>
+
+
+
