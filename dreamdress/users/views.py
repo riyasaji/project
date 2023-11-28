@@ -34,6 +34,11 @@ from django.shortcuts import render, redirect
 #email
 from django.conf import settings
 from django.core.mail import EmailMessage
+from django.core.mail import send_mail
+
+from django.views.decorators.cache import never_cache
+from django.utils.html import strip_tags
+
 
 #threading
 import threading
@@ -97,36 +102,38 @@ def registration(request):
         messages.info(request,"Active your account by clicking the link send to your email")
         return redirect('signin')
     else:
-        return render(request,'registration')
+        return render(request,'registration.html')
 
 def signin(request):
-    if request.method=='POST':
-        username=request.POST['username']
-        password=request.POST['password']
-        user=authenticate(request,username=username, password=password)
+    if request.method == 'POST':
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(request, username=username, password=password)
+        
         if user is not None:
             if user.is_active:
                 if user.is_superuser:
                     return redirect('dashboard')
+                
                 if user.user_type == 'seller':
-                    seller = Seller.objects.get(user=user)
-                    if seller.is_approved:  # Check if the seller is approved by admin
+                    seller = Seller(user=user)
+                    if seller.status == 'Approved':
                         login(request, user)
                         return redirect('seller_dashboard')
                     else:
-                        messages.error(request, 'Your account is pending approval by the admin.')
-                        return redirect('signin')
+                        messages.error(request, 'Your account is pending  for approval by the admin.')
+                        return redirect('seller_updateProfile')
                 else:
-                        login(request, user)
-                        return redirect('home')
+                    login(request, user)
+                    return redirect('home')
             else:
                 messages.error(request, 'Your account is not active.')
                 return redirect('signin')
         else:
-            messages.error(request,'Email and Password Invalid')
+            messages.error(request, 'username and Password Invalid')
             return redirect('signin')
 
-    return render(request,'signin.html')
+    return render(request, 'signin.html')
 
 def user_logout(request):
     if request.user.is_authenticated:
@@ -167,15 +174,7 @@ def dashboard(request):
 def customer_list(request):
     customers = tbl_user.objects.filter(user_type='customer')  # Fetch customers
     return render(request, 'customerList_admin.html', {'customers': customers})
-
-#seller view
-def seller_list(request):
-    sellers = tbl_user.objects.filter(user_type='seller')  # Fetch sellers
-    return render(request, 'sellerList_admin.html', {'sellers': sellers})
-
-def seller_count_view(request):
-    sellers_count = Seller.objects.count()
-    return render(request, 'sellerList_admin.html', {'sellers_count': sellers_count})
+#user count
 
 def user_count_view(request):
     user_count = tbl_user.objects.count()
@@ -231,10 +230,11 @@ from .models import Seller  # Import your Seller model
 def seller_updateProfile(request):
     if request.method == 'POST':
         # Access form data directly from request.POST and request.FILES
-        first_name = request.POST['first_name']
-        last_name = request.POST['last_name']
+        
+        #last_name = request.POST['last_name']
         # email = request.POST.get('email')
         # username = request.POST.get('username')
+        full_name = request.POST.get('name')
         government_identity = request.POST.get('governmentIdentity')
         pan_number = request.POST.get('panNumber')
         business_name = request.POST.get('businessName')
@@ -248,45 +248,16 @@ def seller_updateProfile(request):
         bank_name = request.POST.get('bankName')
         bank_branch = request.POST.get('bankBranch')
         ifsc_code = request.POST.get('ifscCode')
-        
-        if Seller.objects.filter(business_email=business_email).exclude(user=request.user).exists():
-            messages.warning(request, "Email is already taken")
-            return redirect('seller_update_profile')
-        
-        # Validate phone number
-        if Seller.objects.filter(phone=business_phone).exclude(user=request.user).exists():
-            messages.warning(request, "Phone number is already taken")
-            return redirect('seller_update_profile')
-        
-        # If the email is different from the current user's email, update the email and send an activation email
-        if business_email != request.user.email:
-            user = request.user
-            user.email = business_email
-            user.is_active = False  # Make the user inactive
-            user.save()
-            current_site = get_current_site(request)  
-            email_subject = "Activate your account"
-            message = render_to_string('auth/activate.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': generate_token.make_token(user)
-            })
 
-            email_message = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [email])
-            EmailThread(email_message).start()
-            messages.info(request, "Activate your account by clicking the link sent to your email")
-            logout(request)
-            return redirect('signin')
-        
-        # Update the SellerProfile model fields
+         # Update the SellerProfile model fields
         user = request.user
-        user.first_name = first_name
-        user.last_name = last_name
+       # user.first_name = fullname
+        #user.last_name = last_name
         user.save()
 
         # Create a Seller instance with form data
         seller_profile, created = Seller.objects.get_or_create(user=user)
+        seller_profile.full_name = full_name
         seller_profile.government_identity = government_identity
         seller_profile.pan_number = pan_number
         seller_profile.business_name = business_name
@@ -306,7 +277,39 @@ def seller_updateProfile(request):
         messages.success(request, 'Profile updated and Pending for Approval')
         return redirect('signin')  # Redirect to the waiting page after successful registration
     else:
-        return render(request, 'seller_updateProfile',{'user': request.user})
+        return render(request, 'seller_updateProfile.html',{'user': request.user})
+        
+        """if Seller.objects.filter(business_email=business_email).exclude(user=request.user).exists():
+            messages.warning(request, "Email is already taken")
+            return redirect('seller_updateProfile')
+        
+        # Validate phone number
+        if Seller.objects.filter(phone=business_phone).exclude(user=request.user).exists():
+            messages.warning(request, "Phone number is already taken")
+            return redirect('seller_updateProfile')"""
+        
+        # If the email is different from the current user's email, update the email and send an activation email
+        """if business_email != request.user.email:
+            user = request.user
+            user.email = business_email
+            user.is_active = False  # Make the user inactive
+            user.save()
+            current_site = get_current_site(request)  
+            email_subject = "Activate your account"
+            message = render_to_string('auth/activate.html', {
+                'user': user,
+                'domain': current_site.domain,
+                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
+                'token': generate_token.make_token(user)
+            })
+
+            email_message = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [email])
+            EmailThread(email_message).start()
+            messages.info(request, "Activate your account by clicking the link sent to your email")
+            logout(request)
+            return redirect('signin')"""
+        
+       
 
 def seller_registeration(request):
      if request.method=='POST':
@@ -347,15 +350,122 @@ def seller_registeration(request):
         messages.info(request,"Active your account by clicking the link send to your email")
         return redirect('signin')
      else:
-            return render(request,'seller_registeration')
+        return render(request,'seller_registeration.html')
+     
+#seller view
+def seller_list(request):
+    sellers = tbl_user.objects.filter(user_type='seller')  # Fetch sellers
+    return render(request, 'sellerList_admin.html', {'sellers': sellers})
+
+def seller_count_view(request):
+    sellers_count = Seller.objects.count()
+    return render(request, 'sellerList_admin.html', {'sellers_count': sellers_count})
+
+def activate_user(request, user_id):
+    user = tbl_user.objects.get(id=user_id)
+    user.is_active = True
+    user.save()
+    subject = 'Account Activation'
+    html_message = render_to_string('activation_mail.html', {'user': user})
+    plain_message = strip_tags(html_message)
+    from_email = 'hsree524@gmail.com'
+    recipient_list = [user.email]
+    send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
+    return redirect('seller_list')
+
+def deactivate_user(request, user_id):
+    user = tbl_user.objects.get(id=user_id)
+    if user.is_superuser:
+        return HttpResponse("You cannot deactivat the admin.")
+    user.is_active = False
+    user.save()
+    subject = 'Account Deactivation'
+    html_message = render_to_string('deactivation_mail.html', {'user': user})
+    plain_message = strip_tags(html_message)
+    from_email = 'hsree524@gmail.com'
+    recipient_list = [user.email]
+    send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
+    # Send an email to the user here
+    return redirect('seller_list')
+
+#sellerview2
+def sellviews(request):
+    # Retrieve seller profiles with the role 'SELLER'
+    user_profiles = Seller.objects.filter(user_type='seller')
+
+    # Pass the data to the template
+    context = {'user_profiles': user_profiles}
+    return render(request, 'sellerList_admin.html', context)
+     
+#seller approval
+def sellor_approval(request):
+    #unapproved_sellers = SellerProfile.objects.filter(is_approved=False)
+    unapproved_sellers = Seller.objects.all()
+
+    
+    return render(request,'seller_approval.html',{'unapproved_sellers': unapproved_sellers})
+
+def approve_seller(request, seller_id):
+    seller = Seller.objects.get(pk=seller_id)
+    seller.is_approved = True
+    seller.save()
+    subject = 'Your Seller Account Has Been Approved'
+    message = 'Dear {},\n\nYour seller account has been approved by the admin. You can now log in and start using your account.\n\nLogin Link: http://127.0.0.1:8000/auth_app/handlelogin/'.format(seller.user.first_name)
+    from_email = 'prxnv2832@gmail.com'  # Replace with your email address
+    recipient_list = [seller.user.email]
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    
+    return redirect('sellor_approval')
+
+#block_seller - to block the seller approvel
+def block_seller(request, seller_id):
+    seller = Seller.objects.get(pk=seller_id)
+    seller.is_approved = False
+    seller.save()
+    subject = 'Your Seller Account Has Been blocked'
+    message = 'Dear {},\n\nYour seller account has been blocked by the admin. You cannot  log in and  banned your account.'
+    from_email = 'prxnv2832@gmail.com'  # Replace with your email address
+    recipient_list = [seller.user.email]
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    
+    return redirect('sellor_approval')
+
+def delete_seller(request, seller_id):
+   
+    user = tbl_user.objects.get(pk=seller_id)
+    user.delete()
+    subject = 'Your Seller Account Has Been deleted'
+    message = 'Dear {},\n\nYour seller account has been deleted by the admin. You cannot  log in and  banned your account.'
+    from_email = 'prxnv2832@gmail.com'  # Replace with your email address
+    recipient_list = [user.email]
+    
+    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+    return redirect('sellor_approval')
+
+@never_cache
+@login_required(login_url="signin")
+#seller approval
+def seller_dashboard(request):
+    try:
+        seller_profile = request.user.sellerprofile
+        if seller_profile.is_approved:
+             return render(request,'seller_dashboard.html')
+        else:
+            messages.success(request, 'Your profile is pending admin approval.')
+            return redirect('seller_waiting')  # Redirect to the sellersign view
+    except Seller.DoesNotExist:
+        messages.success(request, 'You do not have a seller profile.')
+        return redirect('seller_updateProfile')
+
 
 
 def seller_waiting(request):
     return render(request,'seller_waiting.html')
 
-
-def seller_dashboard(request):
-    return render(request,'seller_dashboard.html')
+def seller_viewforapproval(request):
+    return render(request,'seller_approval.html')
 
 def shop(request):
     return render(request,'shop.html')
@@ -377,6 +487,7 @@ def contact(request):
 
 def base(request):
     return render(request,'base.html')
+
 
 def customer_dashboard(request):
     return render(request,'customer_dashboard.html')

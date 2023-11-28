@@ -56,6 +56,7 @@ urlpatterns = [
     path('change_password/',views.change_password,name='change_password'),
     path('customers/', views.customer_list, name='customer_list'),
     path('sellers/', views.seller_list, name='seller_list'),
+    path('sellerrr/',views.seller_viewforapproval,name='seller_forapproval'),
     
 ]
 
