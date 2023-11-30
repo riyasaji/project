@@ -371,7 +371,7 @@ def activate_user(request, user_id):
     from_email = 'hsree524@gmail.com'
     recipient_list = [user.email]
     send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
-    return redirect('seller_list')
+    return redirect('seller_approval')
 
 def deactivate_user(request, user_id):
     user = tbl_user.objects.get(id=user_id)
@@ -386,7 +386,7 @@ def deactivate_user(request, user_id):
     recipient_list = [user.email]
     send_mail(subject, plain_message, from_email, recipient_list, html_message=html_message)
     # Send an email to the user here
-    return redirect('seller_list')
+    return redirect('seller_approval')
 
 #sellerview2
 def sellviews(request):
