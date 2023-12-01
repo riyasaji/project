@@ -107,15 +107,14 @@ th {
             <h2>Seller Approvals</h2>
         </header>                                        
                                             
-        <div class="seller-table">
+        <div>
             <table>
                 <thead>
                     <tr>
-                        <th>Full Name</th>
-                        <th>Phone Number</th>
-                        <th>Email</th>
-                        <th>Government Identity</th>
-                        <!-- Add other fields you want to display -->
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email ID</th>
+                        <th>Phone</th>
                         <th>Status</th>
                         <th>Action</th>
                         <th>View More Details</th>
@@ -123,40 +122,41 @@ th {
                 </thead>
                 <tbody>
                     {% for seller in unapproved_sellers %}
-                    <tr>
-                        <td>{{ seller.user.seller.full_name }}</td>
-                        <td>{{ seller.user.seller.phone_number }}</td>
-                        <td>{{ seller.user.seller.business_email }}</td>
-                        <td>{{ seller.user.seller.government_identity }}</td>
-                        <!-- Add other fields you want to display -->
-                        <td>
-                            {% if seller.user.seller.status == 'Pending' %}
-                                <span class="status pending">Pending</span>
-                            {% elif seller.user.seller.status == 'Approved' %}
-                                <span class="status approved">Approved</span>
-                            {% elif seller.user.seller.status == 'Rejected' %}
-                                <span class="status rejected">Rejected</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            {% if seller.user.seller.status == 'Pending' %}
-                                <a href="{% url 'approve_seller' seller.id %}">Approve</a>
-                            {% elif seller.user.seller.status == 'Approved' %}
-                                <a href="{% url 'block_seller' seller.id %}">Block</a>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <a href="{% url 'view_seller_details' seller.user.seller.id %}">View More Details</a>
-                        </td>
-                    </tr>
+                        <tr>
+                            <td>{{ seller.user.first_name }}</td>
+                            <td>{{ seller.user.last_name }}</td>
+                            <td>{{ seller.user.email }}</td>
+                            <td>{{ seller.phone_number }}</td>
+                            <td>
+                                {% if seller.status == 'Approved' %}
+                                    <span class="status approved">Approved</span>
+                                {% elif seller.status == 'Pending' %}
+                                    <span class="status pending">Pending</span>
+                                {% elif seller.status == 'Rejected' %}
+                                    <span class="status rejected">Rejected</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if seller.status == 'Pending' %}
+                                    <a href="{% url 'approve_seller' seller_id %}">Approve</a>
+                                    <a href="{% url 'block_seller' seller_id %}">Block</a>
+                                    <a href="{% url 'delete_seller' seller_id %}">Delete</a>
+                                {% endif %}
+                            </td>
+                            <!--<td>
+                                <a href="{% url 'seller_details' seller_id %}">View More Details</a>
+                            </td>-->
+                        </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="7">No sellers found</td>
-                    </tr>
+                        <tr>
+                            <td colspan="7">No sellers found.</td>
+                        </tr>
                     {% endfor %}
                 </tbody>
             </table>
+            <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         </div>
+        
     </body></html>
                                             
 <script>

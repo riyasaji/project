@@ -52,6 +52,7 @@ urlpatterns = [
     path('contact/',views.contact,name='contact'),
     path('admin_authenticate/',views.admin_authenticate,name='admin_authenticate'),
     path('base/',views.base,name='base'),
+    path('temp/',views.temp,name='temp'),
     path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     path('change_password/',views.change_password,name='change_password'),
     path('customers/', views.customer_list, name='customer_list'),
