@@ -71,7 +71,7 @@
 				<span style="color: crimson;">DreamDress</span>
             </div>
             <div class="col-md-4">
-                <h4 style="color:rgb(226, 32, 32)"><span id="username">{{ user.username }}</span></h4>
+                <h4 style="color:rgb(226, 32, 32)">Welcome  <span id="username">{{ user.username }}</span></h4>
             </div>
             <div class="col-md-4 text-right">
                 <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
@@ -109,7 +109,7 @@
                     </div>
                     <div class="form-group col-md-6">
                         <label for="category">Category</label>
-                        <select id="category" class="form-control">
+                        <select id="category" class="form-control" name="category_name">
                             <option selected disabled>Select category</option>
                             <option>Dress</option>
                             <option>Shirt</option>
@@ -127,7 +127,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="description">Description</label>
-                        <textarea class="form-control" name="about_product" id="about_product" required  oninput="validateAboutProduct()" rows="3" placeholder="Enter product description"></textarea>
+                        <textarea class="form-control" name="about_product" id="about_product" required oninput="validateAboutProduct()" rows="3" placeholder="Enter product description"></textarea>
                         <div id="about_product_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
@@ -143,12 +143,12 @@
                         <div id="current_price_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="stockQuantity">Stock Quantity</label>
+                        <label for="stockQuantity" >Stock Quantity</label>
                         <div class="input-group">
                             <div class="input-group-prepend">
                                 <button class="btn btn-outline-secondary" type="button" id="decreaseUnits">-</button>
                             </div>
-                            <input type="text" class="form-control text-center" id="productUnits" value="1">
+                            <input type="text" class="form-control text-center" id="productUnits" value="1" name="stock">
                             <div class="input-group-append">
                                 <button class="btn btn-outline-secondary" type="button" id="increaseUnits">+</button>
                             </div>
@@ -158,46 +158,32 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="sizes">Sizes</label>
-                        <select id="sizes" class="form-control">
-                            <option selected disabled>Select size</option>
-                            <option>Small</option>
-                            <option>Medium</option>
-                            <option>Large</option>
-                            <option>XL</option>
-                            <option>XXL</option>
-                            <option>XXXL</option>
-                            <option>5XL</option>
+                        <select id="sizes" class="form-control" name="sizes" multiple>
+                            <option value="Small">Small</option>
+                            <option value="Medium">Medium</option>
+                            <option value="Large">Large</option>
+                            <option value="XL">XL</option>
+                            <option value="XXL">XXL</option>
+                            <option value="XXXL">3XL</option>
+                            <option value="4XL">4XL</option>
+                            <option value="5XL">5XL</option>
                         </select>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="colors">Colors</label>
-                        <input type="text" class="form-control" id="colors" placeholder="Enter colors">
+                        <input type="text" class="form-control" id="colors" placeholder="Enter colors" name="colors">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="productImage">Product Image 1</label>
-                        <input type="file" class="form-control-file" id="productImage" name="main_image" required>
+                        <label for="productImage1">Product Image 1</label>
+                        <input type="file" class="form-control-file" id="productImage1" name="main_image" required>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="productImage">Product Image 2</label>
-                        <input type="file" class="form-control-file" id="productImage" name="main_image">
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="productImage">Product Image 3</label>
-                        <input type="file" class="form-control-file" id="productImage" name="main_image" >
-                    </div>
-                    <!--<label for="images">Images:</label>
-
-                    <input type="hidden" name="num_images" id="num_images" value="0">
-                    
-                    <div id="image-container">
-                        <!-- Dynamically add image input fields using JavaScript
-                    </div>
-                    <button type="button" onclick="addImageField()">Add Image</button>-->
-                </div>
+                <!-- Dynamically add image input fields using JavaScript -->
+                <!--<button type="button" onclick="addImageField()">Add Image</button>-->
                 <button type="submit" class="btn btn-primary">Add Product</button>
             </form>
+            
         </div>
     </div>
 </div>
@@ -367,5 +353,15 @@ function validateCurrentPrice() {
         }
 
 </script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $('#sizes').select2();
+    });
+</script>
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
+
 </body>
 </html>

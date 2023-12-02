@@ -4,21 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Seller Dashboard - DreamDress</title>
+	<link href="/static/img/favicon.png" rel="icon">
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Your custom styles -->
     <style>
         /* Custom styles */
-        body {
+		body {
             background-color: #fff; /* White background */
-            color: #000; /* Black text */
+            color: #333; /* Dark text */
+            font-family: 'Arial', sans-serif; /* Font style */
         }
         header {
             background-color: #ff69b4; /* Pink header */
             color: #fff; /* White text */
         }
+        header img {
+            max-height: 50px;
+        }
+        header h4 {
+            font-size: 1.2em;
+        }
         .navbar-dark .navbar-nav .nav-link {
             color: #fff; /* White navigation links */
+            font-weight: bold; /* Bold font for navigation links */
         }
         .navbar-dark .navbar-toggler-icon {
             background-color: #fff; /* White hamburger icon */
@@ -32,13 +41,14 @@
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-4">
-                <img src="path/to/dreamdress-logo.png" alt="DreamDress Logo" class="img-fluid" style="max-height: 50px;">
+                <img src="/static/img/favicon.png" alt="DreamDress Logo" class="img-fluid" style="max-height: 50px;">
+				<span style="color: crimson;">DreamDress</span>
             </div>
             <div class="col-md-4">
-                <h4>Welcome, <span id="username">John Doe</span></h4>
+                <h4 style="color:rgb(226, 32, 32)">Welcome, <span id="username">{{ user.username }}</span></h4>
             </div>
             <div class="col-md-4 text-right">
-                <a href="logout-url" class="btn btn-danger">Logout</a>
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
             </div>
         </div>
     </div>
@@ -53,13 +63,13 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
-                    <a class="nav-link" href="add-products-url">Add Products</a>
+                    <a class="nav-link" href="{% url 'add_product' %}">Add Products</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="reviews-url">Reviews</a>
+                    <a class="nav-link" href="#">Reviews</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="orders-url">Orders</a>
+                    <a class="nav-link" href="#">Orders</a>
                 </li>
             </ul>
         </div>
@@ -68,12 +78,35 @@
 
 <!-- Main Content -->
 <div class="container mt-4">
-    <!-- Your main content goes here -->
-</div>
+    <div class="jumbotron">
+        <h1 class="display-4">Welcome to DreamDress Seller Dashboard!</h1>
+        <p class="lead">Manage your products, reviews, and orders here.</p>
+        <hr class="my-4">
+        <p>
+            {% if messages %}
+    {% for message in messages %}
+        <div class="alert alert-danger alert-dismissible fade show" role="alert" id="successMessage">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        <script>
+            // jQuery function to hide the message after 10 seconds
+            $(document).ready(function(){
+                $("#successMessage").delay(10000).fadeOut("slow");
+            });
+        </script>
+    {% endfor %}
+{% endif %}
+        
+        </p>
+    </div>
 
 <!-- Bootstrap JS and jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
 </body>
 </html>

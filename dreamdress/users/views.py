@@ -38,7 +38,8 @@ from django.core.mail import send_mail
 
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
-
+from .models import Product, category, Size
+from django.http import HttpResponseRedirect
 
 #threading
 import threading
@@ -119,7 +120,7 @@ def signin(request):
                     seller = Seller.objects.get()
                     if seller.status == "Approved":
                         login(request, user)
-                        return redirect('temp')
+                        return redirect('seller_dashboard')
                     else:
                         messages.error(request, 'Your account is pending  for approval by the admin.')
                         return redirect('seller_updateProfile')
@@ -169,8 +170,22 @@ def check_email(request):
 
 def dashboard(request):
     recent_users = tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
-    return render(request,'dashboard.html', {'recent_users': recent_users})
-
+    seller=Seller.objects.all()
+    sellers_count = seller.count()
+    users = tbl_user.objects.all()
+    user_count=users.count()
+    pending_sellers = Seller.objects.filter(status='pending')
+    app=pending_sellers.count()
+    context={
+        'recent_users': recent_users,
+        'seller':seller,
+        'sellers_count': sellers_count,
+        'users':users,
+        'user_count':user_count,
+        'pending_sellers' :pending_sellers,
+        'app':app,
+    }
+    return render(request,'dashboard.html', context)
 def customer_list(request):
     customers = tbl_user.objects.filter(user_type='customer')  # Fetch customers
     return render(request, 'customerList_admin.html', {'customers': customers})
@@ -358,7 +373,8 @@ def seller_list(request):
     return render(request, 'sellerList_admin.html', {'sellers': sellers})
 
 def seller_count_view(request):
-    sellers_count = Seller.objects.count()
+    user=Seller.objects.all()
+    sellers_count = user.count()
     return render(request, 'sellerList_admin.html', {'sellers_count': sellers_count})
 
 def activate_user(request, user_id):
@@ -462,16 +478,8 @@ def delete_seller(request, seller_id):
 @login_required(login_url="signin")
 #seller approval
 def seller_dashboard(request):
-    try:
-        seller_profile = request.user.sellerprofile
-        if seller_profile.is_approved:
-             return render(request,'seller_dashboard.html')
-        else:
-            messages.success(request, 'Your profile is pending admin approval.')
-            return redirect('seller_waiting')  # Redirect to the sellersign view
-    except Seller.DoesNotExist:
-        messages.success(request, 'You do not have a seller profile.')
-        return redirect('seller_updateProfile')
+    return render(request,'seller_dashboard.html')
+       
 
 
 
@@ -485,8 +493,58 @@ def seller_viewforapproval(request):
 def shop(request):
     return render(request,'shop.html')
 
+
+
+
 def add_product(request):
-    return render(request,'add_prod.html')
+    if request.method == 'POST':
+        # Fetch data from the form
+        brand_name = request.POST.get('brand_name')
+        product_name = request.POST.get('product_name')
+        product_number = request.POST.get('product_number')
+        stock = request.POST.get('stock')
+        about_product = request.POST.get('about_product')
+        current_price = request.POST.get('current_price')
+        category_name = request.POST.get('category_name')  # Assuming the category is submitted as a string
+        seller_id = request.POST.get('seller_id')
+        color = request.POST.get('colors')
+        material = request.POST.get('material')
+        image_1 = request.FILES.get('main_image')  # Assuming it's an image file
+
+        category_instance, created = category.objects.get_or_create(category_name=category_name)
+        
+        # Assuming sizes are submitted as a list
+        selected_sizes = request.POST.getlist('sizes')
+        sizes = []
+        for size_name in selected_sizes:
+            size, created = Size.objects.get_or_create(name=size_name)
+            sizes.append(size)
+
+        # Create the Product instance
+        product = Product.objects.create(
+            brand_name=brand_name,
+            product_name=product_name,
+            product_number=product_number,
+            stock=stock,
+            about_product=about_product,
+            current_price=current_price,
+            category_id=category_instance,
+            seller_id=seller_id,
+            color=color,
+            material=material,
+            image_1=image_1
+        )
+        
+
+        # Add sizes to the product
+        product.save()
+        product.sizes.set(sizes)
+        # Redirect to a success page or do something else
+        messages.success(request, 'Product added successfully!')
+        return redirect('seller_dashboard')  # Replace '/success/' with your desired URL
+
+    return render(request, 'add_prod.html')  # Assuming the template name is 'add_product.html'
+
 
 def details(request):
     return render(request,'detail.html')
@@ -504,7 +562,12 @@ def base(request):
     return render(request,'base.html')
 
 def temp(request):
-    return render(request,'temp.html')
+     products = [
+        {'id': 1, 'name': 'Product 1', 'description': 'Description for Product 1', 'price': 10.0, 'image': 'product1.jpg'},
+        {'id': 2, 'name': 'Product 2', 'description': 'Description for Product 2', 'price': 15.0, 'image': 'product2.jpg'},
+        # Add more products here...
+    ]
+     return render(request,'temp.html',{'products': products})
 
 from django.shortcuts import render
 from .models import Seller

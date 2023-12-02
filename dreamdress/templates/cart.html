@@ -145,8 +145,14 @@
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0">
-                            <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
-                            <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">{{ user.username }}</a>
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Your Profile</a>
+                                <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                            {% else %}
+                                <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+                                <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                            {% endif %}
                         </div>
                     </div>
                 </nav>

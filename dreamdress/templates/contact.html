@@ -134,19 +134,17 @@
                         <div class="navbar-nav mr-auto py-0">
                             <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
                             <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
-                            <a href="{% url 'details' %}" class="nav-item nav-link">Shop Detail</a>
-                            <div class="nav-item dropdown">
-                                <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown">Pages</a>
-                                <div class="dropdown-menu rounded-0 m-0">
-                                    <a href="{% url 'cart' %}" class="dropdown-item">Shopping Cart</a>
-                                    <a href="{% url 'checkout' %}" class="dropdown-item">Checkout</a>
-                                </div>
-                            </div>
                             <a href="{% url 'contact' %}" class="nav-item nav-link active">Contact</a>
                         </div>
                         <div class="navbar-nav ml-auto py-0">
-                            <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
-                            <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">{{ user.username }}</a>
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Your Profile</a>
+                                <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                            {% else %}
+                                <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+                                <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                            {% endif %}
                         </div>
                     </div>
                 </nav>
@@ -210,7 +208,7 @@
             </div>
             <div class="col-lg-5 mb-5">
                 <h5 class="font-weight-semi-bold mb-3">Get In Touch</h5>
-                <p>Justo sed diam ut sed amet duo amet lorem amet stet sea ipsum, sed duo amet et. Est elitr dolor elitr erat sit sit. Dolor diam et erat clita ipsum justo sed.</p>
+                <p>We firmly believe that with the right Outfit one can rule the world.You can reach out to us.</p>
                 <div class="d-flex flex-column mb-3">
                     <h5 class="font-weight-semi-bold mb-3">Store 1</h5>
                     <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
@@ -236,7 +234,7 @@
                 <a href="" class="text-decoration-none">
                     <h1 class="mb-4 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border border-white px-3 mr-1">Dream</span>Dress</h1>
                 </a>
-                <p>>We firmly believe that with the right Outfit one can rule the world.</p>
+                <p>We firmly believe that with the right Outfit one can rule the world.</p>
                 <!--<p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
                 <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
                 <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>-->
