@@ -116,10 +116,10 @@ def signin(request):
                     return redirect('dashboard')
                 
                 if user.user_type == 'seller':
-                    seller = Seller(user=user)
-                    if seller.status == 'Approved':
+                    seller = Seller.objects.get()
+                    if seller.status == "Approved":
                         login(request, user)
-                        return redirect('seller_dashboard')
+                        return redirect('temp')
                     else:
                         messages.error(request, 'Your account is pending  for approval by the admin.')
                         return redirect('seller_updateProfile')
@@ -397,26 +397,40 @@ def sellviews(request):
     context = {'user_profiles': user_profiles}
     return render(request, 'sellerList_admin.html', context)
      
-#seller approval
-def sellor_approval(request):
-    #unapproved_sellers = SellerProfile.objects.filter(is_approved=False)
-    unapproved_sellers = Seller.objects.all()
 
+
+
+
+# views.py
+from .models import Seller  # Import the Seller model
+
+# def sellor_approval(request):
+#     # Filter sellers with status equals 'Pending'
+#     unapproved_sellers = Seller.objects.filter(status='Pending')
     
-    return render(request,'seller_approval.html',{'unapproved_sellers': unapproved_sellers})
+#     return render(request, 'seller_approval.html', {'unapproved_sellers': unapproved_sellers})
 
-def approve_seller(request, seller_id):
+
+
+
+def seller_approval(request, seller_id):
     seller = Seller.objects.get(pk=seller_id)
-    seller.is_approved = True
+
+    # Update seller status to 'Approved'
+    seller.status = Seller.APPROVED
     seller.save()
-    subject = 'Your Seller Account Has Been Approved'
-    message = 'Dear {},\n\nYour seller account has been approved by the admin. You can now log in and start using your account.\n\nLogin Link: http://127.0.0.1:8000/auth_app/handlelogin/'.format(seller.user.first_name)
-    from_email = 'prxnv2832@gmail.com'  # Replace with your email address
-    recipient_list = [seller.user.email]
+
+    # Send email notification
+    subject = 'Account Activation'
+    message = 'Your seller account has been activated successfully.'
+    from_email = 'prxnv2832@gmail.com'  # Your email address
+    to_email = seller.user.email
+    send_mail(subject, message, from_email, [to_email])
     
-    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
     
-    return redirect('sellor_approval')
+    return redirect('seller_viewforapproval')
+
 
 #block_seller - to block the seller approvel
 def block_seller(request, seller_id):
@@ -465,7 +479,8 @@ def seller_waiting(request):
     return render(request,'seller_waiting.html')
 
 def seller_viewforapproval(request):
-    return render(request,'seller_approval.html')
+    sellers = Seller.objects.filter(status='Pending')
+    return render(request,'seller_approval.html',{'sellers': sellers})
 
 def shop(request):
     return render(request,'shop.html')
@@ -490,6 +505,16 @@ def base(request):
 
 def temp(request):
     return render(request,'temp.html')
+
+from django.shortcuts import render
+from .models import Seller
+
+def demo(request):
+    # Fetch all sellers
+    sellers = Seller.objects.all()
+    
+    return render(request, 'demo.html', {'sellers': sellers})
+
 
 
 def customer_dashboard(request):

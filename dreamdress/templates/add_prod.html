@@ -3,7 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Dress - Seller Dashboard</title>
+    <title>Add Dress</title>
+    <link href="/static/img/favicon.png" rel="icon">
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <!-- Your custom styles -->
@@ -23,6 +24,39 @@
         }
         header h4 {
             font-size: 1.2em;
+        }
+        .error {
+            color: red; /* Red color for errors */
+            font-size: 0.9em;
+        }
+        input[type="file"] {
+            border: none;
+            background-color: #f8f9fa;
+            color: #495057;
+        }
+
+        select {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding: 12px;
+            background: #f8f9fa url('https://cdn3.iconfinder.com/data/icons/iconic-1/32/sync_32x32.png') no-repeat right center / 18px;
+        }
+        
+        input[type="submit"] {
+            background-color: #0056b3;
+            color: #ffffff;
+            padding: 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            font-weight: bold;
+        }
+         
+        input[type="submit"]:hover {
+            background-color: #0ade34; /* Orange color on hover */
         }
     </style>
 </head>
@@ -53,22 +87,25 @@
             <h5>Add Dress Product</h5>
         </div>
         <div class="card-body">
-            <form method="post">
+            <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
                 {% csrf_token %}
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="productName">Product Name</label>
-                        <input type="text" class="form-control" id="productName" placeholder="Enter product name">
+                        <input type="text" class="form-control" name="product_name" id="product_name" placeholder="Enter product name" required oninput="validateProductName()">
+                        <div id="product_name_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="productNumber">Product Number</label>
-                        <input type="text" class="form-control" id="productNumber" placeholder="Enter product number">
+                        <input type="text" class="form-control" name="product_number" id="product_number" required oninput="validateProductNumber()" placeholder="Enter product number">
+                        <div id="product_number_error" class="error"></div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="brandName">Brand Name</label>
-                        <input type="text" class="form-control" id="brandName" placeholder="Enter brand name">
+                        <input type="text" class="form-control" name="brand_name" id="brand_name" required oninput="validateBrandName()" placeholder="Enter brand name">
+                        <div id="brand_name_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="category">Category</label>
@@ -90,17 +127,20 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="description">Description</label>
-                        <textarea class="form-control" id="description" rows="3" placeholder="Enter product description"></textarea>
+                        <textarea class="form-control" name="about_product" id="about_product" required  oninput="validateAboutProduct()" rows="3" placeholder="Enter product description"></textarea>
+                        <div id="about_product_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="material">Material</label>
-                        <input type="text" class="form-control" id="material" placeholder="Enter material">
+                        <input type="text" class="form-control" name="material" required oninput="validateField('material')" placeholder="Enter material">
+                        <div id="material_error" class="error"></div>
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="price">Price</label>
-                        <input type="text" class="form-control" id="price" placeholder="Enter price">
+                        <input type="text" class="form-control" name="current_price" id="current_price" step="0.01" required oninput="validateCurrentPrice()" placeholder="Enter price">
+                        <div id="current_price_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
                         <label for="stockQuantity">Stock Quantity</label>
@@ -136,17 +176,25 @@
                 </div>
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="productImage">Product Image</label>
+                        <label for="productImage">Product Image 1</label>
                         <input type="file" class="form-control-file" id="productImage" name="main_image" required>
                     </div>
-                    <label for="images">Images:</label>
+                    <div class="form-group col-md-6">
+                        <label for="productImage">Product Image 2</label>
+                        <input type="file" class="form-control-file" id="productImage" name="main_image">
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="productImage">Product Image 3</label>
+                        <input type="file" class="form-control-file" id="productImage" name="main_image" >
+                    </div>
+                    <!--<label for="images">Images:</label>
 
                     <input type="hidden" name="num_images" id="num_images" value="0">
                     
                     <div id="image-container">
-                        <!-- Dynamically add image input fields using JavaScript -->
+                        <!-- Dynamically add image input fields using JavaScript
                     </div>
-                    <button type="button" onclick="addImageField()">Add Image</button>
+                    <button type="button" onclick="addImageField()">Add Image</button>-->
                 </div>
                 <button type="submit" class="btn btn-primary">Add Product</button>
             </form>
@@ -202,6 +250,122 @@
 
     // Add event listener for input change
     document.querySelector('input[name="main_image"]').addEventListener('change', validateMainImage);
+</script>
+<script>
+    function validateField(fieldName, errorId) {
+            var inputField = document.getElementsByName(fieldName)[0];
+            var errorElement = document.getElementById(errorId);
+
+            // Regular expression to allow only letters (both uppercase and lowercase)
+            var lettersOnly = /^[A-Za-z]+$/;
+
+            if (inputField.value.trim() === '') {
+                errorElement.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' is required';
+            } else if (!lettersOnly.test(inputField.value)) {
+                errorElement.textContent = 'Only letters are allowed in the ' + fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
+            } else {
+                errorElement.textContent = '';
+            }
+        }
+    function validateProductName() {
+            var productNameInput = document.getElementById('product_name');
+            var productNameError = document.getElementById('product_name_error');
+
+            var lettersOnly = /^[A-Za-z]+$/;
+
+            if (productNameInput.value.trim() === '') {
+                productNameError.textContent = 'Product Name is required';
+            } else if (!lettersOnly.test(productNameInput.value)) {
+                productNameError.textContent = 'Only letters are allowed in the Product Name';
+            } else {
+                productNameError.textContent = '';
+            }
+        }
+
+    function validateAboutProduct() {
+        var aboutProductInput = document.getElementById('about_product');
+        var aboutProductError = document.getElementById('about_product_error');
+
+        var lettersAndSpacesOnly = /^[A-Za-z ]+$/;
+
+        if (aboutProductInput.value.trim() === '') {
+            aboutProductError.textContent = 'About Product is required';
+        } else if (!lettersAndSpacesOnly.test(aboutProductInput.value)) {
+            aboutProductError.textContent = 'Only letters and spaces are allowed in the About Product';
+        } else {
+            aboutProductError.textContent = '';
+        }
+}
+function validateCurrentPrice() {
+            var currentPriceInput = document.getElementById('current_price');
+            var currentPriceError = document.getElementById('current_price_error');
+
+            var digitsOnly = /^\d+$/;
+
+            if (currentPriceInput.value.trim() === '') {
+                currentPriceError.textContent = 'Current Price is required';
+            } else if (!digitsOnly.test(currentPriceInput.value)) {
+                currentPriceError.textContent = 'Only digits are allowed in the Current Price';
+            } else {
+                currentPriceError.textContent = '';
+            }
+        }
+
+        function validateField(fieldName) {
+        var input = document.getElementsByName(fieldName)[0];
+        var errorElement = document.getElementById(fieldName + '_error');
+
+        // Regular expression to allow only letters (both uppercase and lowercase)
+        var lettersOnly = /^[A-Za-z]+$/;
+
+        if (input.value.trim() === '') {
+            errorElement.textContent = 'Color is required';
+        } else if (!lettersOnly.test(input.value)) {
+            errorElement.textContent = 'Only letters are allowed in the Color';
+        } else {
+            errorElement.textContent = '';
+        }
+    }
+    function validateField(fieldName) {
+        var inputField = document.getElementsByName(fieldName)[0];
+        var errorElement = document.getElementById(fieldName + '_error');
+
+        // Regular expression to allow only letters (both uppercase and lowercase)
+        var lettersOnly = /^[A-Za-z]+$/;
+
+        if (inputField.value.trim() === '') {
+            errorElement.textContent = 'Material is required';
+        } else if (!lettersOnly.test(inputField.value)) {
+            errorElement.textContent = 'Only letters are allowed in the Material';
+        } else {
+            errorElement.textContent = '';
+        }
+    }
+    function validateForm() {
+            // Add overall form validation logic here
+            // Return true if the form is valid, false otherwise
+
+            var errorElements = document.querySelectorAll('.error');
+            for (var i = 0; i < errorElements.length; i++) {
+                if (errorElements[i].textContent !== '') {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+        function addImageField() {
+            var container = document.getElementById('image-container');
+            var numImages = container.getElementsByTagName('input').length + 1;
+
+            var input = document.createElement('input');
+            input.type = 'file';
+            input.name = 'image_' + numImages;
+            container.appendChild(input);
+
+            document.getElementById('num_images').value = numImages;
+        }
+
 </script>
 </body>
 </html>

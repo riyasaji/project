@@ -98,6 +98,22 @@ th {
     font-weight: bold;
 }
 
+.approve-btn, .reject-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        text-align: center;
+        text-decoration: none;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        background-color: #f2f2f2;
+        color: #333;
+        cursor: pointer;
+    }
+
+    .approve-btn:hover, .reject-btn:hover {
+        background-color: #e0e0e0;
+    }
+
 
         </style> <!-- Link your CSS file -->
     </head>
@@ -111,47 +127,45 @@ th {
             <table>
                 <thead>
                     <tr>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email ID</th>
-                        <th>Phone</th>
+                        <th>Full Name</th>
+                        <th>Phone Number</th>
+                        <th>Government Identity</th>
+                        <th>PAN Number</th>
+                        <th>Business Name</th>
+                        <th>Business Address</th>
+                        <!-- Include other fields you want to display -->
                         <th>Status</th>
-                        <th>Action</th>
-                        <th>View More Details</th>
+                        <th>Approve</th>
+                        <th>Reject</th>
+                        
                     </tr>
                 </thead>
                 <tbody>
-                    {% for seller in unapproved_sellers %}
-                        <tr>
-                            <td>{{ seller.user.first_name }}</td>
-                            <td>{{ seller.user.last_name }}</td>
-                            <td>{{ seller.user.email }}</td>
-                            <td>{{ seller.phone_number }}</td>
-                            <td>
-                                {% if seller.status == 'Approved' %}
-                                    <span class="status approved">Approved</span>
-                                {% elif seller.status == 'Pending' %}
-                                    <span class="status pending">Pending</span>
-                                {% elif seller.status == 'Rejected' %}
-                                    <span class="status rejected">Rejected</span>
-                                {% endif %}
-                            </td>
-                            <td>
-                                {% if seller.status == 'Pending' %}
-                                    <a href="{% url 'approve_seller' seller_id %}">Approve</a>
-                                    <a href="{% url 'block_seller' seller_id %}">Block</a>
-                                    <a href="{% url 'delete_seller' seller_id %}">Delete</a>
-                                {% endif %}
-                            </td>
-                            <!--<td>
-                                <a href="{% url 'seller_details' seller_id %}">View More Details</a>
-                            </td>-->
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td colspan="7">No sellers found.</td>
-                        </tr>
-                    {% endfor %}
+                    {% for seller in sellers %}
+                    <tr>
+                        <td>{{ seller.full_name }}</td>
+                        <td>{{ seller.phone_number }}</td>
+                        <td>{{ seller.government_identity }}</td>
+                        <td>{{ seller.pan_number }}</td>
+                        <td>{{ seller.business_name }}</td>
+                        <td>{{ seller.business_address }}</td>
+                        <!-- Include other fields corresponding to the header -->
+                        <td>{{ seller.status }}</td>
+                        <td>
+                            
+                            <a href="{% url 'seller_approval' seller.pk %}" class="approve-btn">Approve</a>
+
+                            
+                        </td>
+                        <td>
+                            {% if seller.status == 'Pending' %}
+                                <a href="" class="reject-btn">Reject</a>
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </td>
+                    </tr>
+                {% endfor %}
                 </tbody>
             </table>
             <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

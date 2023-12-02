@@ -53,11 +53,13 @@ urlpatterns = [
     path('admin_authenticate/',views.admin_authenticate,name='admin_authenticate'),
     path('base/',views.base,name='base'),
     path('temp/',views.temp,name='temp'),
+    path('demo/',views.demo,name='demo'),
     path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     path('change_password/',views.change_password,name='change_password'),
     path('customers/', views.customer_list, name='customer_list'),
     path('sellers/', views.seller_list, name='seller_list'),
-    path('seller_approval/<int:seller_id>/', views.sellor_approval, name='sellor_approval'),
+    #path('seller-approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
+    path('seller_approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
     path('seller_viewforapproval', views.seller_viewforapproval, name='seller_viewforapproval'),
     
     
