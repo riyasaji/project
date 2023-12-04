@@ -40,6 +40,8 @@ from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
 from .models import Product, category, Size
 from django.http import HttpResponseRedirect
+from django.shortcuts import render, get_object_or_404
+from .models import Product
 
 #threading
 import threading
@@ -491,9 +493,17 @@ def seller_viewforapproval(request):
     return render(request,'seller_approval.html',{'sellers': sellers})
 
 def shop(request):
-    return render(request,'shop.html')
+    products = Product.objects.all()  # Change this query based on your filtering logic
 
+    return render(request, 'shop.html', {'products': products})
+    
 
+def product_details(request,product_id):
+    product = get_object_or_404(Product, pk=product_id)
+    context = {
+        'product': product,
+    }
+    return render(request,'detail.html', context)
 
 
 def add_product(request):
@@ -546,8 +556,7 @@ def add_product(request):
     return render(request, 'add_prod.html')  # Assuming the template name is 'add_product.html'
 
 
-def details(request):
-    return render(request,'detail.html')
+
 
 def cart(request):
     return render(request,'cart.html')
@@ -560,6 +569,7 @@ def contact(request):
 
 def base(request):
     return render(request,'base.html')
+
 
 def temp(request):
      products = [
@@ -627,4 +637,4 @@ def change_password(request):
     return render(request, 'change_password.html')
 
 
-  
+ 
