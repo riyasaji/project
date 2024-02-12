@@ -46,6 +46,10 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google'
 ]
 
+# # session
+# SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+
+
 SOCIALACCOUNT_PROVIDERS = {
     'google':{
         'SCOPE':[

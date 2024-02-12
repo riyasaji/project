@@ -25,8 +25,6 @@ urlpatterns = [
     path('signin/',views.signin , name='signin'),
     path('registration/',views.registration , name='registration'),
     path('logout/',views.user_logout, name='logout'),
-    path('signin/registration/', views.registration, name='registration'),
-    path('registration/signin/', views.signin, name='signin'),
     path('check_email/',views.check_email,name='check_email'),
     path('check_username/',views.check_username,name='check_username'),
     # path('demo/',views.demo),
@@ -61,7 +59,6 @@ urlpatterns = [
     #path('seller-approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
     path('seller_approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
     path('seller_viewforapproval', views.seller_viewforapproval, name='seller_viewforapproval'),
-    
     
 ]
 

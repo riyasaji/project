@@ -1,21 +1,13 @@
 
-from django.http import JsonResponse
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout
-from .models import tbl_user
-from .models import UserProfile
+from .models import Tbl_user
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
-from django.contrib import messages
-
-from django.shortcuts import render,redirect
 from django.http import HttpResponse,JsonResponse
-from django.contrib import messages
-from django.contrib.auth import authenticate, login,logout
 from django.utils.encoding import DjangoUnicodeDecodeError
 import re
-
 from django.views.generic import View
 # from .utils import *
 from .utils import TokenGenerator,generate_token
@@ -29,7 +21,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import update_session_auth_hash
-from django.shortcuts import render, redirect
+
 
 #email
 from django.conf import settings
@@ -38,10 +30,9 @@ from django.core.mail import send_mail
 
 from django.views.decorators.cache import never_cache
 from django.utils.html import strip_tags
-from .models import Product, category, Size
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
-from .models import Product
+from django.contrib.auth.tokens import default_token_generator
 
 #threading
 import threading
@@ -69,26 +60,23 @@ def about(request):
 def registration(request):
     if request.method=='POST':
         username=request.POST['username']
-        if tbl_user.objects.filter(username=username).exists():
+        if Tbl_user.objects.filter(username=username).exists():
             messages.success(request,'Username Already Exists')
             return redirect('registration')
         
         email=request.POST['email']
-        if tbl_user.objects.filter(email=email).exists():
+        if Tbl_user.objects.filter(email=email).exists():
             messages.success(request,'Email Already Exists')
             return redirect('registration')
         
         password=request.POST['password']
         user_type = 'customer' 
         
-        user=tbl_user(username=username,email=email,user_type=user_type)
-        
-        user.set_password(password)
-        
+        user=Tbl_user.objects.create(username=username,email=email,password=password,user_type=user_type)
+
         #authentication
         user.is_active=False
         user.save()
-        
         current_site=get_current_site(request)  
         email_subject="Activate your account"
         message=render_to_string('activate.html',{
@@ -99,7 +87,6 @@ def registration(request):
 
 
             })
-
         email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
         EmailThread(email_message).start()
         messages.info(request,"Active your account by clicking the link send to your email")
@@ -111,32 +98,24 @@ def signin(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
-        user = authenticate(request, username=username, password=password)
-        
+        print(username)
+        user = authenticate(request,username=username, password=password)
+        print(user)
         if user is not None:
-            if user.is_active:
-                if user.is_superuser:
-                    return redirect('dashboard')
-                
-                if user.user_type == 'seller':
-                    seller = Seller.objects.get()
-                    if seller.status == "Approved":
-                        login(request, user)
-                        return redirect('seller_dashboard')
-                    else:
-                        messages.error(request, 'Your account is pending  for approval by the admin.')
-                        return redirect('seller_updateProfile')
-                else:
-                    login(request, user)
-                    return redirect('home')
-            else:
-                messages.error(request, 'Your account is not active.')
+             if user.is_active: 
+                login(request,user)
+                request.session['user_id'] = user.id
+                request.session['user_email'] = user.email
+                request.session['user_type'] = user.user_type
+                return redirect('home')
+             else:
+                messages.error(request, 'Your account is not yet activated. Please check your email for the activation link.')
                 return redirect('signin')
         else:
-            messages.error(request, 'username and Password Invalid')
-            return redirect('signin')
-
+            messages.error(request, 'Invalid credentials. Please try again.')
+            return redirect('signin')  
     return render(request, 'signin.html')
+                
 
 def user_logout(request):
     if request.user.is_authenticated:
@@ -147,7 +126,7 @@ class ActivateAccountView(View):
     def get(self,request,uidb64,token):
         try:
             uid=force_str(urlsafe_base64_decode(uidb64))
-            user=tbl_user.objects.get(pk=uid)
+            user=Tbl_user.objects.get(pk=uid)
         except Exception as identifier:
             user=None
         if user is not None and generate_token.check_token(user,token):
@@ -161,20 +140,20 @@ class ActivateAccountView(View):
 def check_username(request):
     username = request.GET.get('username','')
     print(username)
-    user_exists = tbl_user.objects.filter(username=username).exists()
+    user_exists = Tbl_user.objects.filter(username=username).exists()
     return JsonResponse({'exists': user_exists})
 
 def check_email(request):
     email= request.GET.get('email','')
-    email_exists = tbl_user.objects.filter(email=email).exists()
+    email_exists = Tbl_user.objects.filter(email=email).exists()
     return JsonResponse({'exists': email_exists})
 
 
 def dashboard(request):
-    recent_users = tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
+    recent_users = Tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
     seller=Seller.objects.all()
     sellers_count = seller.count()
-    users = tbl_user.objects.all()
+    users = Tbl_user.objects.all()
     user_count=users.count()
     pending_sellers = Seller.objects.filter(status='pending')
     app=pending_sellers.count()
@@ -189,12 +168,12 @@ def dashboard(request):
     }
     return render(request,'dashboard.html', context)
 def customer_list(request):
-    customers = tbl_user.objects.filter(user_type='customer')  # Fetch customers
+    customers = Tbl_user.objects.filter(user_type='customer')  # Fetch customers
     return render(request, 'customerList_admin.html', {'customers': customers})
 #user count
 
 def user_count_view(request):
-    user_count = tbl_user.objects.count()
+    user_count = Tbl_user.objects.count()
     return render(request, 'customerList_admin.html', {'user_count': user_count})
     
 @login_required(login_url='signin')
@@ -239,18 +218,8 @@ def profile_update(request):
     return render(request, 'update_profile.html', context)
 
 
-
-  
-from django.shortcuts import render, redirect
-from .models import Seller  # Import your Seller model
-
 def seller_updateProfile(request):
     if request.method == 'POST':
-        # Access form data directly from request.POST and request.FILES
-        
-        #last_name = request.POST['last_name']
-        # email = request.POST.get('email')
-        # username = request.POST.get('username')
         full_name = request.POST.get('name')
         government_identity = request.POST.get('governmentIdentity')
         pan_number = request.POST.get('panNumber')
@@ -267,32 +236,35 @@ def seller_updateProfile(request):
         ifsc_code = request.POST.get('ifscCode')
 
          # Update the SellerProfile model fields
-        user = request.user
-       # user.first_name = fullname
+        user = Seller()
+        print(user)
+        print
+        # user.first_name = fullname
         #user.last_name = last_name
-        user.save()
+        #user.save()
 
-        # Create a Seller instance with form data
-        seller_profile, created = Seller.objects.get_or_create(user=user)
-        seller_profile.full_name = full_name
-        seller_profile.government_identity = government_identity
-        seller_profile.pan_number = pan_number
-        seller_profile.business_name = business_name
-        seller_profile.business_address = business_address
-        seller_profile.business_email = business_email
-        seller_profile.business_phone = business_phone
-        seller_profile.business_registration_number = business_registration_number
-        seller_profile.gst_number = gst_number
-        seller_profile.certificate_pdf = certificate_pdf
-        seller_profile.bank_account_number = bank_account_number
-        seller_profile.bank_name = bank_name
-        seller_profile.bank_branch = bank_branch
-        seller_profile.ifsc_code = ifsc_code
-        # Assign other fields similarly
-        seller_profile.save()
+        if user.is_authenticated:
+            seller_profile, created = Seller.objects.get_or_create(user=user)
+            seller_profile.full_name = full_name
+            seller_profile.government_identity = government_identity
+            seller_profile.pan_number = pan_number
+            seller_profile.business_name = business_name
+            seller_profile.business_address = business_address
+            seller_profile.business_email = business_email
+            seller_profile.business_phone = business_phone
+            seller_profile.business_registration_number = business_registration_number
+            seller_profile.gst_number = gst_number
+            seller_profile.certificate_pdf = certificate_pdf
+            seller_profile.bank_account_number = bank_account_number
+            seller_profile.bank_name = bank_name
+            seller_profile.bank_branch = bank_branch
+            seller_profile.ifsc_code = ifsc_code
+            seller_profile.save()
 
-        messages.success(request, 'Profile updated and Pending for Approval')
-        return redirect('signin')  # Redirect to the waiting page after successful registration
+            messages.success(request, 'Profile updated and Pending for Approval')
+            return redirect('signin')  # Redirect to the waiting page after successful registration
+        else:
+            return HttpResponse("Please log in to update your profile.")
     else:
         return render(request, 'seller_updateProfile.html',{'user': request.user})
         
@@ -331,19 +303,19 @@ def seller_updateProfile(request):
 def seller_registeration(request):
      if request.method=='POST':
         username=request.POST['username']
-        if tbl_user.objects.filter(username=username).exists():
+        if Tbl_user.objects.filter(username=username).exists():
             messages.success(request,'Username Already Exists')
             return redirect('registration')
         
         email=request.POST['email']
-        if tbl_user.objects.filter(email=email).exists():
+        if Tbl_user.objects.filter(email=email).exists():
             messages.success(request,'Email Already Exists')
             return redirect('registration')
         
         password=request.POST['password']
         user_type = 'seller' 
         
-        user=tbl_user.objects.create_user(username=username,email=email,user_type=user_type)
+        user=Tbl_user.objects.create_user(username=username,email=email,user_type=user_type)
         
         user.set_password(password)
         
@@ -371,7 +343,7 @@ def seller_registeration(request):
      
 #seller view
 def seller_list(request):
-    sellers = tbl_user.objects.filter(user_type='seller')  # Fetch sellers
+    sellers = Tbl_user.objects.filter(user_type='seller')  # Fetch sellers
     return render(request, 'sellerList_admin.html', {'sellers': sellers})
 
 def seller_count_view(request):
@@ -380,7 +352,7 @@ def seller_count_view(request):
     return render(request, 'sellerList_admin.html', {'sellers_count': sellers_count})
 
 def activate_user(request, user_id):
-    user = tbl_user.objects.get(id=user_id)
+    user = Tbl_user.objects.get(id=user_id)
     user.is_active = True
     user.save()
     subject = 'Account Activation'
@@ -392,7 +364,7 @@ def activate_user(request, user_id):
     return redirect('seller_approval')
 
 def deactivate_user(request, user_id):
-    user = tbl_user.objects.get(id=user_id)
+    user = Tbl_user.objects.get(id=user_id)
     if user.is_superuser:
         return HttpResponse("You cannot deactivat the admin.")
     user.is_active = False
@@ -419,8 +391,7 @@ def sellviews(request):
 
 
 
-# views.py
-from .models import Seller  # Import the Seller model
+
 
 # def sellor_approval(request):
 #     # Filter sellers with status equals 'Pending'
@@ -466,7 +437,7 @@ def block_seller(request, seller_id):
 
 def delete_seller(request, seller_id):
    
-    user = tbl_user.objects.get(pk=seller_id)
+    user = Tbl_user.objects.get(pk=seller_id)
     user.delete()
     subject = 'Your Seller Account Has Been deleted'
     message = 'Dear {},\n\nYour seller account has been deleted by the admin. You cannot  log in and  banned your account.'
@@ -579,8 +550,7 @@ def temp(request):
     ]
      return render(request,'temp.html',{'products': products})
 
-from django.shortcuts import render
-from .models import Seller
+
 
 def demo(request):
     # Fetch all sellers
