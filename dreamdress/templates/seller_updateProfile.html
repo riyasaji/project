@@ -15,7 +15,7 @@
         }
 
         .navbar {
-            background-color: #af1855;
+            background-color: #a55850;
             color: white;
         }
 
@@ -55,12 +55,12 @@
         }
 
         .btn-primary {
-            background-color: #d50f5e;
+            background-color: #a55850;
             border: none;
         }
 
         .btn-primary:hover {
-            background-color: #a90f4d;
+            background-color: #a55850;
         }
         .center-btn {
             text-align: center;
@@ -89,18 +89,6 @@
                 <li class="nav-item">
                     <a class="nav-link" href="#banking-info">Banking Information</a>
                 </li>
-                <!--<li class="nav-item">
-                    <a class="nav-link" href="#shipping-info">Shipping and Return Information</a>
-                </li>-->
-                <!--<li class="nav-item">
-                    <a class="nav-link" href="#product-info">Product Information</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#identity-verification">Identity Verification</a>
-                </li>-->
-                <!--<li class="nav-item">
-                    <a class="nav-link" href="#terms-conditions">Terms and Conditions</a>
-                </li>-->
             </ul>
         </div>
         <!-- Right-aligned links -->
@@ -113,30 +101,21 @@
             </li>
         </div>
     </nav>
-
     <form method="post">
         {% csrf_token %}
         <div class="form-section" id="personal-info">
             <h2>Personal Information</h2>
             <div class="form-group">
-                <label for="name">Full Name:</label>
-                <input type="text" class="form-control" id="name" name="name" required><br>
+                <label for="firstname">First Name:</label>
+                <input type="text" class="form-control" id="name" name="firstname" required><br>
             </div>
-            <!--<div class="form-group">
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" class="form-control" id="name" name="lastname" required><br>
+            </div>
+            <div class="form-group">
                 <label for="email">Email:</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ user.tbl_user.email }}" readonly>{{ user.email }}<br>
-            </div>
-            <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" class="form-control" id="username" name="username" value="{{ user.tbl_user.username }}" readonly><br>
-            </div>-->
-            <!--<div class="form-group">
-                <label for="confirmPassword">Confirm Password:</label>
-                <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" required><br>
-            </div>-->
-            <div class="form-group">
-                <label for="username">Goverment Identity:</label>
-                <input type="text" class="form-control" id="governmentIdentity" name="governmentIdentity" required><br>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly><br>
             </div>
             <div class="form-group">
                 <label for="username">PAN Number:</label>
@@ -146,23 +125,27 @@
 
         <div class="form-section" id="business-info">
 		 <h2>Business Information</h2>
-            <label for="businessName">Business Name:</label>
-			<input type="text" class="form-control" id="businessName" name="businessName" required> <br>
-			<label for="businessName">Business Address:</label>
+            <label for="brandName">Brand Name:</label>
+			<input type="text" class="form-control" id="businessName" name="brandName" required> <br>
+			<label for="businessAddress">Address:</label>
 			<input type="text" class="form-control" id="businessName" name="businessAddress" required> <br>
-			<label for="businessEmail">Business Email:</label>
-			<input type="email" class="form-control id="businessEmail" name="businessEmail" required><br>
+            <label for="pincode">Pincode:</label>
+			<input type="text" class="form-control" id="pincode" name="pincode" required> <br>
+            <label for="district">District:</label>
+			<input type="text" class="form-control" id="district" name="district" required> <br>
+            <label for="state">State:</label>
+			<input type="text" class="form-control" id="state" name="state" required> <br>
 			<label for="businessPhone">Business Phone Number:</label>
 			<input type="tel" class="form-control id="businessPhone" name="businessPhone" required><br>
         </div>
 
         <div class="form-section" id="legal-info">
 		<h2>Legal Information</h2>
-            <label for="businessRegistrationNumber">Business Registration Number:</label>
+            <label for="businessRegistrationNumber">Business License Number:</label>
 			<input type="text" class="form-control id="businessRegistrationNumber" name="businessRegistrationNumber" required><br>
 			<label for="vatNumber">GST Number:</label>
 			<input type="text" class="form-control  id="vatNumber" name="vatNumber" required><br>
-			<label for="certificatePdf">Certificate PDF:</label>
+			<label for="certificatePdf">Lincense Certificate(as pdf) </label>
 			<input type="file" class="form-control-file" id="certificatePdf" name="certificatePdf" accept=".pdf" required><br>
         </div>
 
@@ -172,13 +155,10 @@
                 <input type="text" class="form-control id="bankAccountNumber" name="bankAccountNumber" required><br>
                 <label for="bankName">Bank Name:</label>
                 <input type="text" class="form-control id="bankName" name="bankName" required><br>
-                <label for="bankBranch">Bank Branch:</label>
-                <input type="text" class="form-control id="bankBranch" name="bankBranch" required><br>
+      
                 <label for="ifscCode">IFSC Code:</label>
                 <input type="text" class="form-control id="ifscCode" name="ifscCode" required><br>
         </div>
-
-        <!-- Other sections like Shipping, Product Info, Identity Verification can follow the same structure -->
 
         <!-- Single checkbox form for terms & conditions -->
         <div class="form-section">
@@ -190,6 +170,7 @@
         </div>
         </div>
     </form>
+
 
     <!-- Bootstrap JS and dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>

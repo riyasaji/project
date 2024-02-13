@@ -1,17 +1,16 @@
 
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
-from django.contrib.auth import login,authenticate,logout
-from .models import Tbl_user
+from django.contrib.auth import login,authenticate,logout,get_user_model
+from .models import Tbl_user,Tbl_seller
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
 from django.utils.encoding import DjangoUnicodeDecodeError
 import re
 from django.views.generic import View
-# from .utils import *
 from .utils import TokenGenerator,generate_token
-
+from django.core.exceptions import ObjectDoesNotExist
 #for activating user account
 from django.contrib.sites.shortcuts import get_current_site
 from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
@@ -57,23 +56,18 @@ def index(request):
 def about(request):
     return render(request,'about.html')
 
+#customer registeration
 def registration(request):
     if request.method=='POST':
-        username=request.POST['username']
-        if Tbl_user.objects.filter(username=username).exists():
-            messages.success(request,'Username Already Exists')
-            return redirect('registration')
-        
         email=request.POST['email']
         if Tbl_user.objects.filter(email=email).exists():
             messages.success(request,'Email Already Exists')
             return redirect('registration')
-        
+        username= email
         password=request.POST['password']
         user_type = 'customer' 
-        
         user=Tbl_user.objects.create(username=username,email=email,password=password,user_type=user_type)
-
+        user.set_password(password)
         #authentication
         user.is_active=False
         user.save()
@@ -87,6 +81,7 @@ def registration(request):
 
 
             })
+        print(message)
         email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
         EmailThread(email_message).start()
         messages.info(request,"Active your account by clicking the link send to your email")
@@ -94,6 +89,7 @@ def registration(request):
     else:
         return render(request,'registration.html')
 
+#login
 def signin(request):
     if request.method == 'POST':
         username = request.POST['username']
@@ -107,7 +103,22 @@ def signin(request):
                 request.session['user_id'] = user.id
                 request.session['user_email'] = user.email
                 request.session['user_type'] = user.user_type
-                return redirect('home')
+                if user.user_type == 'seller':
+                    try:
+                        seller = Tbl_seller.objects.get(user=user)
+                        print("seller: ",seller)
+                        if seller.admin_approval == 'pending':
+                            return redirect('seller_updateProfile')
+                        elif seller.admin_approval == 'approved':
+                            return redirect('seller_dashboard')
+                        else:
+                            messages.error(request, 'Your seller account has been rejected by the admin.')
+                            return redirect('signin')
+                    except Tbl_seller.DoesNotExist:
+                        messages.error(request, 'Seller account not found.')
+                        return redirect('seller_updateProfile')
+                else:
+                    return redirect('home')
              else:
                 messages.error(request, 'Your account is not yet activated. Please check your email for the activation link.')
                 return redirect('signin')
@@ -116,12 +127,13 @@ def signin(request):
             return redirect('signin')  
     return render(request, 'signin.html')
                 
-
+#logout
 def user_logout(request):
     if request.user.is_authenticated:
         logout(request)
     return redirect('signin')
 
+#email activation
 class ActivateAccountView(View):
     def get(self,request,uidb64,token):
         try:
@@ -137,36 +149,118 @@ class ActivateAccountView(View):
         return render(request,"auth/activatefail.html")
     
 
-def check_username(request):
-    username = request.GET.get('username','')
-    print(username)
-    user_exists = Tbl_user.objects.filter(username=username).exists()
-    return JsonResponse({'exists': user_exists})
+# def check_username(request):
+#     username = request.GET.get('username','')
+#     print(username)
+#     user_exists = Tbl_user.objects.filter(username=username).exists()
+#     return JsonResponse({'exists': user_exists})
 
+#check email
 def check_email(request):
     email= request.GET.get('email','')
     email_exists = Tbl_user.objects.filter(email=email).exists()
     return JsonResponse({'exists': email_exists})
 
 
+#seller registeration
+def seller_registeration(request):
+     if request.method=='POST':
+        email=request.POST['email']
+        if Tbl_user.objects.filter(email=email).exists():
+            messages.success(request,'Email Already Exists')
+            return redirect('seller_registration')
+        username= email
+        password=request.POST['password']
+        user_type = 'seller' 
+        
+        user=Tbl_user.objects.create(username=username,email=email,password=password,user_type=user_type)
+        user.set_password(password)
+        
+        #authentication
+        user.is_active=False
+        user.save()
+        
+        Tbl_seller.objects.create(user=user)
+
+        current_site=get_current_site(request)  
+        email_subject="Activate your account"
+        message=render_to_string('activate.html',{
+                   'user':user,
+                   'domain':current_site.domain,
+                   'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+                   'token':generate_token.make_token(user)
+
+
+            })
+        print(message)
+
+        email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
+        EmailThread(email_message).start()
+        messages.info(request,"Active your account by clicking the link send to your email")
+        return redirect('signin')
+     else:
+        return render(request,'seller_registeration.html')
+     
+
+from django.shortcuts import get_object_or_404
+
+def seller_updateProfile(request):
+    seller = get_object_or_404(Tbl_seller, user=request.user)
+
+    if request.method == 'POST':
+        seller.seller_firstname = request.POST.get('firstname')
+        seller.seller_lastname = request.POST.get('lastname')
+        seller.seller_pan_number = request.POST.get('panNumber')
+        seller.seller_brand_name = request.POST.get('brandName')
+        seller.seller_address = request.POST.get('businessAddress')
+        seller.seller_pincode = request.POST.get('pincode')
+        seller.seller_district = request.POST.get('district')
+        seller.seller_state = request.POST.get('state')
+        seller.seller_phone = request.POST.get('businessPhone')
+        seller.seller_license_number = request.POST.get('businessRegistrationNumber')
+        seller.seller_gst_number = request.POST.get('vatNumber')
+        seller.seller_bank_account_number = request.POST.get('bankAccountNumber')
+        seller.seller_bank_name = request.POST.get('bankName')
+        seller.seller_ifsc_code = request.POST.get('ifscCode')
+
+        # Handle file upload
+        if 'certificatePdf' in request.FILES:
+            seller.seller_license_pdf = request.FILES['certificatePdf']
+
+        seller.save()
+
+        return redirect('seller_dashboard')
+        
+    return render(request, 'seller_updateProfile.html', {'seller': seller})
+
+#seller_dashboard
+def seller_dashboard(request):
+    return render(request,'seller_dashboard.html')
+
+#admin_dashboard
 def dashboard(request):
-    recent_users = Tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
-    seller=Seller.objects.all()
-    sellers_count = seller.count()
-    users = Tbl_user.objects.all()
-    user_count=users.count()
-    pending_sellers = Seller.objects.filter(status='pending')
-    app=pending_sellers.count()
-    context={
-        'recent_users': recent_users,
-        'seller':seller,
-        'sellers_count': sellers_count,
-        'users':users,
-        'user_count':user_count,
-        'pending_sellers' :pending_sellers,
-        'app':app,
-    }
-    return render(request,'dashboard.html', context)
+    # recent_users = Tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
+    # seller=Tbl_seller.objects.all()
+    # sellers_count = seller.count()
+    # users = Tbl_user.objects.all()
+    # user_count=users.count()
+    # pending_sellers = Tbl_seller.objects.filter(status='pending')
+    # app=pending_sellers.count()
+    # context={
+    #     'recent_users': recent_users,
+    #     'seller':seller,
+    #     'sellers_count': sellers_count,
+    #     'users':users,
+    #     'user_count':user_count,
+    #     'pending_sellers' :pending_sellers,
+    #     'app':app,
+    # }
+    return render(request,'dashboard.html')
+
+
+def extra(request):
+    return render(request,'extra.html')
+
 def customer_list(request):
     customers = Tbl_user.objects.filter(user_type='customer')  # Fetch customers
     return render(request, 'customerList_admin.html', {'customers': customers})
@@ -218,128 +312,12 @@ def profile_update(request):
     return render(request, 'update_profile.html', context)
 
 
-def seller_updateProfile(request):
-    if request.method == 'POST':
-        full_name = request.POST.get('name')
-        government_identity = request.POST.get('governmentIdentity')
-        pan_number = request.POST.get('panNumber')
-        business_name = request.POST.get('businessName')
-        business_address = request.POST.get('businessAddress')
-        business_email = request.POST.get('businessEmail')
-        business_phone = request.POST.get('businessPhone')
-        business_registration_number = request.POST.get('businessRegistrationNumber')
-        gst_number = request.POST.get('vatNumber')
-        certificate_pdf = request.FILES.get('certificatePdf')
-        bank_account_number = request.POST.get('bankAccountNumber')
-        bank_name = request.POST.get('bankName')
-        bank_branch = request.POST.get('bankBranch')
-        ifsc_code = request.POST.get('ifscCode')
 
-         # Update the SellerProfile model fields
-        user = Seller()
-        print(user)
-        print
-        # user.first_name = fullname
-        #user.last_name = last_name
-        #user.save()
+        
 
-        if user.is_authenticated:
-            seller_profile, created = Seller.objects.get_or_create(user=user)
-            seller_profile.full_name = full_name
-            seller_profile.government_identity = government_identity
-            seller_profile.pan_number = pan_number
-            seller_profile.business_name = business_name
-            seller_profile.business_address = business_address
-            seller_profile.business_email = business_email
-            seller_profile.business_phone = business_phone
-            seller_profile.business_registration_number = business_registration_number
-            seller_profile.gst_number = gst_number
-            seller_profile.certificate_pdf = certificate_pdf
-            seller_profile.bank_account_number = bank_account_number
-            seller_profile.bank_name = bank_name
-            seller_profile.bank_branch = bank_branch
-            seller_profile.ifsc_code = ifsc_code
-            seller_profile.save()
-
-            messages.success(request, 'Profile updated and Pending for Approval')
-            return redirect('signin')  # Redirect to the waiting page after successful registration
-        else:
-            return HttpResponse("Please log in to update your profile.")
-    else:
-        return render(request, 'seller_updateProfile.html',{'user': request.user})
-        
-        """if Seller.objects.filter(business_email=business_email).exclude(user=request.user).exists():
-            messages.warning(request, "Email is already taken")
-            return redirect('seller_updateProfile')
-        
-        # Validate phone number
-        if Seller.objects.filter(phone=business_phone).exclude(user=request.user).exists():
-            messages.warning(request, "Phone number is already taken")
-            return redirect('seller_updateProfile')"""
-        
-        # If the email is different from the current user's email, update the email and send an activation email
-        """if business_email != request.user.email:
-            user = request.user
-            user.email = business_email
-            user.is_active = False  # Make the user inactive
-            user.save()
-            current_site = get_current_site(request)  
-            email_subject = "Activate your account"
-            message = render_to_string('auth/activate.html', {
-                'user': user,
-                'domain': current_site.domain,
-                'uid': urlsafe_base64_encode(force_bytes(user.pk)),
-                'token': generate_token.make_token(user)
-            })
-
-            email_message = EmailMessage(email_subject, message, settings.EMAIL_HOST_USER, [email])
-            EmailThread(email_message).start()
-            messages.info(request, "Activate your account by clicking the link sent to your email")
-            logout(request)
-            return redirect('signin')"""
-        
        
 
-def seller_registeration(request):
-     if request.method=='POST':
-        username=request.POST['username']
-        if Tbl_user.objects.filter(username=username).exists():
-            messages.success(request,'Username Already Exists')
-            return redirect('registration')
-        
-        email=request.POST['email']
-        if Tbl_user.objects.filter(email=email).exists():
-            messages.success(request,'Email Already Exists')
-            return redirect('registration')
-        
-        password=request.POST['password']
-        user_type = 'seller' 
-        
-        user=Tbl_user.objects.create_user(username=username,email=email,user_type=user_type)
-        
-        user.set_password(password)
-        
-        #authentication
-        user.is_active=False
-        user.save()
-        
-        current_site=get_current_site(request)  
-        email_subject="Activate your account"
-        message=render_to_string('activate.html',{
-                   'user':user,
-                   'domain':current_site.domain,
-                   'uid':urlsafe_base64_encode(force_bytes(user.pk)),
-                   'token':generate_token.make_token(user)
 
-
-            })
-
-        email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
-        EmailThread(email_message).start()
-        messages.info(request,"Active your account by clicking the link send to your email")
-        return redirect('signin')
-     else:
-        return render(request,'seller_registeration.html')
      
 #seller view
 def seller_list(request):
@@ -447,11 +425,7 @@ def delete_seller(request, seller_id):
     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     return redirect('sellor_approval')
 
-@never_cache
-@login_required(login_url="signin")
-#seller approval
-def seller_dashboard(request):
-    return render(request,'seller_dashboard.html')
+
        
 
 
@@ -607,4 +581,53 @@ def change_password(request):
     return render(request, 'change_password.html')
 
 
- 
+ #seller_updateProfile
+# def seller_updateProfile(request):
+#     if request.method == 'POST':
+#         seller_firstname = request.POST.get('firstname')
+#         seller_lastname=request.POST.get('lastname')
+#         pan_number = request.POST.get('panNumber')
+#         brand_name = request.POST.get('brandName')
+#         business_address = request.POST.get('businessAddress')
+#         business_pincode= request.POST.get('pincode')
+#         business_district= request.POST.get('district')
+#         business_state= request.POST.get('state')
+#         business_phone = request.POST.get('businessPhone')
+#         business_license_number = request.POST.get('businessRegistrationNumber')
+#         gst_number = request.POST.get('vatNumber')
+#         certificate_pdf = request.FILES.get('certificatePdf')
+#         bank_account_number = request.POST.get('bankAccountNumber')
+#         bank_name = request.POST.get('bankName')
+#         ifsc_code = request.POST.get('ifscCode')
+
+#         # Handle file upload
+#         if 'certificatePdf' in request.FILES:
+#             certificate_pdf = request.FILES['certificatePdf']
+#         else:
+#             certificate_pdf = None
+
+#         user = request.user
+
+#         seller = Tbl_seller(
+#             user=user,
+#             seller_firstname=seller_firstname,
+#             seller_lastname=seller_lastname,
+#             seller_pan_number=pan_number,
+#             seller_brand_name=brand_name,
+#             seller_address=business_address,
+#             seller_pincode=business_pincode,
+#             seller_district=business_district,
+#             seller_state=business_state,
+#             seller_phone=business_phone,
+#             seller_license_number=business_license_number,
+#             seller_gst_number=gst_number,
+#             seller_bank_account_number=bank_account_number,
+#             seller_bank_name=bank_name,
+#             seller_ifsc_code=ifsc_code,
+#             seller_license_pdf=certificate_pdf,
+#         )
+#         seller.save()
+
+#         return redirect('seller_dashboard')
+        
+#     return render(request, 'seller_updateProfile.html',{'user': request.user})    

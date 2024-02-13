@@ -19,12 +19,6 @@ class Tbl_user(AbstractUser):
         default='customer',  
     )
 
-    def save(self, *args, **kwargs):
-        # Hash the password before saving
-        if self.password:
-            self.password = make_password(self.password)
-        super().save(*args, **kwargs)
-
     def __str__(self):
         return self.email
 
@@ -42,7 +36,7 @@ class Tbl_user(AbstractUser):
 #         return self.user.username + "'s Profile"
     
 
-# # seller Registeration
+# Seller Registeration
 # class Seller(models.Model):
 #     from users.models import tbl_user
 #     user = models.OneToOneField(tbl_user, on_delete=models.CASCADE,primary_key=True)
@@ -61,9 +55,8 @@ class Tbl_user(AbstractUser):
 #     bank_name = models.CharField(max_length=100)
 #     bank_branch = models.CharField(max_length=100)
 #     ifsc_code = models.CharField(max_length=20)
-#     # Add other fields related to the seller profile
-
-#     # Choices for status
+    
+#     Choices for status
 #     PENDING = 'Pending'
 #     APPROVED = 'Approved'
 #     REJECTED = 'Rejected'
@@ -79,7 +72,38 @@ class Tbl_user(AbstractUser):
 #         #return f"Seller: {self.user.email}"
 #         return self.user.email
 
+# Seller Registeration
+class Tbl_seller(models.Model):
+    PENDING = 'pending'
+    REJECTED = 'rejected'
+    APPROVED = 'approved'
 
+    ADMIN_APPROVAL_CHOICES = [
+        (PENDING, 'Pending'),
+        (REJECTED, 'Rejected'),
+        (APPROVED, 'Approved'),
+    ]
+
+    user = models.OneToOneField(Tbl_user, on_delete=models.CASCADE)
+    seller_firstname = models.CharField(max_length=100,null=True)
+    seller_lastname = models.CharField(max_length=100,null=True)
+    seller_pan_number = models.CharField(max_length=15,null=True)
+    seller_phone = models.CharField(max_length=15,null=True)
+    seller_address = models.CharField(max_length=255,null=True)
+    seller_pincode = models.CharField(max_length=10,null=True)
+    seller_district = models.CharField(max_length=100,null=True)
+    seller_state = models.CharField(max_length=100,null=True)
+    seller_brand_name = models.CharField(max_length=255,null=True)
+    seller_license_number= models.CharField(max_length=50,default='')
+    seller_license_pdf= models.FileField(upload_to='certificates/',null=True) 
+    seller_gst_number = models.CharField(max_length=15,null=True)
+    seller_bank_name = models.CharField(max_length=100,null=True)
+    seller_bank_account_number = models.CharField(max_length=50,null=True)
+    seller_ifsc_code = models.CharField(max_length=20,null=True)
+    admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
+
+    def __str__(self):
+        return f"{self.seller_firstname} {self.seller_lastname}"
 
 # #model for category
 # class category(models.Model):

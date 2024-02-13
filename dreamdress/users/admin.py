@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.models import User
-from .models import Tbl_user
+from .models import Tbl_user,Tbl_seller
 from django.contrib.auth.admin import UserAdmin
 
 class CustomUserAdmin(UserAdmin):
@@ -10,3 +10,4 @@ class CustomUserAdmin(UserAdmin):
 
 # Register your models here.
 admin.site.register(Tbl_user,CustomUserAdmin)
+admin.site.register(Tbl_seller)
