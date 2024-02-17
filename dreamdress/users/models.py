@@ -37,42 +37,6 @@ class Tbl_user(AbstractUser):
     
 
 # Seller Registeration
-# class Seller(models.Model):
-#     from users.models import tbl_user
-#     user = models.OneToOneField(tbl_user, on_delete=models.CASCADE,primary_key=True)
-#     full_name = models.CharField(max_length=100)
-#     phone_number= models.CharField(max_length=10)
-#     government_identity = models.CharField(max_length=100)
-#     pan_number = models.CharField(max_length=20)
-#     business_name = models.CharField(max_length=100)
-#     business_address = models.CharField(max_length=255)
-#     business_email = models.EmailField()
-#     business_phone = models.CharField(max_length=15)
-#     business_registration_number = models.CharField(max_length=50)
-#     gst_number = models.CharField(max_length=20)
-#     certificate_pdf = models.FileField(upload_to='certificates/')  # Example: Upload certificate PDF to 'certificates/' directory
-#     bank_account_number = models.CharField(max_length=30)
-#     bank_name = models.CharField(max_length=100)
-#     bank_branch = models.CharField(max_length=100)
-#     ifsc_code = models.CharField(max_length=20)
-    
-#     Choices for status
-#     PENDING = 'Pending'
-#     APPROVED = 'Approved'
-#     REJECTED = 'Rejected'
-
-#     STATUS_CHOICES = [
-#         (PENDING, 'Pending'),
-#         (APPROVED, 'Approved'),
-#         (REJECTED, 'Rejected'),
-#     ]
-#     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Pending')
-    
-#     def __str__(self):
-#         #return f"Seller: {self.user.email}"
-#         return self.user.email
-
-# Seller Registeration
 class Tbl_seller(models.Model):
     PENDING = 'pending'
     REJECTED = 'rejected'

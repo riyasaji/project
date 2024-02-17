@@ -255,11 +255,17 @@ def dashboard(request):
     #     'pending_sellers' :pending_sellers,
     #     'app':app,
     # }
-    return render(request,'dashboard.html')
+    users = Tbl_user.objects.all()
+    return render(request, 'dashboard.html', {'users': users})
 
 
 def extra(request):
     return render(request,'extra.html')
+
+def user_list(request):
+    users = Tbl_user.objects.all()
+    return render(request, 'user_list.html', {'users': users})
+
 
 def customer_list(request):
     customers = Tbl_user.objects.filter(user_type='customer')  # Fetch customers

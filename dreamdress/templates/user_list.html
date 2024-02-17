@@ -145,36 +145,65 @@
 
       <main role="main" class="main-content col-md-10 ml-md-auto col-lg-10 px-4">
         <div class="content">
-          <!-- Main content here -->
-          <h2>Welcome to Dreamdress Admin Panel</h2>
-          <p>This is where you can manage your Dreamdress project.</p>
-          <div id="user-list">
-            <h3>User List</h3>
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>User Type</th>
-                    <th>Active</th>
-                </tr>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.user_type }}</td>
-                    <td>{{ user.is_active }}</td>
-                </tr>
-                {% endfor %}
+            <h1>User List</h1>
+            <style>
+                /* Table styles */
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+    
+                th, td {
+                    padding: 8px;
+                    text-align: left;
+                    border-bottom: 1px solid #b2a8a8;
+                }
+    
+                th {
+                    background-color: #f2f2f2;
+                    color: #333;
+                }
+    
+                tr:hover {
+                    background-color: #f5f5f5;
+                }
+            </style>
+            <table border="1">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>User Type</th>
+                        <th>Active</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    {% if not user.is_superuser %} {# Check if user is not a superuser #}
+                    <tr>
+                        <td>{{ user.username }}</td>
+                        <td>{{ user.email }}</td>
+                        <td>{{ user.get_user_type_display }}</td>
+                        <td>{{ user.is_active }}</td>
+                    </tr>
+                    {% endif %}
+                    {% endfor %}
+                </tbody>
             </table>
         </div>
+    </main>
     
-        </div>
-      </main>
-    </div>
-  </div>
+</div>
+</div>
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
+<!-- Bootstrap core JavaScript -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>
 </body>
 </html>

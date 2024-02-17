@@ -1,0 +1,44 @@
+/* Custom CSS for navbar */
+.navbar {
+    padding-bottom: 20px; /* Add padding to the bottom */
+  }
+  
+  .navbar-brand {
+    font-size: 1.8rem; /* Larger font size */
+    font-weight: bold; /* Bold font weight */
+  }
+  
+  .navbar-dark .navbar-brand {
+    color: #fff; /* White text color */
+  }
+  
+  .navbar-dark .navbar-brand:hover {
+    color: #fff; /* White text color on hover */
+  }
+  
+  /* Navbar background color */
+  .bg-dark {
+    background-color: #343a40 !important; /* Dark background color */
+  }
+  
+  /* Active link */
+  .navbar-dark .navbar-nav .nav-link.active {
+    background-color: #007bff; /* Blue active link color */
+  }
+  
+  /* Navbar links */
+  .navbar-dark .navbar-nav .nav-link {
+    color: rgba(255, 255, 255, 0.8); /* Semi-transparent white text color */
+  }
+  
+  .navbar-dark .navbar-nav .nav-link:hover {
+    color: rgba(255, 255, 255, 1); /* Full white text color on hover */
+  }
+  
+  /* Footer background color */
+  footer {
+    background-color: #343a40;
+    color: #fff; /* White text color */
+    padding: 20px 0; /* Add padding top and bottom */
+  }
+  

@@ -60,6 +60,7 @@ urlpatterns = [
     #path('seller-approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
     path('seller_approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
     path('seller_viewforapproval', views.seller_viewforapproval, name='seller_viewforapproval'),
+    path('user_list/', views.user_list, name='user_list'),
     
 ]
 
