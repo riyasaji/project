@@ -153,9 +153,11 @@
         </div>
       </nav>
 
-      <main role="main" class="main-content col-md-10 ml-md-auto col-lg-10 px-4">
-        <div class="content">
-            <h1>User List</h1>
+
+<main role="main" class="main-content col-md-10 ml-md-auto col-lg-10 px-4">
+    <div class="content">
+        <h1>Admin Approvals</h1>
+        <table border="1">
             <style>
                 /* Table styles */
                 table {
@@ -178,42 +180,122 @@
                     background-color: #f5f5f5;
                 }
             </style>
-            <table border="1">
-                <thead>
-                    <tr>
-                        <th>Username</th>
-                        <th>Email</th>
-                        <th>User Type</th>
-                        <th>Active</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for user in users %}
-                    {% if not user.is_superuser %} {# Check if user is not a superuser #}
-                    <tr>
-                        <td>{{ user.username }}</td>
-                        <td>{{ user.email }}</td>
-                        <td>{{ user.get_user_type_display }}</td>
-                        <td>{{ user.is_active }}</td>
-                    </tr>
-                    {% endif %}
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </main>
-    
-</div>
-</div>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Brand Name</th>
+                    <th>Show Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for seller in sellers %}
+                <tr>
+                    <td>{{ seller.seller_firstname }} {{ seller.seller_lastname }}</td>
+                    <td>{{ seller.seller_brand_name }}</td>
+                    <td>
+                        <button class="btn btn-primary show-details-btn" data-seller-id="{{ seller.id }}">
+                            <i class="fas fa-info-circle"></i> Show Details
+                        </button>
+                    </td>
+                </tr>
+                <!-- Hidden row for seller details -->
+                <!-- Hidden row for seller details -->
+        <tr class="hidden-row" id="seller-details-{{ seller.id }}" style="display: none;">
+            <td colspan="3">
+                <strong><u>Details:</u></strong><br>
+                <strong>Phone:</strong> {{ seller.seller_phone }}<br>
+                <strong>PAN Number:</strong> {{ seller.seller_pan_number }}<br>
+                <strong>Address:</strong> {{ seller.seller_address }}<br>
+                <strong>Pincode:</strong> {{ seller.seller_pincode }}<br>
+                <strong>District:</strong> {{ seller.seller_district }}<br>
+                <strong>State:</strong> {{ seller.seller_state }}<br>
+                <strong>Brand Name:</strong> {{ seller.seller_brand_name }}<br>
+                <strong>License Number:</strong> {{ seller.seller_license_number }}<br>
+                <strong>GST Number:</strong> {{ seller.seller_gst_number }}<br>
+                <strong>Bank Name:</strong> {{ seller.seller_bank_name }}<br>
+                <strong>Bank Account Number:</strong> {{ seller.seller_bank_account_number }}<br>
+                <strong>IFSC Code:</strong> {{ seller.seller_ifsc_code }}<br>
+                <strong>Admin Approval:</strong> {{ seller.get_admin_approval_display }}<br>
+                <button class="btn btn-danger reject-btn" data-seller-id="{{ seller.id }}">Reject</button>
+                <button class="btn btn-success approve-btn" data-seller-id="{{ seller.id }}">Approve</button>
+
+            </td>
+        </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div id="approval-message"></div>
+    </div>
+</main>
+
+<!-- Include Font Awesome -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
 
 
+
+
+</div>
+</div>
 
 <!-- Bootstrap core JavaScript -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        // Click event handler for "Show Details" button
+        $('.show-details-btn').click(function() {
+            var sellerId = $(this).data('seller-id');
+            var detailsDiv = $('#seller-details-' + sellerId);
+            // Toggle visibility of seller details with slide effect
+            detailsDiv.slideToggle();
+        });
+    });
+    // Click event handler for "Reject" button
+    $('.reject-btn').click(function() {
+            var sellerId = $(this).data('seller-id');
+            // Implement reject functionality here
+        });
+
+        // Click event handler for "Approve" button
+        $('.approve-btn').click(function() {
+            var sellerId = $(this).data('seller-id');
+            // Implement approve functionality here
+        });
+</script>
+<script>
+    $(document).ready(function() {
+        // Click event handler for "Approve" button
+        $('.approve-btn').click(function() {
+            // Get the seller ID from the data attribute
+            var sellerId = $(this).data('seller-id');
+            
+            // Make an AJAX request to approve the seller
+            $.ajax({
+                url: `/approve_seller/${sellerId}/`, // URL for approve_seller endpoint
+                type: 'GET', // or 'POST' if your view requires it
+                success: function(response) {
+                    // Handle success response if needed
+                    console.log('Seller approved successfully');
+                    // Optionally, you can update the UI to reflect the approval
+                    $('#seller-details-' + sellerId).slideUp(); // Slide up to hide the details
+                    // Remove the row from the table
+                    $('#seller-row-' + sellerId).remove();
+                    // Display a success message
+                    $('#approval-message').text('Seller has been approved.');
+                },
+                error: function(xhr, status, error) {
+                    // Handle error response if needed
+                    console.error('Error approving seller:', error);
+                }
+            });
+        });
+    });
+</script>
+
 
 </body>
 </html>
-</body>
-</html>
+
+

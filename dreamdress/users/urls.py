@@ -58,9 +58,11 @@ urlpatterns = [
     path('customers/', views.customer_list, name='customer_list'),
     path('sellers/', views.seller_list, name='seller_list'),
     #path('seller-approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
-    path('seller_approval/<int:seller_id>/', views.seller_approval, name='seller_approval'),
+    path('approve_seller/<int:seller_id>/', views.approve_seller, name='approve_seller'),
     path('seller_viewforapproval', views.seller_viewforapproval, name='seller_viewforapproval'),
     path('user_list/', views.user_list, name='user_list'),
+    path('seller_list/', views.seller_list, name='seller_list'),
+    path('admin_approvals/', views.admin_approvals, name='admin_approvals'),
     
 ]
 
