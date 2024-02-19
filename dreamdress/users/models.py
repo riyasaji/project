@@ -68,6 +68,47 @@ class Tbl_seller(models.Model):
 
     def __str__(self):
         return f"{self.seller_firstname} {self.seller_lastname}"
+    
+
+
+#model for category
+class Tbl_category(models.Model):
+    category_id = models.AutoField(primary_key=True)
+    category_name = models.CharField(max_length=20, null=False)
+    category_description = models.CharField(max_length=20, null=False)
+
+#model for colour
+class Tbl_colour(models.Model):
+    colour_id = models.AutoField(primary_key=True)
+    colour_name = models.CharField(max_length=20, null=False)
+
+#model for product
+class Tbl_product(models.Model):
+    product_id = models.AutoField(primary_key=True)
+    category = models.ForeignKey(Tbl_category, on_delete=models.CASCADE)
+    seller = models.ForeignKey(Tbl_seller, on_delete=models.CASCADE)
+    product_current_price = models.IntegerField(null=False)
+    product_about_product = models.CharField(max_length=200, null=False)  
+    product_material = models.CharField(max_length=20, null=False)
+
+#model for size
+class Tbl_size(models.Model):
+    size_id = models.AutoField(primary_key=True)
+    size_name = models.CharField(max_length=20, null=False)
+
+#model for stock
+class Tbl_stock(models.Model):
+    stock_id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
+    colour = models.ForeignKey(Tbl_colour, on_delete=models.CASCADE)
+    size = models.ForeignKey(Tbl_size, on_delete=models.CASCADE)
+    stock_quantity = models.IntegerField(null=False)
+
+#model for productImage
+class Tbl_ProductImage(models.Model):
+    image_id = models.AutoField(primary_key=True)
+    product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='product_images/') 
 
 # #model for category
 # class category(models.Model):

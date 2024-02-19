@@ -32,7 +32,7 @@ from django.utils.html import strip_tags
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
-
+from django.shortcuts import get_object_or_404
 #threading
 import threading
 class EmailThread(threading.Thread):
@@ -46,6 +46,7 @@ class EmailThread(threading.Thread):
 from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 @login_required(login_url='signin')
+@never_cache
 def home(request):
     return render(request,'home.html') 
 
@@ -89,20 +90,25 @@ def registration(request):
     else:
         return render(request,'registration.html')
 
+
 #login
+@never_cache
 def signin(request):
     if request.method == 'POST':
         username = request.POST['username']
         password = request.POST['password']
         print(username)
+
         if username == 'admin' and password == 'Abc1234#':
             user = Tbl_user.objects.filter(username=username).first()
             if user is not None and user.is_superuser:
                 user.backend = 'django.contrib.auth.backends.ModelBackend'
                 login(request, user)
                 return redirect('dashboard')
-        user = authenticate(request,username=username, password=password)
-        print(user)
+        else:
+            user = authenticate(request,username=username, password=password)
+            print(user)
+
         if user is not None:
              if user.is_active: 
                 login(request,user)
@@ -134,6 +140,7 @@ def signin(request):
     return render(request, 'signin.html')
                 
 #logout
+@never_cache
 def user_logout(request):
     if request.user.is_authenticated:
         logout(request)
@@ -208,8 +215,9 @@ def seller_registeration(request):
         return render(request,'seller_registeration.html')
      
 
-from django.shortcuts import get_object_or_404
 
+@login_required(login_url='signin')
+@never_cache
 def seller_updateProfile(request):
     seller = get_object_or_404(Tbl_seller, user=request.user)
 
@@ -235,34 +243,31 @@ def seller_updateProfile(request):
 
         seller.save()
 
-        return redirect('seller_dashboard')
+        return redirect('seller_waiting')
         
     return render(request, 'seller_updateProfile.html', {'seller': seller})
 
 #seller_dashboard
+@login_required(login_url='signin')
+@never_cache
 def seller_dashboard(request):
     return render(request,'seller_dashboard.html')
 
 #admin_dashboard
+@login_required(login_url='signin')
+@never_cache
 def dashboard(request):
-    # recent_users = Tbl_user.objects.all().filter(is_superuser=False).order_by('-last_login')[:10]
-    # seller=Tbl_seller.objects.all()
-    # sellers_count = seller.count()
-    # users = Tbl_user.objects.all()
-    # user_count=users.count()
-    # pending_sellers = Tbl_seller.objects.filter(status='pending')
-    # app=pending_sellers.count()
-    # context={
-    #     'recent_users': recent_users,
-    #     'seller':seller,
-    #     'sellers_count': sellers_count,
-    #     'users':users,
-    #     'user_count':user_count,
-    #     'pending_sellers' :pending_sellers,
-    #     'app':app,
-    # }
+    customer_count = Tbl_user.objects.filter(user_type='customer').count()
+    seller_count = Tbl_user.objects.filter(user_type='seller').count()
+    tailor_count = Tbl_user.objects.filter(user_type='tailor').count()
+    
+    context = {
+        'customer_count': customer_count,
+        'seller_count': seller_count,
+        'tailor_count': tailor_count,
+    }
     users = Tbl_user.objects.all()
-    return render(request, 'dashboard.html', {'users': users})
+    return render(request, 'dashboard.html',context)
 
 
 def extra(request):
@@ -278,7 +283,7 @@ def seller_list(request):
     sellers= Tbl_seller.objects.filter(admin_approval='approved')
     return render(request, 'seller_list.html', {'sellers': sellers})
 
-#admin approvals for diaplay in dashboard
+#admin approvals for display in dashboard
 def admin_approvals(request):
      sellers = Tbl_seller.objects.filter(admin_approval=Tbl_seller.PENDING)
      return render(request, 'admin_approvals.html', {'sellers': sellers})
@@ -292,13 +297,49 @@ def approve_seller(request, seller_id):
             seller.admin_approval = 'approved'
             seller.save()
             print("Approved:", seller_id)
+
+            # Retrieve the seller's email from the associated user
+            user = seller.user
+            seller_email = user.email
+
+            # Send approval email
+            subject = 'Your seller account for DreamDress has been approved.'
+            message = render_to_string('approval_email.html', {'seller': seller})
+            plain_message = strip_tags(message)
+            send_mail(subject, plain_message, 'prxnv2832@gmail.com', [seller_email], html_message=message)
+
             return JsonResponse({'success': True})
         except Tbl_seller.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Seller not found'}, status=404)
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
+# Reject Seller
+def reject_seller(request, seller_id):
+    if request.method == 'GET':
+        try:
+            seller = Tbl_seller.objects.get(id=seller_id)
+            # Update the admin_approval status to "Rejected"
+            seller.admin_approval = 'rejected'
+            seller.save()
+            print("Rejected:", seller_id)
 
+            # Retrieve the seller's email from the associated user
+            user = seller.user
+            seller_email = user.email
+
+            # Send rejection email
+            subject = 'Your seller account for DreamDress has been rejected.'
+            message = render_to_string('rejection_email.html', {'seller': seller})
+            plain_message = strip_tags(message)
+            send_mail(subject, plain_message, 'prxnv2832@gmail.com', [seller_email], html_message=message)
+            
+            return JsonResponse({'success': True})
+        except Tbl_seller.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Seller not found'}, status=404)
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+    
 
 def customer_list(request):
     customers = Tbl_user.objects.filter(user_type='customer')  # Fetch customers
@@ -312,6 +353,10 @@ def user_count_view(request):
 # SHOP
 def shop(request):
     return render(request, 'shop.html')
+
+#seller waiting page
+def seller_waiting(request):
+    return render(request,'seller_waiting.html')
 
 
 @login_required(login_url='signin')
@@ -356,18 +401,43 @@ def profile_update(request):
     return render(request, 'update_profile.html', context)
 
 
+#change password for customer
+def change_password(request):
+    if request.method == 'POST' and request.user.is_authenticated:
+        current_password = request.POST.get('currentPassword')
+        new_password = request.POST.get('newPassword')
+        confirm_password = request.POST.get('confirmPassword')
 
-        
+        # Check if the new password and confirm password match
+        if new_password != confirm_password:
+            error_message = "New password and confirm password do not match."
+            return render(request, 'change_password.html', {'error_message': error_message})
+
+        # Check if the current password matches the user's password
+        if not check_password(current_password, request.user.password):
+            error_message = "Current password is incorrect."
+            return render(request, 'change_password.html', {'error_message': error_message})
+
+        # Update the user's password
+        request.user.set_password(new_password)
+        request.user.save()
+
+        # Update the session hash to keep the user logged in
+        update_session_auth_hash(request, request.user)
+
+        messages.success(request, 'Password Changed Successfully')
+        # Redirect to a success page or a profile page
+        return redirect('customer_dashboard')
+
+    return render(request, 'change_password.html')
+
 
        
 
 
     
 
-def seller_count_view(request):
-    user=Seller.objects.all()
-    sellers_count = user.count()
-    return render(request, 'sellerList_admin.html', {'sellers_count': sellers_count})
+
 
 def activate_user(request, user_id):
     user = Tbl_user.objects.get(id=user_id)
@@ -454,7 +524,6 @@ def block_seller(request, seller_id):
     return redirect('sellor_approval')
 
 def delete_seller(request, seller_id):
-   
     user = Tbl_user.objects.get(pk=seller_id)
     user.delete()
     subject = 'Your Seller Account Has Been deleted'
@@ -470,8 +539,7 @@ def delete_seller(request, seller_id):
 
 
 
-def seller_waiting(request):
-    return render(request,'seller_waiting.html')
+
 
 def seller_viewforapproval(request):
     sellers = Seller.objects.filter(status='Pending')
@@ -565,10 +633,7 @@ def temp(request):
 
 
 
-def demo(request):
-    # Fetch all sellers
-    sellers = Seller.objects.all()
-    
+def demo(request):    
     return render(request, 'demo.html', {'sellers': sellers})
 
 
@@ -590,83 +655,5 @@ def admin_authenticate(request):
 
     return redirect('signin')
 
-def change_password(request):
-    if request.method == 'POST' and request.user.is_authenticated:
-        current_password = request.POST.get('currentPassword')
-        new_password = request.POST.get('newPassword')
-        confirm_password = request.POST.get('confirmPassword')
 
-        # Check if the new password and confirm password match
-        if new_password != confirm_password:
-            error_message = "New password and confirm password do not match."
-            return render(request, 'change_password.html', {'error_message': error_message})
-
-        # Check if the current password matches the user's password
-        if not check_password(current_password, request.user.password):
-            error_message = "Current password is incorrect."
-            return render(request, 'change_password.html', {'error_message': error_message})
-
-        # Update the user's password
-        request.user.set_password(new_password)
-        request.user.save()
-
-        # Update the session hash to keep the user logged in
-        update_session_auth_hash(request, request.user)
-
-        messages.success(request, 'Password Changed Successfully')
-        # Redirect to a success page or a profile page
-        return redirect('customer_dashboard')
-
-    return render(request, 'change_password.html')
-
-
- #seller_updateProfile
-# def seller_updateProfile(request):
-#     if request.method == 'POST':
-#         seller_firstname = request.POST.get('firstname')
-#         seller_lastname=request.POST.get('lastname')
-#         pan_number = request.POST.get('panNumber')
-#         brand_name = request.POST.get('brandName')
-#         business_address = request.POST.get('businessAddress')
-#         business_pincode= request.POST.get('pincode')
-#         business_district= request.POST.get('district')
-#         business_state= request.POST.get('state')
-#         business_phone = request.POST.get('businessPhone')
-#         business_license_number = request.POST.get('businessRegistrationNumber')
-#         gst_number = request.POST.get('vatNumber')
-#         certificate_pdf = request.FILES.get('certificatePdf')
-#         bank_account_number = request.POST.get('bankAccountNumber')
-#         bank_name = request.POST.get('bankName')
-#         ifsc_code = request.POST.get('ifscCode')
-
-#         # Handle file upload
-#         if 'certificatePdf' in request.FILES:
-#             certificate_pdf = request.FILES['certificatePdf']
-#         else:
-#             certificate_pdf = None
-
-#         user = request.user
-
-#         seller = Tbl_seller(
-#             user=user,
-#             seller_firstname=seller_firstname,
-#             seller_lastname=seller_lastname,
-#             seller_pan_number=pan_number,
-#             seller_brand_name=brand_name,
-#             seller_address=business_address,
-#             seller_pincode=business_pincode,
-#             seller_district=business_district,
-#             seller_state=business_state,
-#             seller_phone=business_phone,
-#             seller_license_number=business_license_number,
-#             seller_gst_number=gst_number,
-#             seller_bank_account_number=bank_account_number,
-#             seller_bank_name=bank_name,
-#             seller_ifsc_code=ifsc_code,
-#             seller_license_pdf=certificate_pdf,
-#         )
-#         seller.save()
-
-#         return redirect('seller_dashboard')
-        
-#     return render(request, 'seller_updateProfile.html',{'user': request.user})    
+   

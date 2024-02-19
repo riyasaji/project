@@ -136,15 +136,15 @@
             <label for="state">State:</label>
 			<input type="text" class="form-control" id="state" name="state" required> <br>
 			<label for="businessPhone">Business Phone Number:</label>
-			<input type="tel" class="form-control id="businessPhone" name="businessPhone" required><br>
+			<input type="tel" class="form-control" id="businessPhone" name="businessPhone" required><br>
         </div>
 
         <div class="form-section" id="legal-info">
 		<h2>Legal Information</h2>
             <label for="businessRegistrationNumber">Business License Number:</label>
-			<input type="text" class="form-control id="businessRegistrationNumber" name="businessRegistrationNumber" required><br>
+			<input type="text" class="form-control" id="businessRegistrationNumber" name="businessRegistrationNumber" required><br>
 			<label for="vatNumber">GST Number:</label>
-			<input type="text" class="form-control  id="vatNumber" name="vatNumber" required><br>
+			<input type="text" class="form-control"  id="vatNumber" name="vatNumber" required><br>
 			<label for="certificatePdf">Lincense Certificate(as pdf) </label>
 			<input type="file" class="form-control-file" id="certificatePdf" name="certificatePdf" accept=".pdf" required><br>
         </div>
@@ -152,16 +152,20 @@
         <div class="form-section" id="banking-info">
 		<h2>Banking Information</h2>
             <label for="bankAccountNumber">Bank Account Number:</label>
-                <input type="text" class="form-control id="bankAccountNumber" name="bankAccountNumber" required><br>
+                <input type="text" class="form-control" id="bankAccountNumber" name="bankAccountNumber" required><br>
                 <label for="bankName">Bank Name:</label>
-                <input type="text" class="form-control id="bankName" name="bankName" required><br>
+                <input type="text" class="form-control" id="bankName" name="bankName" required><br>
       
                 <label for="ifscCode">IFSC Code:</label>
-                <input type="text" class="form-control id="ifscCode" name="ifscCode" required><br>
+                <input type="text" class="form-control" id="ifscCode" name="ifscCode" required><br>
         </div>
 
         <!-- Single checkbox form for terms & conditions -->
         <div class="form-section">
+            <!-- Icon for showing rules and licenses -->
+    <a href="#" class="float-right mt-2 mr-2">
+        <i class="fas fa-info-circle"></i> <!-- Assuming you're using Font Awesome for icons -->
+    </a>
          <div class="form-group form-check">
 			<input type="checkbox" class="form-check-input" id="approvalCheck" name="approvalCheck" required>
 			<label class="form-check-label" for="approvalCheck"> I understand that submitting false information may lead to rejection of my application.</label>

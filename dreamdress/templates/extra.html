@@ -1,180 +1,188 @@
-{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dreamdress Admin Panel</title>
-  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Dark sidebar and navbar theme -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
-  <style>
-    /* Custom CSS for navbar */
-    .navbar {
-      position: fixed;
-      top: 0;
-      width: 100%;
-      z-index: 1000;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Registration</title>
+    <link href="/static/img/favicon.png" rel="icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+            padding-top: 60px;
+        }
 
-    .navbar-brand {
-      font-size: 1.8rem; /* Larger font size */
-      font-weight: bold; /* Bold font weight */
-      display: flex; /* Use flexbox to align items */
-      align-items: center; /* Center items vertically */
-    }
+        .navbar {
+            background-color: #a55850;
+            color: white;
+        }
 
-    .navbar-brand span {
-      margin-left: 10px; /* Add some space between the image and text */
-    }
+        .navbar-brand {
+            color: white;
+        }
 
-    .navbar-dark .navbar-brand {
-      color: #b6214e; /* White text color */
-    }
+        .navbar-nav .nav-link {
+            color: white;
+        }
 
-    .navbar-dark .navbar-brand:hover {
-      color: #fff; /* White text color on hover */
-    }
+        .form-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
+            padding: 20px;
+			width: 60%; /* Set the width of the form */
+        }
 
-    /* Navbar background color */
-    .bg-dark {
-      background-color: #343a40 !important; /* Dark background color */
-    }
+        .form-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
 
-    /* Active link */
-    .navbar-dark .navbar-nav .nav-link.active {
-      background-color: #007bff; /* Blue active link color */
-    }
+        .container {
+            max-width: 450px;
+        }
 
-    /* Navbar links */
-    .navbar-dark .navbar-nav .nav-link {
-      color: #343a40; /* Semi-transparent white text color */
-    }
+        .form-group {
+            margin-bottom: 20px;
+        }
 
-    .navbar-dark .navbar-nav .nav-link:hover {
-      color: #343a40; /* Full white text color on hover */
-    }
+        .form-control {
+            border-radius: 5px;
+        }
 
-    /* Custom CSS for container-fluid */
-    .container-fluid {
-      padding-top: 80px; /* Adjusted for navbar height */
-    }
+        .btn-primary {
+            background-color: #a55850;
+            border: none;
+        }
 
-    /* Main content */
-    .main-content {
-      padding: 20px;
-      color: #b6214e;;
-    }
-    /* Custom CSS for sidebar */
-    .sidebar {
-      background-color: #343a40; /* Dark background color */
-      color: #fff; /* White text color */
-      box-shadow: #343a40;; /* Shadow for depth */
-    }
-
-    .sidebar-sticky {
-      position: relative;
-      top: 60px;
-    }
-
-    .sidebar .nav-link {
-      padding: 12px 20px; /* Increased padding for better clickability */
-      color: #ebe4e4; /* White text color */
-      transition: background-color 0.3s ease; /* Smooth transition */
-    }
-
-    .sidebar .nav-link:hover {
-      background-color: #b6214e; /* Darker background color on hover */
-    }
-
-    .sidebar .active {
-      background-color: #6b7075;; /* Darker background color for active link */
-    }
-
-    .sidebar-heading {
-      padding: 10px 20px; /* Increased padding */
-      font-size: 1.2rem;
-      font-weight: bold;
-    }
-
-    .sidebar-heading + .nav-link {
-      padding-left: 30px; /* Indent nested links */
-    }
-
-    /* Footer background color */
-    footer {
-      background-color: #343a40;
-      color: #fff; /* White text color */
-      padding: 20px 0; /* Add padding top and bottom */
-    }
-  </style>
-  <!-- Favicon -->
-  <link href="{% static '/img/favicon.png' %}" rel="icon">
+        .btn-primary:hover {
+            background-color: #a55850;
+        }
+        .center-btn {
+            text-align: center;
+        }
+        .float-right {
+            position: absolute;
+            top: 0;
+            right: 0;
+        }
+    </style>
 </head>
 <body>
-  <nav class="navbar navbar-dark bg-dark">
-    <span class="navbar-brand" style="text-align: left;">
-        <img src="{% static '/img/favicon.png' %}" alt="Logo" style="height: 30px; margin-right: 10px;">
-        Dreamdress Admin Panel
-    </span>
-  </nav>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
 
-  <div class="container-fluid">
-    <div class="row">
-      <nav class="col-md-2 col-lg-2 d-md-block bg-dark sidebar">
-        <div class="sidebar-sticky">
-          <ul class="nav flex-column">
-            <li class="nav-item">
-              <a class="nav-link active" href="{% url 'user_list' %}">User Count</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Seller Count</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Tailor Count</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Manage Products</a>
-            </li>
-            <li class="nav-item">
-              <a class="nav-link" href="#">Admin Approvals</a>
-            </li>
-          </ul>
+                <li class="nav-item">
+                    <a class="nav-link" href="#personal-info">Personal Information</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#business-info">Business Information</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#legal-info">Legal Information</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#banking-info">Banking Information</a>
+                </li>
+            </ul>
         </div>
-      </nav>
-
-      <main role="main" class="main-content col-md-10 ml-md-auto col-lg-10 px-4">
-        <div class="content">
-          <!-- Main content here -->
-          <h2>Welcome to Dreamdress Admin Panel</h2>
-          <p>This is where you can manage your Dreamdress project.</p>
-          <div id="user-list">
-            <h3>User List</h3>
-            <table>
-                <tr>
-                    <th>Username</th>
-                    <th>User Type</th>
-                    <th>Active</th>
-                </tr>
-                {% for user in users %}
-                <tr>
-                    <td>{{ user.username }}</td>
-                    <td>{{ user.user_type }}</td>
-                    <td>{{ user.is_active }}</td>
-                </tr>
-                {% endfor %}
-            </table>
+        <!-- Right-aligned links -->
+        <div class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Signin</a>
+            </li>
         </div>
-    
+    </nav>
+    <form method="post">
+        {% csrf_token %}
+        <div class="form-section" id="personal-info">
+            <h2>Personal Information</h2>
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" class="form-control" id="name" name="firstname" required><br>
+            </div>
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" class="form-control" id="name" name="lastname" required><br>
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly><br>
+            </div>
+            <div class="form-group">
+                <label for="username">PAN Number:</label>
+                <input type="text" class="form-control" id="panNumber" name="panNumber" required><br>
+            </div>
         </div>
-      </main>
-    </div>
-  </div>
 
-  <!-- Bootstrap core JavaScript -->
-  <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+        <div class="form-section" id="business-info">
+		 <h2>Business Information</h2>
+            <label for="brandName">Brand Name:</label>
+			<input type="text" class="form-control" id="businessName" name="brandName" required> <br>
+			<label for="businessAddress">Address:</label>
+			<input type="text" class="form-control" id="businessName" name="businessAddress" required> <br>
+            <label for="pincode">Pincode:</label>
+			<input type="text" class="form-control" id="pincode" name="pincode" required> <br>
+            <label for="district">District:</label>
+			<input type="text" class="form-control" id="district" name="district" required> <br>
+            <label for="state">State:</label>
+			<input type="text" class="form-control" id="state" name="state" required> <br>
+			<label for="businessPhone">Business Phone Number:</label>
+			<input type="tel" class="form-control" id="businessPhone" name="businessPhone" required><br>
+        </div>
 
+        <div class="form-section" id="legal-info">
+		<h2>Legal Information</h2>
+            <label for="businessRegistrationNumber">Business License Number:</label>
+			<input type="text" class="form-control" id="businessRegistrationNumber" name="businessRegistrationNumber" required><br>
+			<label for="vatNumber">GST Number:</label>
+			<input type="text" class="form-control"  id="vatNumber" name="vatNumber" required><br>
+			<label for="certificatePdf">Lincense Certificate(as pdf) </label>
+			<input type="file" class="form-control-file" id="certificatePdf" name="certificatePdf" accept=".pdf" required><br>
+        </div>
+
+        <div class="form-section" id="banking-info">
+		<h2>Banking Information</h2>
+            <label for="bankAccountNumber">Bank Account Number:</label>
+                <input type="text" class="form-control" id="bankAccountNumber" name="bankAccountNumber" required><br>
+                <label for="bankName">Bank Name:</label>
+                <input type="text" class="form-control" id="bankName" name="bankName" required><br>
+      
+                <label for="ifscCode">IFSC Code:</label>
+                <input type="text" class="form-control" id="ifscCode" name="ifscCode" required><br>
+        </div>
+
+        <!-- Single checkbox form for terms & conditions -->
+        <div class="form-section">
+         <div class="form-group form-check">
+			<input type="checkbox" class="form-check-input" id="approvalCheck" name="approvalCheck" required>
+			<label class="form-check-label" for="approvalCheck"> I understand that submitting false information may lead to rejection of my application.</label>
+			</div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    <a href="#" class="float-right mt-2 mr-2">
+        <i class="fas fa-info-circle text-danger"></i>
+    </a>
+	     
+        </div>
+        </div>
+    </form>
+
+
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Your JavaScript code for handling form submission or navigation -->
 </body>
 </html>

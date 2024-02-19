@@ -132,13 +132,13 @@
 				<a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
 			</li>
             <li class="nav-item">
-              <a class="nav-link active" href="{% url 'user_list' %}">User Count</a>
+              <a class="nav-link active" href="{% url 'user_list' %}">User</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="{% url 'seller_list' %}">Seller Count</a>
+              <a class="nav-link" href="{% url 'seller_list' %}">Seller</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="#">Tailor Count</a>
+              <a class="nav-link" href="#">Tailors</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" href="#">Manage Products</a>
@@ -161,6 +161,40 @@
 <p> </p>
 <p>This is your central hub for managing your online dress shop. From here, you can oversee all aspects of your store's operations, ensuring a seamless shopping experience for your customers.</p>
 <p>Take control of your users, manage products, and stay up-to-date with the latest trends in the fashion industry. With powerful tools and insights at your fingertips, you're ready to elevate your online dress shop to new heights.</p>
+<style>
+  .circle {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      font-size: 20px;
+      font-weight: bold;
+  }
+</style>
+
+<div class="row">
+<div class="col-md-4">
+  <h4>Customer Count</h4>
+  <div class="circle bg-success">
+    <span>{{ customer_count }}</span>
+  </div>
+</div>
+<div class="col-md-4">
+  <h4>Seller Count</h4>
+  <div class="circle bg-info">
+    <span>{{ seller_count }}</span>
+  </div>
+</div>
+<div class="col-md-4">
+  <h4>Tailor Count</h4>
+  <div class="circle bg-warning">
+    <span>{{ tailor_count }}</span>
+  </div>
+</div>
+</div>
 
         </div>
       </main>
