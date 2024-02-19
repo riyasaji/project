@@ -215,6 +215,7 @@
                 <strong>Bank Name:</strong> {{ seller.seller_bank_name }}<br>
                 <strong>Bank Account Number:</strong> {{ seller.seller_bank_account_number }}<br>
                 <strong>IFSC Code:</strong> {{ seller.seller_ifsc_code }}<br>
+                <strong>License PDF:</strong> <a href="{{ seller.seller_license_pdf.url }}" target="_blank">{{ seller.seller_license_pdf.name }}</a><br>
                 <strong>Admin Approval:</strong> {{ seller.get_admin_approval_display }}<br>
                 <button class="btn btn-danger reject-btn" data-seller-id="{{ seller.id }}">Reject</button>
                 <button class="btn btn-success approve-btn" data-seller-id="{{ seller.id }}">Approve</button>
@@ -316,6 +317,35 @@
             });
         });
     });
+</script>
+<script>
+  $(document).ready(function() {
+      // Click event handler for "Reject" button
+      $('.reject-btn').click(function() {
+          // Get the seller ID from the data attribute
+          var sellerId = $(this).data('seller-id');
+          
+          // Make an AJAX request to reject the seller
+          $.ajax({
+              url: `/reject_seller/${sellerId}/`, // URL for reject_seller endpoint
+              type: 'GET', // or 'POST' if your view requires it
+              success: function(response) {
+                  // Handle success response if needed
+                  console.log('Seller rejected successfully');
+                  // Optionally, you can update the UI to reflect the rejection
+                  $('#seller-details-' + sellerId).slideUp(); // Slide up to hide the details
+                  // Remove the row from the table
+                  $('#seller-row-' + sellerId).remove();
+                  // Display a success message
+                  $('#rejection-message').text('Seller has been rejected.');
+              },
+              error: function(xhr, status, error) {
+                  // Handle error response if needed
+                  console.error('Error rejecting seller:', error);
+              }
+          });
+      });
+  });
 </script>
 
 

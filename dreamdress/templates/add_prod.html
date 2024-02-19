@@ -7,28 +7,36 @@
     <link href="/static/img/favicon.png" rel="icon">
     <!-- Bootstrap CSS -->
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Your custom styles -->
+    
     <style>
         /* Custom styles */
         body {
-            background-color: #fff; /* White background */
-            color: #333; /* Dark text */
+            background-color: #fbfafa; /* White background */
+            color: #0b0b0b; /* Dark text */
             font-family: 'Arial', sans-serif; /* Font style */
         }
+
         header {
             background-color: #ff69b4; /* Pink header */
             color: #fff; /* White text */
+            padding: 10px;
+            margin-bottom: 20px;
         }
+
         header img {
             max-height: 50px;
         }
+
         header h4 {
             font-size: 1.2em;
+            margin-bottom: 0;
         }
+
         .error {
             color: red; /* Red color for errors */
             font-size: 0.9em;
         }
+
         input[type="file"] {
             border: none;
             background-color: #f8f9fa;
@@ -53,17 +61,34 @@
             width: 100%;
             font-size: 16px;
             font-weight: bold;
+            margin-top: 20px;
         }
          
         input[type="submit"]:hover {
-            background-color: #0ade34; /* Orange color on hover */
+            background-color: #0ade34; /* Green color on hover */
+        }
+
+        .card-header {
+            background-color: #b9bfc6;
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .form-row {
+            margin-bottom: 20px;
+        }
+
+        .btn-primary {
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <!-- Header -->
-<header class="bg-light p-3">
+<header class="bg-dark">
     <div class="container">
         <div class="row align-items-center">
             <div class="col-md-4">
@@ -71,7 +96,7 @@
 				<span style="color: crimson;">DreamDress</span>
             </div>
             <div class="col-md-4">
-                <h4 style="color:rgb(226, 32, 32)">Welcome  <span id="username">{{ user.username }}</span></h4>
+                <h4 style="color:crimson;">Welcome  <span id="username">{{ user.username }}</span></h4>
             </div>
             <div class="col-md-4 text-right">
                 <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
@@ -81,7 +106,7 @@
 </header>
 
 <!-- Main Content - Add Dress Form -->
-<div class="container mt-4">
+<div class="container">
     <div class="card">
         <div class="card-header">
             <h5>Add Dress Product</h5>
@@ -89,18 +114,8 @@
         <div class="card-body">
             <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
                 {% csrf_token %}
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="productName">Product Name</label>
-                        <input type="text" class="form-control" name="product_name" id="product_name" placeholder="Enter product name" required oninput="validateProductName()">
-                        <div id="product_name_error" class="error"></div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="productNumber">Product Number</label>
-                        <input type="text" class="form-control" name="product_number" id="product_number" required oninput="validateProductNumber()" placeholder="Enter product number">
-                        <div id="product_number_error" class="error"></div>
-                    </div>
-                </div>
+                
+                <!-- Brand Name and Category -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="brandName">Brand Name</label>
@@ -124,6 +139,8 @@
                         </select>
                     </div>
                 </div>
+
+                <!-- Description and Material -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="description">Description</label>
@@ -136,62 +153,122 @@
                         <div id="material_error" class="error"></div>
                     </div>
                 </div>
+
+                <!-- Price -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="price">Price</label>
                         <input type="text" class="form-control" name="current_price" id="current_price" step="0.01" required oninput="validateCurrentPrice()" placeholder="Enter price">
                         <div id="current_price_error" class="error"></div>
                     </div>
-                    <div class="form-group col-md-6">
-                        <label for="stockQuantity" >Stock Quantity</label>
-                        <div class="input-group">
-                            <div class="input-group-prepend">
-                                <button class="btn btn-outline-secondary" type="button" id="decreaseUnits">-</button>
-                            </div>
-                            <input type="text" class="form-control text-center" id="productUnits" value="1" name="stock">
-                            <div class="input-group-append">
-                                <button class="btn btn-outline-secondary" type="button" id="increaseUnits">+</button>
-                            </div>
-                        </div>
-                    </div>
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="sizes">Sizes</label>
-                        <select id="sizes" class="form-control" name="sizes" multiple>
-                            <option value="Small">Small</option>
-                            <option value="Medium">Medium</option>
-                            <option value="Large">Large</option>
-                            <option value="XL">XL</option>
-                            <option value="XXL">XXL</option>
-                            <option value="XXXL">3XL</option>
-                            <option value="4XL">4XL</option>
-                            <option value="5XL">5XL</option>
-                        </select>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="colors">Colors</label>
-                        <input type="text" class="form-control" id="colors" placeholder="Enter colors" name="colors">
-                    </div>
+
+                <!-- Dynamic stock management section -->
+                <div id="dynamic-stock-section">
+                    <!-- This is where dynamically added rows will go -->
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="productImage1">Product Image 1</label>
-                        <input type="file" class="form-control-file" id="productImage1" name="main_image" required>
-                    </div>
-                <!-- Dynamically add image input fields using JavaScript -->
-                <!--<button type="button" onclick="addImageField()">Add Image</button>-->
+
+                <!-- Button to add a new row for managing stock -->
+                <button type="button" class="btn btn-primary" onclick="addStockRow()">Manage Stock</button>
+
+                <!-- Submit button for adding the product -->
                 <button type="submit" class="btn btn-primary" name="addproduct">Add Product</button>
-            </form>
-            
+            </form>            
         </div>
     </div>
 </div>
+
 
 <!-- Bootstrap JS and jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    function addStockRow() {
+        // Create a new row for managing stock
+        var stockRow = `
+            <div class="stock-row">
+                <div class="form-group col-md-6">
+                    <label for="colors">Color</label>
+                    <input type="text" class="form-control colors" placeholder="Enter color" name="colors[]">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="productImage">Product Image</label>
+                    <input type="file" class="form-control-file product-image" name="product_images[]" required>
+                </div>
+                <div class="sizes-section">
+                    <div class="size-row">
+                        <div class="form-group col-md-6">
+                            <label for="sizes">Size</label>
+                            <select class="form-control sizes" name="sizes[]">
+                                <option value="Small">Small</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Large">Large</option>
+                                <option value="XL">XL</option>
+                                <option value="XXL">XXL</option>
+                                <option value="XXXL">3XL</option>
+                                <option value="4XL">4XL</option>
+                                <option value="5XL">5XL</option>
+                            </select>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label for="stockQuantity">Stock Quantity</label>
+                            <input type="text" class="form-control text-center stock-quantity" value="1" name="stock">
+                        </div>
+                    </div>
+                </div>
+                <button class="btn btn-primary add-size-button">Add Size</button>
+                <button class="btn btn-primary done-button">Done</button>
+            </div>
+        `;
+
+        // Append the new row to the dynamic-stock-section
+        document.getElementById('dynamic-stock-section').insertAdjacentHTML('beforeend', stockRow);
+
+        // Attach event listener to the "Add Size" button
+        var addSizeButton = document.querySelector('.stock-row:last-child .add-size-button');
+        addSizeButton.addEventListener('click', function() {
+            addSizeRow(this); // Add a new size row when "Add Size" button is clicked
+        });
+
+        // Attach event listener to the "Done" button
+        var doneButton = document.querySelector('.stock-row:last-child .done-button');
+        doneButton.addEventListener('click', function() {
+            addStockRow(); // Add a new row when "Done" button is clicked
+        });
+    }
+
+    function addSizeRow(button) {
+        var sizeRow = `
+            <div class="size-row">
+                <div class="form-group col-md-6">
+                    <label for="sizes">Size</label>
+                    <select class="form-control sizes" name="sizes[]">
+                        <option value="Small">Small</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Large">Large</option>
+                        <option value="XL">XL</option>
+                        <option value="XXL">XXL</option>
+                        <option value="XXXL">3XL</option>
+                        <option value="4XL">4XL</option>
+                        <option value="5XL">5XL</option>
+                    </select>
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="stockQuantity">Stock Quantity</label>
+                    <input type="text" class="form-control text-center stock-quantity" value="1" name="stock">
+                </div>
+            </div>
+        `;
+
+        // Insert the new size row before the button
+        button.insertAdjacentHTML('beforebegin', sizeRow);
+    }
+</script>
+
+
+
 <script>
     $(document).ready(function () {
         // Increase stock units

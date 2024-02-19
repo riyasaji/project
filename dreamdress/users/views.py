@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout,get_user_model
-from .models import Tbl_user,Tbl_seller
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -20,7 +20,7 @@ from django.contrib.auth.decorators import login_required
 
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import update_session_auth_hash
-
+from django.views.decorators.csrf import csrf_protect
 
 #email
 from django.conf import settings
@@ -141,6 +141,7 @@ def signin(request):
                 
 #logout
 @never_cache
+@csrf_protect
 def user_logout(request):
     if request.user.is_authenticated:
         logout(request)
@@ -307,7 +308,7 @@ def approve_seller(request, seller_id):
             message = render_to_string('approval_email.html', {'seller': seller})
             plain_message = strip_tags(message)
             send_mail(subject, plain_message, 'prxnv2832@gmail.com', [seller_email], html_message=message)
-
+            print(subject)
             return JsonResponse({'success': True})
         except Tbl_seller.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Seller not found'}, status=404)
@@ -333,7 +334,7 @@ def reject_seller(request, seller_id):
             message = render_to_string('rejection_email.html', {'seller': seller})
             plain_message = strip_tags(message)
             send_mail(subject, plain_message, 'prxnv2832@gmail.com', [seller_email], html_message=message)
-            
+            print(subject)
             return JsonResponse({'success': True})
         except Tbl_seller.DoesNotExist:
             return JsonResponse({'success': False, 'error': 'Seller not found'}, status=404)
@@ -344,8 +345,8 @@ def reject_seller(request, seller_id):
 def customer_list(request):
     customers = Tbl_user.objects.filter(user_type='customer')  # Fetch customers
     return render(request, 'customerList_admin.html', {'customers': customers})
-#user count
 
+#user count
 def user_count_view(request):
     user_count = Tbl_user.objects.count()
     return render(request, 'customerList_admin.html', {'user_count': user_count})
@@ -357,6 +358,66 @@ def shop(request):
 #seller waiting page
 def seller_waiting(request):
     return render(request,'seller_waiting.html')
+
+#add Product 
+def add_product(request):
+    if request.method == 'POST':
+        # Process the form data
+        brand_name = request.POST.get('brand_name')
+        category_name = request.POST.get('category_name')
+        about_product = request.POST.get('about_product')
+        material = request.POST.get('material')
+        current_price = request.POST.get('current_price')
+
+        # Get or create category
+        category, created = Tbl_category.objects.get_or_create(category_name=category_name)
+
+        # Get the current user (assuming user is logged in)
+        user = request.user
+        seller = Tbl_seller.objects.filter(user=user).first()
+        if seller is None:
+             return HttpResponse("You are not registered as a seller.")
+        
+        # Create the product
+        product = Tbl_product.objects.create(
+            category=category,
+            seller=seller,
+            product_current_price=current_price,
+            product_about_product=about_product,
+            product_material=material
+        )
+
+        # Process dynamic stock rows
+        colors = request.POST.getlist('colors[]')
+        sizes = request.POST.getlist('sizes[]')
+        stock_quantities = request.POST.getlist('stock[]')
+
+        for color_name in colors:
+            for size_name in sizes:
+                color, _ = Tbl_colour.objects.get_or_create(colour_name=color_name)
+                size, _ = Tbl_size.objects.get_or_create(size_name=size_name)
+                stock_quantity = stock_quantities.pop(0) if stock_quantities else 0
+
+
+                # Create stock entry
+                stock = Tbl_stock.objects.create(
+                    product=product,
+                    colour=color,
+                    size=size,
+                    stock_quantity=stock_quantity
+                )
+
+        # Process product images
+        for image_file in request.FILES.getlist('product_images[]'):
+            product_image = Tbl_ProductImage.objects.create(
+                product=product,
+                image=image_file
+            )
+        messages.success(request, 'Product added successfully.')
+        return redirect('seller_dashboard')
+    else:
+        return render(request, 'add_prod.html')
+    
 
 
 @login_required(login_url='signin')
@@ -558,54 +619,54 @@ def product_details(request,product_id):
     return render(request,'detail.html', context)
 
 
-def add_product(request):
-    if request.method == 'POST':
-        # Fetch data from the form
-        brand_name = request.POST.get('brand_name')
-        product_name = request.POST.get('product_name')
-        product_number = request.POST.get('product_number')
-        stock = request.POST.get('stock')
-        about_product = request.POST.get('about_product')
-        current_price = request.POST.get('current_price')
-        category_name = request.POST.get('category_name')  # Assuming the category is submitted as a string
-        seller_id = request.POST.get('seller_id')
-        color = request.POST.get('colors')
-        material = request.POST.get('material')
-        image_1 = request.FILES.get('main_image')  # Assuming it's an image file
+# def add_product(request):
+#     if request.method == 'POST':
+#         # Fetch data from the form
+#         brand_name = request.POST.get('brand_name')
+#         product_name = request.POST.get('product_name')
+#         product_number = request.POST.get('product_number')
+#         stock = request.POST.get('stock')
+#         about_product = request.POST.get('about_product')
+#         current_price = request.POST.get('current_price')
+#         category_name = request.POST.get('category_name')  # Assuming the category is submitted as a string
+#         seller_id = request.POST.get('seller_id')
+#         color = request.POST.get('colors')
+#         material = request.POST.get('material')
+#         image_1 = request.FILES.get('main_image')  # Assuming it's an image file
 
-        category_instance, created = category.objects.get_or_create(category_name=category_name)
+#         category_instance, created = category.objects.get_or_create(category_name=category_name)
         
-        # Assuming sizes are submitted as a list
-        selected_sizes = request.POST.getlist('sizes')
-        sizes = []
-        for size_name in selected_sizes:
-            size, created = Size.objects.get_or_create(name=size_name)
-            sizes.append(size)
+#         # Assuming sizes are submitted as a list
+#         selected_sizes = request.POST.getlist('sizes')
+#         sizes = []
+#         for size_name in selected_sizes:
+#             size, created = Size.objects.get_or_create(name=size_name)
+#             sizes.append(size)
 
-        # Create the Product instance
-        product = Product.objects.create(
-            brand_name=brand_name,
-            product_name=product_name,
-            product_number=product_number,
-            stock=stock,
-            about_product=about_product,
-            current_price=current_price,
-            category_id=category_instance,
-            seller_id=seller_id,
-            color=color,
-            material=material,
-            image_1=image_1
-        )
+#         # Create the Product instance
+#         product = Product.objects.create(
+#             brand_name=brand_name,
+#             product_name=product_name,
+#             product_number=product_number,
+#             stock=stock,
+#             about_product=about_product,
+#             current_price=current_price,
+#             category_id=category_instance,
+#             seller_id=seller_id,
+#             color=color,
+#             material=material,
+#             image_1=image_1
+#         )
         
 
-        # Add sizes to the product
-        product.save()
-        product.sizes.set(sizes)
-        # Redirect to a success page or do something else
-        messages.success(request, 'Product added successfully!')
-        return redirect('seller_dashboard')  # Replace '/success/' with your desired URL
+#         # Add sizes to the product
+#         product.save()
+#         product.sizes.set(sizes)
+#         # Redirect to a success page or do something else
+#         messages.success(request, 'Product added successfully!')
+#         return redirect('seller_dashboard')  # Replace '/success/' with your desired URL
 
-    return render(request, 'add_prod.html')  # Assuming the template name is 'add_product.html'
+#     return render(request, 'add_prod.html')  # Assuming the template name is 'add_product.html'
 
 
 

@@ -101,7 +101,7 @@
             </li>
         </div>
     </nav>
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         <div class="form-section" id="personal-info">
             <h2>Personal Information</h2>
@@ -125,7 +125,7 @@
 
         <div class="form-section" id="business-info">
 		 <h2>Business Information</h2>
-            <label for="brandName">Brand Name:</label>
+            <label for="brandName">Business Name:</label>
 			<input type="text" class="form-control" id="businessName" name="brandName" required> <br>
 			<label for="businessAddress">Address:</label>
 			<input type="text" class="form-control" id="businessName" name="businessAddress" required> <br>

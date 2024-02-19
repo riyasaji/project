@@ -59,7 +59,7 @@ class Tbl_seller(models.Model):
     seller_state = models.CharField(max_length=100,null=True)
     seller_brand_name = models.CharField(max_length=255,null=True)
     seller_license_number= models.CharField(max_length=50,default='')
-    seller_license_pdf= models.FileField(upload_to='certificates/',null=True) 
+    seller_license_pdf= models.FileField(upload_to='seller_certificates/',null=True) 
     seller_gst_number = models.CharField(max_length=15,null=True)
     seller_bank_name = models.CharField(max_length=100,null=True)
     seller_bank_account_number = models.CharField(max_length=50,null=True)

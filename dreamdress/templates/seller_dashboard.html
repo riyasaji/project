@@ -89,24 +89,39 @@
             {{ message }}
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
-        <script>
-            // jQuery function to hide the message after 10 seconds
-            $(document).ready(function(){
-                $("#successMessage").delay(10000).fadeOut("slow");
-            });
-        </script>
+        <div id="success-message" style="display: none;">
+            Product added successfully.
+        </div>
+    <script>
+        $(document).ready(function() {
+            setTimeout(function() {
+                $('.alert').alert('close');
+            }, 3000); // 3000 milliseconds = 3 seconds
+        });
+    </script>
     {% endfor %}
-{% endif %}
-        
+{% endif %}     
         </p>
+        
     </div>
 
 <!-- Bootstrap JS and jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<!-- Include jQuery -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+    // Show success message and hide after 3 seconds
+    document.addEventListener('DOMContentLoaded', function() {
+        var successMessage = document.getElementById('success-message');
+        if (successMessage) {
+            successMessage.style.display = 'block';
+            setTimeout(function() {
+                successMessage.style.display = 'none';
+            }, 3000);  // Hide after 3 seconds (3000 milliseconds)
+        }
+    });
+</script>
 
 </body>
 </html>
