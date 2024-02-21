@@ -33,6 +33,8 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import render, get_object_or_404
 from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
+import requests
+import json
 #threading
 import threading
 class EmailThread(threading.Thread):
@@ -216,21 +218,24 @@ def seller_registeration(request):
         return render(request,'seller_registeration.html')
      
 
-
+#seller update profile
 @login_required(login_url='signin')
 @never_cache
 def seller_updateProfile(request):
     seller = get_object_or_404(Tbl_seller, user=request.user)
-
     if request.method == 'POST':
+        pincode = request.POST.get('pincode')
+        if pincode:
+            pincode_details = get_pincode_details(pincode)
+            if pincode_details:
+                seller.seller_pincode = pincode
+                seller.seller_district = pincode_details['district']
+                seller.seller_state = pincode_details['state']
         seller.seller_firstname = request.POST.get('firstname')
         seller.seller_lastname = request.POST.get('lastname')
         seller.seller_pan_number = request.POST.get('panNumber')
         seller.seller_brand_name = request.POST.get('brandName')
         seller.seller_address = request.POST.get('businessAddress')
-        seller.seller_pincode = request.POST.get('pincode')
-        seller.seller_district = request.POST.get('district')
-        seller.seller_state = request.POST.get('state')
         seller.seller_phone = request.POST.get('businessPhone')
         seller.seller_license_number = request.POST.get('businessRegistrationNumber')
         seller.seller_gst_number = request.POST.get('vatNumber')
@@ -247,6 +252,48 @@ def seller_updateProfile(request):
         return redirect('seller_waiting')
         
     return render(request, 'seller_updateProfile.html', {'seller': seller})
+
+import requests
+import logging
+
+# Set up logging
+logger = logging.getLogger(__name__)
+
+def get_pincode_details(pincode):
+    url = f"https://api.postalpincode.in/pincode/{pincode}"
+    try:
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for bad status codes
+        data = response.json()
+        
+        if data:
+            first_entry = data[0]
+            if first_entry['Status'] == 'Success':
+                post_office_details = first_entry.get('PostOffice', [{}])[0]
+                city = post_office_details.get('Block')
+                state = post_office_details.get('State')
+                district = post_office_details.get('District')
+                
+                if city and state and district:
+                    return {
+                        'city': city,
+                        'state': state,
+                        'district': district
+                    }
+                else:
+                    logger.error("City, state, or district not found in API response.")
+            else:
+                logger.error("API response status is not 'Success'.")
+        else:
+            logger.error("No data found in API response.")
+            
+    except requests.RequestException as e:
+        logger.error(f"Failed to fetch data. Error: {e}")
+        
+    except Exception as e:
+        logger.error(f"An unexpected error occurred: {e}")
+        
+    return None
 
 #seller_dashboard
 @login_required(login_url='signin')

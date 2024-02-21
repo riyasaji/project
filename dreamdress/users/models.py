@@ -75,7 +75,6 @@ class Tbl_seller(models.Model):
 class Tbl_category(models.Model):
     category_id = models.AutoField(primary_key=True)
     category_name = models.CharField(max_length=20, null=False)
-    category_description = models.CharField(max_length=20, null=False)
 
 #model for colour
 class Tbl_colour(models.Model):

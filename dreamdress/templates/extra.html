@@ -3,442 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add Dress</title>
+    <title>Seller Registration</title>
     <link href="/static/img/favicon.png" rel="icon">
     <!-- Bootstrap CSS -->
-    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
-    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
-        /* Custom styles */
-        body {
-            background-color: #e9dede; /* White background */
-            color: #0b0b0b; /* Dark text */
-            font-family: 'Arial', sans-serif; /* Font style */
-        }
-
-        header {
-            background-color: #ff69b4; /* Pink header */
-            color: #fff; /* White text */
-            padding: 10px;
-            margin-bottom: 20px;
-        }
-
-        header img {
-            max-height: 50px;
-        }
-
-        header h4 {
-            font-size: 1.2em;
-            margin-bottom: 0;
-        }
-
-        .error {
-            color: red; /* Red color for errors */
-            font-size: 0.9em;
-        }
-
-        input[type="file"] {
-            border: none;
+         body {
+            font-family: Arial, sans-serif;
             background-color: #f8f9fa;
-            color: #495057;
+            padding-top: 60px;
         }
 
-        select {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding: 12px;
-            background: #f8f9fa url('https://cdn3.iconfinder.com/data/icons/iconic-1/32/sync_32x32.png') no-repeat right center / 18px;
-        }
-        
-        input[type="submit"] {
-            background-color: #0056b3;
-            color: #ffffff;
-            padding: 12px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            font-weight: bold;
-            margin-top: 20px;
-        }
-         
-        input[type="submit"]:hover {
-            background-color: #0ade34; /* Green color on hover */
+        .navbar {
+            background-color: #a55850;
+            color: white;
         }
 
-        .card-header {
-            background-color: #b9bfc6;
+        .navbar-brand {
+            color: white;
         }
 
-        .card-body {
+        .navbar-nav .nav-link {
+            color: white;
+        }
+
+        .form-section {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            margin: 20px auto;
             padding: 20px;
+			width: 60%; /* Set the width of the form */
         }
 
-        .form-row {
+        .form-section h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 10px;
+        }
+
+        .container {
+            max-width: 450px;
+        }
+
+        .form-group {
             margin-bottom: 20px;
+        }
+
+        .form-control {
+            border-radius: 5px;
         }
 
         .btn-primary {
-            margin-top: 10px;
+            background-color: #a55850;
+            border: none;
+        }
+
+        .btn-primary:hover {
+            background-color: #a55850;
+        }
+        .center-btn {
+            text-align: center;
         }
     </style>
 </head>
 <body>
+        <nav class="navbar navbar-expand-lg navbar-dark">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+            aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
 
-<!-- Header -->
-<header class="bg-dark">
-    <div class="container">
-        <div class="row align-items-center">
-            <div class="col-md-4">
-                <img src="/static/img/favicon.png" alt="DreamDress Logo" class="img-fluid" style="max-height: 50px;">
-				<span style="color: crimson;">DreamDress</span>
+                <li class="nav-item">
+                    <a class="nav-link" href="#personal-info">Personal Information</a>
+                </li>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="#business-info">Business Information</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#legal-info">Legal Information</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#banking-info">Banking Information</a>
+                </li>
+            </ul>
+        </div>
+        <!-- Right-aligned links -->
+        <div class="navbar-nav ml-auto">
+            <li class="nav-item">
+                <a class="nav-link" href="{% url 'home' %}">Home</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#">Signin</a>
+            </li>
+        </div>
+    </nav>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-section" id="personal-info">
+            <h2>Personal Information</h2>
+            <div class="form-group">
+                <label for="firstname">First Name:</label>
+                <input type="text" class="form-control" id="firstname" name="firstname" required><br>
+                <span id="firstname-error" style="color: red;"></span>
             </div>
-            <div class="col-md-4">
-                <h4 style="color:crimson;">Welcome  <span id="username">{{ user.username }}</span></h4>
+
+            <div class="form-group">
+                <label for="lastname">Last Name:</label>
+                <input type="text" class="form-control" id="lastname" name="lastname" required><br>
+                <span id="lastname-error" style="color: red;"></span>   
             </div>
-            <div class="col-md-4 text-right">
-                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" readonly><br>
+            </div>
+
+            <div class="form-group">
+                <label for="username">PAN Number:</label>
+                <input type="text" class="form-control" id="panNumber" name="panNumber" required><br>
+                <span id="panNumber-error" style="color: red;"></span>
             </div>
         </div>
-    </div>
-</header>
 
-<!-- Main Content - Add Dress Form -->
-<div class="container">
-    <div class="card">
-        <div class="card-header">
-            <h5>Add Dress Product</h5>
+        <div class="form-section" id="business-info">
+		 <h2>Business Information</h2>
+         <div class="form-group">
+            <label for="brandName">Business Name:</label>
+            <input type="text" class="form-control" id="brandName" name="brandName" required> <br>
+            <span id="brandName-error" style="color: red;"></span>
         </div>
-        <div class="card-body">
-            <form method="post" enctype="multipart/form-data" onsubmit="return validateForm()">
-                {% csrf_token %}
-                
-                <!-- Brand Name and Category -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="brandName">Brand Name</label>
-                        <input type="text" class="form-control" name="brand_name" id="brand_name" required oninput="validateBrandName()" placeholder="Enter brand name">
-                        <div id="brand_name_error" class="error"></div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="category">Category</label>
-                        <select id="category" class="form-control" name="category_name">
-                            <option selected disabled>Select category</option>
-                            <option>Dress</option>
-                            <option>Shirt</option>
-                            <option>Jeans</option>
-                            <option>Swimwear</option>
-                            <option>Sleepwear</option>
-                            <option>Sportswear</option>
-                            <option>Jumpsuits</option>
-                            <option>Blazers</option>
-                            <option>Jackets</option>
-                            <option>Indian Wear</option>
-                        </select>
-                    </div>
-                </div>
 
-                <!-- Description and Material -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="description">Description</label>
-                        <textarea class="form-control" name="about_product" id="about_product" required oninput="validateAboutProduct()" rows="3" placeholder="Enter product description"></textarea>
-                        <div id="about_product_error" class="error"></div>
-                    </div>
-                    <div class="form-group col-md-6">
-                        <label for="material">Material</label>
-                        <input type="text" class="form-control" name="material" required oninput="validateField('material')" placeholder="Enter material">
-                        <div id="material_error" class="error"></div>
-                    </div>
-                </div>
-
-                <!-- Price -->
-                <div class="form-row">
-                    <div class="form-group col-md-6">
-                        <label for="price">Price</label>
-                        <input type="text" class="form-control" name="current_price" id="current_price" step="0.01" required oninput="validateCurrentPrice()" placeholder="Enter price">
-                        <div id="current_price_error" class="error"></div>
-                    </div>
-                </div>
-
-                <!-- Dynamic stock management section -->
-                <div id="dynamic-stock-section">
-                    <!-- This is where dynamically added rows will go -->
-                </div>
-
-                <!-- Button to add a new row for managing stock -->
-                <button type="button" class="btn btn-primary" onclick="addStockRow()">Manage Stock</button>
-
-                <!-- Submit button for adding the product -->
-                <button type="submit" class="btn btn-primary" name="addproduct">Add Product</button>
-            </form>            
+        <div class="form-group">
+            <label for="businessAddress">Address:</label>
+            <input type="text" class="form-control" id="businessAddress" name="businessAddress" required> <br>
+            <span id="businessAddress-error" style="color: red;"></span>
         </div>
-    </div>
-</div>
+        <div class="form-group">
+            <label for="pincode">Pincode:</label>
+			<input type="text" class="form-control" id="pincode" name="pincode" required> <br>
+            <span id="pincode-error" style="color: red;"></span>
+        </div>     
+        <div class="form-group">
+            <label for="city">City:</label>
+			<input type="text" class="form-control" id="city" name="city" required> <br>
+            <span id="city-error" style="color: red;"></span>
+        </div>
+
+        <div class="form-group">
+            <label for="district">District:</label>
+			<input type="text" class="form-control" id="district" name="district" required> <br>
+            <span id="district-error" style="color: red;"></span>
+        </div>
+        <div class="form-group">
+            <label for="state">State:</label>
+			<input type="text" class="form-control" id="state" name="state" required> <br>
+            <span id="state-error" style="color: red;"></span>
+        </div>
+        <div class="form-group">
+			<label for="businessPhone">Business Phone Number:</label>
+			<input type="tel" class="form-control" id="businessPhone" name="businessPhone" required><br>
+            <span id="businessPhone-error" style="color: red;"></span>
+        </div>
+        </div>
+
+        <div class="form-section" id="legal-info">
+		<h2>Legal Information</h2>
+        <div class="form-group">
+            <label for="businessRegistrationNumber">Business License Number:</label>
+			<input type="text" class="form-control" id="businessRegistrationNumber" name="businessRegistrationNumber" required><br>
+            <span id="businessRegistrationNumber-error" style="color: red;"></span>
+        </div>
+        <div class="form-group">
+			<label for="vatNumber">GST Number:</label>
+			<input type="text" class="form-control"  id="vatNumber" name="vatNumber" required><br>
+            <span id="vatNumber-error" style="color: red;"></span>
+        </div>
+        <div class="form-group">
+			<label for="certificatePdf">Lincense Certificate(as pdf) </label>
+			<input type="file" class="form-control-file" id="certificatePdf" name="certificatePdf" accept=".pdf" required><br>
+            <span id="certificatePdf-error" style="color: red;"></span>
+        </div>
+
+        </div>
+
+        <div class="form-section" id="banking-info">
+		<h2>Banking Information</h2>
+            <div class="form-group">
+                <label for="bankAccountNumber">Bank Account Number:</label>
+                <input type="text" class="form-control" id="bankAccountNumber" name="bankAccountNumber" required><br>
+                <span id="bankAccountNumber-error" style="color: red;"></span>
+            </div>
+            <div class="form-group">
+                <label for="bankName">Bank Name:</label>
+                <input type="text" class="form-control" id="bankName" name="bankName" required><br>
+                <span id="bankName-error" style="color: red;"></span>
+            </div>
+            <div class="form-group">
+                <label for="ifscCode">IFSC Code:</label>
+                <input type="text" class="form-control" id="ifscCode" name="ifscCode" required><br>
+                <span id="ifscCode-error" style="color: red;"></span>
+            </div>
+        </div>
+
+        <!-- Single checkbox form for terms & conditions -->
+        <div class="form-section">
+            <!-- Icon for showing rules and licenses -->
+    <a href="#" class="float-right mt-2 mr-2">
+        <i class="fas fa-info-circle"></i> <!-- Assuming you're using Font Awesome for icons -->
+    </a>
+         <div class="form-group form-check">
+			<input type="checkbox" class="form-check-input" id="approvalCheck" name="approvalCheck" required>
+			<label class="form-check-label" for="approvalCheck"> I understand that submitting false information may lead to rejection of my application.</label>
+			</div>
+	     <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        </div>
+    </form>
 
 
-<!-- Bootstrap JS and jQuery -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <!-- Bootstrap JS and dependencies -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
 
+
+ <!-- validation for firstname -->
 <script>
-    function addStockRow() {
-        // Create a new row for managing stock
-        var stockRow = `
-            <div class="stock-row">
-                <div class="form-group col-md-6">
-                    <label for="colors">Color</label>
-                    <input type="text" class="form-control colors" placeholder="Enter color" name="colors[]">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="productImage">Product Image</label>
-                    <input type="file" class="form-control-file product-image" name="product_images[]" required>
-                </div>
-                <div class="sizes-section">
-                    <div class="size-row">
-                        <div class="form-group col-md-6">
-                            <label for="sizes">Size</label>
-                            <select class="form-control sizes" name="sizes[]">
-                                <option value="Small">Small</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Large">Large</option>
-                                <option value="XL">XL</option>
-                                <option value="XXL">XXL</option>
-                                <option value="XXXL">3XL</option>
-                                <option value="4XL">4XL</option>
-                                <option value="5XL">5XL</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="stockQuantity">Stock Quantity</label>
-                            <input type="text" class="form-control text-center stock-quantity" value="1" name="stock">
-                        </div>
-                    </div>
-                </div>
-                <button class="btn btn-primary add-size-button">Add Size</button>
-                <button class="btn btn-primary done-button">Done</button>
-            </div>
-        `;
+    document.getElementById('firstname').addEventListener('input', function() {
+        var firstnameInput = this.value.trim();
+        var firstnameError = document.getElementById('firstname-error');
+        
+        if (!/^[a-zA-Z]+$/.test(firstnameInput)) {
+            firstnameError.textContent = "First Name should contain only letters.";
+        } else {
+            firstnameError.textContent = ""; // Clear error message if input is valid
+        }
+    });
 
-        // Append the new row to the dynamic-stock-section
-        document.getElementById('dynamic-stock-section').insertAdjacentHTML('beforeend', stockRow);
-
-        // Attach event listener to the "Add Size" button
-        var addSizeButton = document.querySelector('.stock-row:last-child .add-size-button');
-        addSizeButton.addEventListener('click', function() {
-            addSizeRow(this); // Add a new size row when "Add Size" button is clicked
-        });
-
-        // Attach event listener to the "Done" button
-        var doneButton = document.querySelector('.stock-row:last-child .done-button');
-        doneButton.addEventListener('click', function() {
-            addStockRow(); // Add a new row when "Done" button is clicked
-        });
-    }
-
-    function addSizeRow(button) {
-        var sizeRow = `
-            <div class="size-row">
-                <div class="form-group col-md-6">
-                    <label for="sizes">Size</label>
-                    <select class="form-control sizes" name="sizes[]">
-                        <option value="Small">Small</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Large">Large</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                        <option value="XXXL">3XL</option>
-                        <option value="4XL">4XL</option>
-                        <option value="5XL">5XL</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="stockQuantity">Stock Quantity</label>
-                    <input type="text" class="form-control text-center stock-quantity" value="1" name="stock">
-                </div>
-            </div>
-        `;
-
-        // Insert the new size row before the button
-        button.insertAdjacentHTML('beforebegin', sizeRow);
-    }
-</script>
-
-
-
-<script>
-    $(document).ready(function () {
-        // Increase stock units
-        $("#increaseUnits").click(function () {
-            var currentValue = parseInt($("#productUnits").val());
-            $("#productUnits").val(currentValue + 1);
-        });
-
-        // Decrease stock units
-        $("#decreaseUnits").click(function () {
-            var currentValue = parseInt($("#productUnits").val());
-            if (currentValue > 1) {
-                $("#productUnits").val(currentValue - 1);
-            }
-        });
+    // Function to clear error message when the input field is focused
+    document.getElementById('firstname').addEventListener('focus', function() {
+        var firstnameError = document.getElementById('firstname-error');
+        firstnameError.textContent = ""; // Clear error message when the input field is focused
     });
 </script>
+
+<!-- lastname validation -->
 <script>
-    function addImageField() {
-        var container = document.getElementById('image-container');
-        var numImages = container.getElementsByTagName('input').length + 1;
-
-        var input = document.createElement('input');
-        input.type = 'file';
-        input.name = 'image_' + numImages;
-        container.appendChild(input);
-
-        document.getElementById('num_images').value = numImages;
-    }
-
-    // Add validation function for the main image
-    function validateMainImage() {
-        var mainImageInput = document.querySelector('input[name="main_image"]');
-        var mainImageError = document.getElementById('main_image_error');
-
-        if (!mainImageInput.files.length) {
-            mainImageError.textContent = 'Main Image is required';
+    document.getElementById('lastname').addEventListener('input', function() {
+        var lastnameInput = this.value.trim();
+        var lastnameError = document.getElementById('lastname-error');
+        
+        if (!/^[a-zA-Z]+$/.test(lastnameInput)) {
+            lastnameError.textContent = "Last Name should contain only letters.";
         } else {
-            mainImageError.textContent = '';
+            lastnameError.textContent = "";
         }
-    }
-
-    // Add event listener for input change
-    document.querySelector('input[name="main_image"]').addEventListener('change', validateMainImage);
+    });
+    // Function to clear error message when the input field is focused
+    document.getElementById('lastname').addEventListener('focus', function() {
+        var firstnameError = document.getElementById('lastname-error');
+        firstnameError.textContent = ""; // Clear error message when the input field is focused
+    });
 </script>
+
+<!-- pan number -->
 <script>
-    function validateField(fieldName, errorId) {
-            var inputField = document.getElementsByName(fieldName)[0];
-            var errorElement = document.getElementById(errorId);
-
-            // Regular expression to allow only letters (both uppercase and lowercase)
-            var lettersOnly = /^[A-Za-z]+$/;
-
-            if (inputField.value.trim() === '') {
-                errorElement.textContent = fieldName.charAt(0).toUpperCase() + fieldName.slice(1) + ' is required';
-            } else if (!lettersOnly.test(inputField.value)) {
-                errorElement.textContent = 'Only letters are allowed in the ' + fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
-            } else {
-                errorElement.textContent = '';
-            }
-        }
-    function validateProductName() {
-            var productNameInput = document.getElementById('product_name');
-            var productNameError = document.getElementById('product_name_error');
-
-            var lettersOnly = /^[A-Za-z]+$/;
-
-            if (productNameInput.value.trim() === '') {
-                productNameError.textContent = 'Product Name is required';
-            } else if (!lettersOnly.test(productNameInput.value)) {
-                productNameError.textContent = 'Only letters are allowed in the Product Name';
-            } else {
-                productNameError.textContent = '';
-            }
-        }
-
-    function validateAboutProduct() {
-        var aboutProductInput = document.getElementById('about_product');
-        var aboutProductError = document.getElementById('about_product_error');
-
-        var lettersAndSpacesOnly = /^[A-Za-z ]+$/;
-
-        if (aboutProductInput.value.trim() === '') {
-            aboutProductError.textContent = 'About Product is required';
-        } else if (!lettersAndSpacesOnly.test(aboutProductInput.value)) {
-            aboutProductError.textContent = 'Only letters and spaces are allowed in the About Product';
+    document.getElementById('panNumber').addEventListener('input', function() {
+        var panNumberInput = this.value.trim();
+        var panNumberError = document.getElementById('panNumber-error');
+        
+        if (!/^[a-zA-Z0-9]{1}[a-zA-Z0-9]{9}$/.test(panNumberInput)) {
+            panNumberError.textContent = "PAN Number should start with an alphabet, followed by a combination of alphabets and numbers, maximum 10 characters, no special characters or spaces allowed.";
         } else {
-            aboutProductError.textContent = '';
+            panNumberError.textContent = ""; // Clear error message if input is valid
         }
-}
-function validateCurrentPrice() {
-            var currentPriceInput = document.getElementById('current_price');
-            var currentPriceError = document.getElementById('current_price_error');
+    });
 
-            var digitsOnly = /^\d+$/;
+    // Function to clear error message when the input field is focused
+    document.getElementById('panNumber').addEventListener('focus', function() {
+        var panNumberError = document.getElementById('panNumber-error');
+        panNumberError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
 
-            if (currentPriceInput.value.trim() === '') {
-                currentPriceError.textContent = 'Current Price is required';
-            } else if (!digitsOnly.test(currentPriceInput.value)) {
-                currentPriceError.textContent = 'Only digits are allowed in the Current Price';
-            } else {
-                currentPriceError.textContent = '';
-            }
-        }
-
-        function validateField(fieldName) {
-        var input = document.getElementsByName(fieldName)[0];
-        var errorElement = document.getElementById(fieldName + '_error');
-
-        // Regular expression to allow only letters (both uppercase and lowercase)
-        var lettersOnly = /^[A-Za-z]+$/;
-
-        if (input.value.trim() === '') {
-            errorElement.textContent = 'Color is required';
-        } else if (!lettersOnly.test(input.value)) {
-            errorElement.textContent = 'Only letters are allowed in the Color';
+<!-- businessName -->
+<script>
+    document.getElementById('brandName').addEventListener('input', function() {
+        var brandNameInput = this.value.trim();
+        var brandNameError = document.getElementById('brandName-error');
+        
+        if (!/^[^\s].*$/.test(brandNameInput)) {
+            brandNameError.textContent = "Business Name should not start with a space.";
         } else {
-            errorElement.textContent = '';
+            brandNameError.textContent = ""; // Clear error message if input is valid
         }
-    }
-    function validateField(fieldName) {
-        var inputField = document.getElementsByName(fieldName)[0];
-        var errorElement = document.getElementById(fieldName + '_error');
+    });
 
-        // Regular expression to allow only letters (both uppercase and lowercase)
-        var lettersOnly = /^[A-Za-z]+$/;
+    // Function to clear error message when the input field is focused
+    document.getElementById('brandName').addEventListener('focus', function() {
+        var brandNameError = document.getElementById('brandName-error');
+        brandNameError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
 
-        if (inputField.value.trim() === '') {
-            errorElement.textContent = 'Material is required';
-        } else if (!lettersOnly.test(inputField.value)) {
-            errorElement.textContent = 'Only letters are allowed in the Material';
+<!-- businessAddress -->
+<script>
+    document.getElementById('businessAddress').addEventListener('input', function() {
+        var businessAddressInput = this.value.trim();
+        var businessAddressError = document.getElementById('businessAddress-error');
+        
+        if (!/^[^\s].*$/.test(businessAddressInput)) {
+            businessAddressError.textContent = "Address should not start with a space.";
         } else {
-            errorElement.textContent = '';
+            businessAddressError.textContent = ""; // Clear error message if input is valid
         }
-    }
-    function validateForm() {
-            // Add overall form validation logic here
-            // Return true if the form is valid, false otherwise
+    });
 
-            var errorElements = document.querySelectorAll('.error');
-            for (var i = 0; i < errorElements.length; i++) {
-                if (errorElements[i].textContent !== '') {
-                    return false;
+    // Function to clear error message when the input field is focused
+    document.getElementById('businessAddress').addEventListener('focus', function() {
+        var businessAddressError = document.getElementById('businessAddress-error');
+        businessAddressError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
+
+<!-- Phone Number -->
+<script>
+    document.getElementById('businessPhone').addEventListener('input', function() {
+        var businessPhoneInput = this.value.trim();
+        var businessPhoneError = document.getElementById('businessPhone-error');
+        
+        // Check if phone number is exactly 10 digits
+        if (!/^\d{10}$/.test(businessPhoneInput)) {
+            businessPhoneError.textContent = "Phone number should be 10 digits long.";
+        } else if (/(\d)\1{9}/.test(businessPhoneInput)) {
+            businessPhoneError.textContent = "Phone number cannot have the same digit repeated 10 times.";
+        } else {
+            businessPhoneError.textContent = ""; // Clear error message if input is valid
+        }
+    });
+
+    // Function to clear error message when the input field is focused
+    document.getElementById('businessPhone').addEventListener('focus', function() {
+        var businessPhoneError = document.getElementById('businessPhone-error');
+        businessPhoneError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
+
+<!-- pincode -->
+<script>
+    document.getElementById('pincode').addEventListener('input', function() {
+        var pincodeInput = this.value.trim();
+        var pincodeError = document.getElementById('pincode-error');
+        
+        // Check if pincode consists of exactly 6 digits
+        if (!/^\d{6}$/.test(pincodeInput)) {
+            pincodeError.textContent = "Pincode should consist of exactly 6 digits.";
+        } else {
+            pincodeError.textContent = ""; // Clear error message if input is valid
+        }
+    });
+
+    // Function to clear error message when the input field is focused
+    document.getElementById('pincode').addEventListener('focus', function() {
+        var pincodeError = document.getElementById('pincode-error');
+        pincodeError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
+
+<!-- Bank Account Number -->
+<script>
+    document.getElementById('bankAccountNumber').addEventListener('input', function() {
+        var bankAccountNumberInput = this.value.trim();
+        var bankAccountNumberError = document.getElementById('bankAccountNumber-error');
+        
+        // Check if bank account number contains only alphabets and numbers
+        if (!/^[a-zA-Z0-9]*$/.test(bankAccountNumberInput)) {
+            bankAccountNumberError.textContent = "Bank account number should contain only alphabets and numbers.";
+        } else {
+            bankAccountNumberError.textContent = ""; // Clear error message if input is valid
+        }
+    });
+
+    // Function to clear error message when the input field is focused
+    document.getElementById('bankAccountNumber').addEventListener('focus', function() {
+        var bankAccountNumberError = document.getElementById('bankAccountNumber-error');
+        bankAccountNumberError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
+
+<!-- bank name -->
+<script>
+    document.getElementById('bankName').addEventListener('input', function() {
+        var bankNameInput = this.value.trim();
+        var bankNameError = document.getElementById('bankName-error');
+        
+        // Check if bank name contains only alphabets
+        if (!/^[a-zA-Z\s]+$/.test(bankNameInput)) {
+            bankNameError.textContent = "Bank name should contain only alphabets and spaces.";
+        } else {
+            bankNameError.textContent = ""; // Clear error message if input is valid
+        }
+    });
+
+    // Function to clear error message when the input field is focused
+    document.getElementById('bankName').addEventListener('focus', function() {
+        var bankNameError = document.getElementById('bankName-error');
+        bankNameError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
+
+<!-- ifsc code -->
+<script>
+    document.getElementById('ifscCode').addEventListener('input', function() {
+        var ifscCodeInput = this.value.trim();
+        var ifscCodeError = document.getElementById('ifscCode-error');
+        
+        // Check if IFSC code contains only alphabets and digits
+        if (!/^[a-zA-Z0-9]+$/.test(ifscCodeInput)) {
+            ifscCodeError.textContent = "IFSC code should contain only alphabets and digits.";
+        } else {
+            ifscCodeError.textContent = ""; // Clear error message if input is valid
+        }
+    });
+
+    // Function to clear error message when the input field is focused
+    document.getElementById('ifscCode').addEventListener('focus', function() {
+        var ifscCodeError = document.getElementById('ifscCode-error');
+        ifscCodeError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
+
+<!-- pincode api functionality -->
+<script>
+    document.getElementById('pincode').addEventListener('input', function() {
+        var pincode = this.value.trim();
+        if (pincode.length === 6) {
+            fetchPincodeDetails(pincode);
+        }
+    });
+
+    function fetchPincodeDetails(pincode) {
+        fetch(`/get_pincode_details/${pincode}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    document.getElementById('city').value = data.city;
+                    document.getElementById('district').value = data.district;
+                    document.getElementById('state').value = data.state;
+                } else {
+                    // Handle error
+                    console.error(data.error);
                 }
-            }
-
-            return true;
-        }
-        function addImageField() {
-            var container = document.getElementById('image-container');
-            var numImages = container.getElementsByTagName('input').length + 1;
-
-            var input = document.createElement('input');
-            input.type = 'file';
-            input.name = 'image_' + numImages;
-            container.appendChild(input);
-
-            document.getElementById('num_images').value = numImages;
-        }
-
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
 </script>
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $('#sizes').select2();
-    });
-</script>
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/css/select2.min.css" rel="stylesheet">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.13/js/select2.min.js"></script>
 
 </body>
 </html>

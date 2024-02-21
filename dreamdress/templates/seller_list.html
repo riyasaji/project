@@ -238,7 +238,13 @@
                     <strong>Bank Name:</strong> {{ seller.seller_bank_name }}<br>
                     <strong>Bank Account Number:</strong> {{ seller.seller_bank_account_number }}<br>
                     <strong>IFSC Code:</strong> {{ seller.seller_ifsc_code }}<br>
-                    <strong>License PDF:</strong> <a href="{{ seller.seller_license_pdf.url }}" target="_blank">{{ seller.seller_license_pdf.name }}</a><br>
+                    <strong>License PDF:</strong> 
+                      {% if seller.seller_license_pdf %}
+                          <a href="{{ seller.seller_license_pdf.url }}" target="_blank">{{ seller.seller_license_pdf.name }}</a>
+                      {% else %}
+                          No PDF uploaded
+                      {% endif %}
+                      <br>
                     <strong>Admin Approval:</strong> {{ seller.get_admin_approval_display }}<br>
     
                 </td>
