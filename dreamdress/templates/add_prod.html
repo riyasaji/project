@@ -124,21 +124,19 @@
                         <div id="brand_name_error" class="error"></div>
                     </div>
                     <div class="form-group col-md-6">
-                        <label for="category">Category</label>
-                        <select id="category" class="form-control" name="category_name">
-                            <option selected disabled>Select category</option>
-                            <option>Dress</option>
-                            <option>Shirt</option>
-                            <option>Jeans</option>
-                            <option>Swimwear</option>
-                            <option>Sleepwear</option>
-                            <option>Sportswear</option>
-                            <option>Jumpsuits</option>
-                            <option>Blazers</option>
-                            <option>Jackets</option>
-                            <option>Indian Wear</option>
-                        </select>
-                    </div>
+                        <label for="categories">Category</label>
+                        <div class="input-group">
+                            <select class="form-control category-dropdown" name="category_id">
+                                <option value="" selected disabled>Select category</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.category_id }}">{{ category.category_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary add-category-button">+</button>
+                            </div>
+                        </div>
+                    </div>             
                 </div>
 
                 <!-- Description and Material -->
@@ -174,7 +172,7 @@
 
                 <!-- Submit button for adding the product -->
                 <button type="submit" class="btn btn-primary" name="addproduct">Add Product</button>
-            </form>            
+                       
         </div>
     </div>
 </div>
@@ -185,108 +183,103 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+
+<!-- <manage stock -->
 <script>
-    function addStockRow() {
-        // Create a new row for managing stock
-        var stockRow = `
-            <div class="stock-row">
+function addStockRow() {
+    // Create a new row for managing stock
+    var stockRow = `
+        <div class="stock-row">
+            <div class="color-fields">
                 <div class="form-group col-md-6">
                     <label for="colors">Color</label>
-                    <input type="text" class="form-control colors" placeholder="Enter color" name="colors[]">
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="productImage">Product Image</label>
-                    <input type="file" class="form-control-file product-image" name="product_images[]" required>
-                </div>
-                <div class="sizes-section">
-                    <div class="size-row">
-                        <div class="form-group col-md-6">
-                            <label for="sizes">Size</label>
-                            <select class="form-control sizes" name="sizes[]">
-                                <option value="Small">Small</option>
-                                <option value="Medium">Medium</option>
-                                <option value="Large">Large</option>
-                                <option value="XL">XL</option>
-                                <option value="XXL">XXL</option>
-                                <option value="XXXL">3XL</option>
-                                <option value="4XL">4XL</option>
-                                <option value="5XL">5XL</option>
-                            </select>
-                        </div>
-                        <div class="form-group col-md-6">
-                            <label for="stockQuantity">Stock Quantity</label>
-                            <input type="text" class="form-control text-center stock-quantity" value="1" name="stock">
+                    <div class="input-group">
+                        <select class="form-control color-dropdown" name="colour_id">
+                            <option value="" selected disabled>Select color</option>
+                            {% for color in colors %}
+                                <option value="{{ color.colour_id }}">{{ color.colour_name }}</option>
+                            {% endfor %}
+                        </select>
+                        <div class="input-group-append">
+                            <button type="button" class="btn btn-outline-primary add-color-button">+</button>
                         </div>
                     </div>
                 </div>
-                <button class="btn btn-primary add-size-button">Add Size</button>
-                <button class="btn btn-primary done-button">Done</button>
             </div>
-        `;
-
-        // Append the new row to the dynamic-stock-section
-        document.getElementById('dynamic-stock-section').insertAdjacentHTML('beforeend', stockRow);
-
-        // Attach event listener to the "Add Size" button
-        var addSizeButton = document.querySelector('.stock-row:last-child .add-size-button');
-        addSizeButton.addEventListener('click', function() {
-            addSizeRow(this); // Add a new size row when "Add Size" button is clicked
-        });
-
-        // Attach event listener to the "Done" button
-        var doneButton = document.querySelector('.stock-row:last-child .done-button');
-        doneButton.addEventListener('click', function() {
-            addStockRow(); // Add a new row when "Done" button is clicked
-        });
-    }
-
-    function addSizeRow(button) {
-        var sizeRow = `
-            <div class="size-row">
-                <div class="form-group col-md-6">
-                    <label for="sizes">Size</label>
-                    <select class="form-control sizes" name="sizes[]">
-                        <option value="Small">Small</option>
-                        <option value="Medium">Medium</option>
-                        <option value="Large">Large</option>
-                        <option value="XL">XL</option>
-                        <option value="XXL">XXL</option>
-                        <option value="XXXL">3XL</option>
-                        <option value="4XL">4XL</option>
-                        <option value="5XL">5XL</option>
-                    </select>
-                </div>
-                <div class="form-group col-md-6">
-                    <label for="stockQuantity">Stock Quantity</label>
-                    <input type="text" class="form-control text-center stock-quantity" value="1" name="stock">
-                </div>
+            <div class="form-group col-md-6">
+                <label for="productImage">Product Image</label>
+                <input type="file" class="form-control-file product-image" name="product_images[]" required>
             </div>
-        `;
+            <div class="sizes-section">
+                <!-- This is where dynamically added size rows will go -->
+            </div>
+            <button type="button" class="btn btn-primary add-size-button">Add Size</button>
+            <button type="button" class="btn btn-primary done-button">Done</button>
+        </div>
+    `;
 
-        // Insert the new size row before the button
-        button.insertAdjacentHTML('beforebegin', sizeRow);
-    }
-</script>
+    // Append the new row to the dynamic-stock-section
+    document.getElementById('dynamic-stock-section').insertAdjacentHTML('beforeend', stockRow);
 
-
-
-<script>
-    $(document).ready(function () {
-        // Increase stock units
-        $("#increaseUnits").click(function () {
-            var currentValue = parseInt($("#productUnits").val());
-            $("#productUnits").val(currentValue + 1);
-        });
-
-        // Decrease stock units
-        $("#decreaseUnits").click(function () {
-            var currentValue = parseInt($("#productUnits").val());
-            if (currentValue > 1) {
-                $("#productUnits").val(currentValue - 1);
-            }
-        });
+    // Attach event listener to the "Add Size" button
+    var addSizeButton = document.querySelector('.stock-row:last-child .add-size-button');
+    addSizeButton.addEventListener('click', function() {
+        addSizeRow(this); // Add a new size row when "Add Size" button is clicked
     });
+
+    // Attach event listener to the "Done" button
+    var doneButton = document.querySelector('.stock-row:last-child .done-button');
+    doneButton.addEventListener('click', function() {
+        addStockRow(); // Add a new row when "Done" button is clicked
+    });
+}
+
+function addSizeRow(button) {
+    var sizeRow = `
+        <div class="size-row">
+            <div class="form-group col-md-6">
+                <label for="sizes">Size</label>
+                <select class="form-control sizes" name="size_id">
+                    <option selected disabled>Select size</option>
+                    {% for size in sizes %}
+                        <option value="{{ size.size_id }}">{{ size.size_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group col-md-6">
+                <label for="stockQuantity">Stock Quantity</label>
+                <input type="number" class="form-control text-center stock-quantity" value="1" name="stock_quantity[]">
+            </div>
+        </div>
+    `;
+
+    // Insert the new size row before the button
+    button.insertAdjacentHTML('beforebegin', sizeRow);
+}
 </script>
+</form>
+
+
+<!-- stock quantity validation -->
+<script>
+    function validateStockQuantity(input) {
+        var inputValue = input.value.trim();
+        var errorElement = document.getElementById('stockQuantityError');
+
+        // Regular expression to allow only positive whole numbers
+        var wholeNumbersOnly = /^[1-9]\d*$/;
+
+        if (inputValue === '') {
+            errorElement.textContent = 'Stock quantity is required';
+        } else if (!wholeNumbersOnly.test(inputValue)) {
+            errorElement.textContent = 'Only positive whole numbers are allowed';
+        } else {
+            errorElement.textContent = '';
+        }
+    }
+</script>
+
+
 <script>
     function addImageField() {
         var container = document.getElementById('image-container');
@@ -315,6 +308,181 @@
     // Add event listener for input change
     document.querySelector('input[name="main_image"]').addEventListener('change', validateMainImage);
 </script>
+
+<!--Dynamic adding of colours-->
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    var csrftoken = getCookie('csrftoken');
+
+    // Function to add a new color field
+    function addColorField() {
+        var newColorField = `
+            <div class="input-group mt-2">
+                <input type="text" class="form-control new-color-input" placeholder="Enter new color">
+                <div class="input-group-append">
+                    <button type="button" class="btn btn-outline-primary check-color-button">Check</button>
+                    <button type="button" class="btn btn-outline-danger remove-color-button">-</button>
+                </div>
+            </div>
+        `;
+        $('.color-fields').append(newColorField);
+    }
+
+    // Event listener for the plus button to add a new color field
+    $(document).on('click', '.add-color-button', function() {
+        addColorField();
+    });
+
+    // Event listener for the minus button to remove a color field
+    $(document).on('click', '.remove-color-button', function() {
+        $(this).closest('.input-group').remove();
+    });
+
+    // Event listener for the check color button
+    $(document).on('click', '.check-color-button', function() {
+        var colorInput = $(this).closest('.input-group').find('.new-color-input');
+        var color = colorInput.val().trim(); // Get the entered color
+
+        // Check if the color is empty
+        if (color === '') {
+            alert('Please enter a color.');
+            return;
+        }
+
+        // Send an AJAX request to check if the color exists in the database
+        $.ajax({
+            url: '/check_color/',
+            method: 'POST',
+            headers: { "X-CSRFToken": csrftoken }, // Add CSRF token to headers
+            data: {
+                'color_name': color
+            },
+            success: function(response) {
+                if (response.exists) {
+                    alert('This color already exists.');
+                } else {
+                    // If the color doesn't exist, add it to the database
+                    $.ajax({
+                        url: '/add_color/',
+                        method: 'POST',
+                        headers: { "X-CSRFToken": csrftoken }, // Add CSRF token to headers
+                        data: {
+                            'color_name': color
+                        },
+                        success: function(response) {
+                            if (response.success) {
+                                alert('Color added successfully.');
+                            } else {
+                                alert('Failed to add color.');
+                            }
+                        },
+                        error: function(xhr, status, error) {
+                            alert('An error occurred while adding the color.');
+                        }
+                    });
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('An error occurred while checking the color.');
+            }
+        });
+    });
+</script>
+
+<!-- categor dynamically -->
+<script>
+    // // Function to add a new category field
+    // function addCategoryField() {
+    //     var newCategoryField = `
+    //         <div class="input-group mt-2">
+    //             <input type="text" class="form-control new-category-input" placeholder="Enter new category">
+    //             <div class="input-group-append">
+    //                 <button type="button" class="btn btn-outline-primary check-category-button">Check</button>
+    //                 <button type="button" class="btn btn-outline-danger remove-category-button">-</button>
+    //             </div>
+    //         </div>
+    //     `;
+    //     $('.category-fields').append(newCategoryField);
+    // }
+
+    // // Event listener for the plus button to add a new category field
+    // $(document).on('click', '.add-category-button', function() {
+    //     addCategoryField();
+    // });
+
+    // // Event listener for the minus button to remove a category field
+    // $(document).on('click', '.remove-category-button', function() {
+    //     $(this).closest('.input-group').remove();
+    // });
+
+    // // Event listener for the check category button
+    // $(document).on('click', '.check-category-button', function() {
+    //     var categoryInput = $(this).closest('.input-group').find('.new-category-input');
+    //     var category = categoryInput.val().trim(); // Get the entered category
+
+    //     // Check if the category is empty
+    //     if (category === '') {
+    //         alert('Please enter a category.');
+    //         return;
+    //     }
+
+    //     // Send an AJAX request to check if the category exists in the database
+    //     $.ajax({
+    //         url: '/check_category/',
+    //         method: 'POST',
+    //         headers: { "X-CSRFToken": csrftoken }, // Add CSRF token to headers
+    //         data: {
+    //             'category_name': category
+    //         },
+    //         success: function(response) {
+    //             if (response.exists) {
+    //                 alert('This category already exists.');
+    //             } else {
+    //                 // If the category doesn't exist, add it to the database
+    //                 $.ajax({
+    //                     url: '/add_category/',
+    //                     method: 'POST',
+    //                     headers: { "X-CSRFToken": csrftoken }, // Add CSRF token to headers
+    //                     data: {
+    //                         'category_name': category
+    //                     },
+    //                     success: function(response) {
+    //                         if (response.success) {
+    //                             alert('Category added successfully.');
+    //                         } else {
+    //                             alert('Failed to add category.');
+    //                         }
+    //                     },
+    //                     error: function(xhr, status, error) {
+    //                         alert('An error occurred while adding the category.');
+    //                     }
+    //                 });
+    //             }
+    //         },
+    //         error: function(xhr, status, error) {
+    //             alert('An error occurred while checking the category.');
+    //         }
+    //     });
+    // });
+</script>
+
+
+<!-- field validation -->
 <script>
     function validateField(fieldName, errorId) {
             var inputField = document.getElementsByName(fieldName)[0];

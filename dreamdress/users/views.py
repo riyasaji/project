@@ -406,107 +406,161 @@ def shop(request):
 def seller_waiting(request):
     return render(request,'seller_waiting.html')
 
-#add Product 
+# Add Product
+@login_required(login_url='signin')  
 def add_product(request):
     if request.method == 'POST':
-        # Process the form data
-        brand_name = request.POST.get('brand_name')
-        category_name = request.POST.get('category_name')
-        about_product = request.POST.get('about_product')
-        material = request.POST.get('material')
-        current_price = request.POST.get('current_price')
-
-        # Get or create category
-        category, created = Tbl_category.objects.get_or_create(category_name=category_name)
-
-        # Get the current user (assuming user is logged in)
-        user = request.user
-        seller = Tbl_seller.objects.filter(user=user).first()
-        if seller is None:
-             return HttpResponse("You are not registered as a seller.")
-        
-        # Create the product
-        product = Tbl_product.objects.create(
-            category=category,
-            seller=seller,
-            product_current_price=current_price,
-            product_about_product=about_product,
-            product_material=material
-        )
-
-        # Process dynamic stock rows
-        colors = request.POST.getlist('colors[]')
-        sizes = request.POST.getlist('sizes[]')
-        stock_quantities = request.POST.getlist('stock[]')
-
-        for color_name in colors:
-            for size_name in sizes:
-                color, _ = Tbl_colour.objects.get_or_create(colour_name=color_name)
-                size, _ = Tbl_size.objects.get_or_create(size_name=size_name)
-                stock_quantity = stock_quantities.pop(0) if stock_quantities else 0
-
-
-                # Create stock entry
+        try:
+            # Extract data from the form
+            brand_name = request.POST.get('brand_name')
+            category_id = request.POST.get('category_id')
+            about_product = request.POST.get('about_product')
+            material = request.POST.get('material')
+            current_price = request.POST.get('current_price')
+            
+            # Retrieve category object
+            category = get_object_or_404(Tbl_category, pk=category_id)
+            
+            # Get the logged-in seller
+            seller = request.user.tbl_seller
+            
+            # Create the product object
+            product = Tbl_product.objects.create(
+                seller=seller,
+                category=category,
+                product_about_product=about_product,
+                product_material=material,
+                product_current_price=current_price
+            )
+            
+            # Handle stock entries
+            colors = request.POST.getlist('colour_id')
+            sizes = request.POST.getlist('size_id')
+            quantities = request.POST.getlist('stock_quantity[]')
+            
+            for color_id, size_id, quantity in zip(colors, sizes, quantities):
+                colour = get_object_or_404(Tbl_colour, pk=color_id)
+                size = get_object_or_404(Tbl_size, pk=size_id)
+                
                 stock = Tbl_stock.objects.create(
                     product=product,
-                    colour=color,
+                    colour=colour,
                     size=size,
-                    stock_quantity=stock_quantity
+                    stock_quantity=quantity
                 )
+            
+            # Handle product images
+            product_images = request.FILES.getlist('product_images[]')
+            for image in product_images:
+                Tbl_ProductImage.objects.create(product=product, image=image)
+            
+            messages.success(request, 'Product added successfully!')
+            return redirect('seller_dashboard')  
+        except Exception as e:
+            messages.error(request, f'Error occurred while adding product: {str(e)}')
+            return redirect('add_product')
 
-        # Process product images
-        for image_file in request.FILES.getlist('product_images[]'):
-            product_image = Tbl_ProductImage.objects.create(
-                product=product,
-                image=image_file
-            )
-        messages.success(request, 'Product added successfully.')
-        return redirect('seller_dashboard')
+    return render(request, 'add_prod.html', {
+        'categories': Tbl_category.objects.all(),
+        'colors': Tbl_colour.objects.all(),
+        'sizes': Tbl_size.objects.all()
+    })
+
+#shop-view porduct
+def products_view(request):
+   products = Tbl_product.objects.select_related('category', 'seller').prefetch_related('tbl_stock_set__colour', 'tbl_stock_set__size', 'tbl_productimage_set').all()
+   context = {'products': products}
+   return render(request, 'shop.html', context)
+
+#   Check for colour  
+def check_color(request):
+    if request.method == 'POST':
+        color_name = request.POST.get('color_name')
+        if Tbl_colour.objects.filter(colour_name=color_name).exists():
+            # If the color already exists in the database
+            return JsonResponse({'exists': True})
+        else:
+            # If the color doesn't exist in the database
+            return JsonResponse({'exists': False})
     else:
-        return render(request, 'add_prod.html')
+        return JsonResponse({'error': 'Invalid request method'})
+
+# add Tbl_colour
+def add_color(request):
+    if request.method == 'POST':
+        color_name = request.POST.get('color_name')
+        # Create a new color object and save it to the database
+        new_color = Tbl_colour(colour_name=color_name)
+        new_color.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
     
+#check category
+def check_category(request):
+    if request.method == 'POST':
+        category_name = request.POST.get('category_name')
+        if Tbl_category.objects.filter(category_name=category_name).exists():
+            # If the category already exists in the database
+            return JsonResponse({'exists': True})
+        else:
+            # If the category doesn't exist in the database
+            return JsonResponse({'exists': False})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+    
+# add category
+def add_category(request):
+    if request.method == 'POST':
+        category_name = request.POST.get('category_name')
+        new_category = Tbl_category(category_name=category_name)
+        new_category.save()
+        return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
 
 
 @login_required(login_url='signin')
 def profile_update(request):
-    user = request.user  # Assuming the authenticated user
+    # user = request.user  # Assuming the authenticated user
 
-    try:
-        user_profile = UserProfile.objects.get(user=user)
-    except UserProfile.DoesNotExist:
-        # Handle the case where the profile doesn't exist for the user
-        user_profile = None
+    # try:
+    #     user_profile = UserProfile.objects.get(user=user)
+    # except UserProfile.DoesNotExist:
+    #     # Handle the case where the profile doesn't exist for the user
+    #     user_profile = None
 
-    if request.method == 'POST':
-         first_name = request.POST.get('firstName')
-         last_name = request.POST.get('lastName')
-         email = request.POST.get('email')
-         phone_number = request.POST.get('phoneNumber')
-         profile_image = request.FILES.get('profileImage')
-          # Update user's basic information
-         user.first_name = first_name
-         user.last_name = last_name
-         user.email = email
-         user.save()
-                # Update or create user profile
-         if user_profile:
-            user_profile.phone_number = phone_number
-            if profile_image:
-                user_profile.profile_image = profile_image
-         else:
-            user_profile = UserProfile(user=user, phone_number=phone_number, profile_image=profile_image)
-         user_profile.save()
+    # if request.method == 'POST':
+    #      first_name = request.POST.get('firstName')
+    #      last_name = request.POST.get('lastName')
+    #      email = request.POST.get('email')
+    #      phone_number = request.POST.get('phoneNumber')
+    #      profile_image = request.FILES.get('profileImage')
+    #       # Update user's basic information
+    #      user.first_name = first_name
+    #      user.last_name = last_name
+    #      user.email = email
+    #      user.save()
+    #             # Update or create user profile
+    #      if user_profile:
+    #         user_profile.phone_number = phone_number
+    #         if profile_image:
+    #             user_profile.profile_image = profile_image
+    #      else:
+    #         user_profile = UserProfile(user=user, phone_number=phone_number, profile_image=profile_image)
+    #      user_profile.save()
 
-         messages.success(request, 'Profile updated successfully')
-         return redirect('customer_dashboard')  # Redirect to the user's profile page
+    #      messages.success(request, 'Profile updated successfully')
+    #      return redirect('customer_dashboard')  # Redirect to the user's profile page
 
-    # Pass user and user_profile objects to the template for rendering
-    context = {
-        'user': user,
-        'user_profile': user_profile
-    }
+    # # Pass user and user_profile objects to the template for rendering
+    # context = {
+    #     'user': user,
+    #     'user_profile': user_profile
+    # }
 
-    return render(request, 'update_profile.html', context)
+    return render(request, 'update_profile.html')
 
 
 #change password for customer
@@ -574,14 +628,14 @@ def deactivate_user(request, user_id):
     # Send an email to the user here
     return redirect('seller_approval')
 
-#sellerview2
-def sellviews(request):
-    # Retrieve seller profiles with the role 'SELLER'
-    user_profiles = Seller.objects.filter(user_type='seller')
+# #sellerview2
+# def sellviews(request):
+#     # Retrieve seller profiles with the role 'SELLER'
+#     user_profiles = Seller.objects.filter(user_type='seller')
 
-    # Pass the data to the template
-    context = {'user_profiles': user_profiles}
-    return render(request, 'sellerList_admin.html', context)
+#     # Pass the data to the template
+#     context = {'user_profiles': user_profiles}
+#     return render(request, 'sellerList_admin.html', context)
      
 
 
@@ -618,18 +672,18 @@ def sellviews(request):
 
 
 #block_seller - to block the seller approvel
-def block_seller(request, seller_id):
-    seller = Seller.objects.get(pk=seller_id)
-    seller.is_approved = False
-    seller.save()
-    subject = 'Your Seller Account Has Been blocked'
-    message = 'Dear {},\n\nYour seller account has been blocked by the admin. You cannot  log in and  banned your account.'
-    from_email = 'prxnv2832@gmail.com'  # Replace with your email address
-    recipient_list = [seller.user.email]
+# def block_seller(request, seller_id):
+#     seller = Seller.objects.get(pk=seller_id)
+#     seller.is_approved = False
+#     seller.save()
+#     subject = 'Your Seller Account Has Been blocked'
+#     message = 'Dear {},\n\nYour seller account has been blocked by the admin. You cannot  log in and  banned your account.'
+#     from_email = 'prxnv2832@gmail.com'  # Replace with your email address
+#     recipient_list = [seller.user.email]
     
-    send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+#     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
     
-    return redirect('sellor_approval')
+#     return redirect('sellor_approval')
 
 def delete_seller(request, seller_id):
     user = Tbl_user.objects.get(pk=seller_id)
@@ -649,9 +703,9 @@ def delete_seller(request, seller_id):
 
 
 
-def seller_viewforapproval(request):
-    sellers = Seller.objects.filter(status='Pending')
-    return render(request,'seller_approval.html',{'sellers': sellers})
+# def seller_viewforapproval(request):
+#     sellers = Seller.objects.filter(status='Pending')
+#     return render(request,'seller_approval.html',{'sellers': sellers})
 
 
 
@@ -659,7 +713,7 @@ def seller_viewforapproval(request):
     
 
 def product_details(request,product_id):
-    product = get_object_or_404(Product, pk=product_id)
+    product = get_object_or_404(Tbl_product, pk=product_id)
     context = {
         'product': product,
     }
@@ -742,7 +796,7 @@ def temp(request):
 
 
 def demo(request):    
-    return render(request, 'demo.html', {'sellers': sellers})
+    return render(request, 'demo.html')
 
 
 

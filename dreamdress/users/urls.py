@@ -59,10 +59,15 @@ urlpatterns = [
     path('sellers/', views.seller_list, name='seller_list'),
     path('approve_seller/<int:seller_id>/', views.approve_seller, name='approve_seller'),
     path('reject_seller/<int:seller_id>/', views.reject_seller, name='reject_seller'),
-    path('seller_viewforapproval', views.seller_viewforapproval, name='seller_viewforapproval'),
+
+
     path('user_list/', views.user_list, name='user_list'),
     path('seller_list/', views.seller_list, name='seller_list'),
     path('admin_approvals/', views.admin_approvals, name='admin_approvals'),
+    path('check_color/', views.check_color, name='check_color'),
+    path('add_color/', views.add_color, name='add_color'),
+    path('check_category/', views.check_category, name='check_category'),
+    path('add_category/', views.add_category, name='add_category'),
     path('get_pincode_details/<str:pincode>/', views.get_pincode_details, name='get_pincode_details'),
     
 ]

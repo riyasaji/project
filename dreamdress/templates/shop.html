@@ -40,25 +40,6 @@
                     <a class="text-dark" href="">Support</a>
                 </div>
             </div>
-            <div class="col-lg-6 text-center text-lg-right">
-                <div class="d-inline-flex align-items-center">
-                    <a class="text-dark px-2" href="">
-                        <i class="fab fa-facebook-f"></i>
-                    </a>
-                    <a class="text-dark px-2" href="">
-                        <i class="fab fa-twitter"></i>
-                    </a>
-                    <a class="text-dark px-2" href="">
-                        <i class="fab fa-linkedin-in"></i>
-                    </a>
-                    <a class="text-dark px-2" href="">
-                        <i class="fab fa-instagram"></i>
-                    </a>
-                    <a class="text-dark pl-2" href="">
-                        <i class="fab fa-youtube"></i>
-                    </a>
-                </div>
-            </div>
         </div>-->
         <div class="row align-items-center py-3 px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
@@ -78,7 +59,7 @@
                     </div>
                 </form>
             </div>
-            <!--<div class="col-lg-3 col-6 text-right">
+            <div class="col-lg-3 col-6 text-right">
                 <a href="" class="btn border">
                     <i class="fas fa-heart text-primary"></i>
                     <span class="badge">0</span>
@@ -87,7 +68,7 @@
                     <i class="fas fa-shopping-cart text-primary"></i>
                     <span class="badge">0</span>
                 </a>
-            </div>-->
+            </div>
         </div>
     </div>
     <!-- Topbar End -->
@@ -148,10 +129,6 @@
                             <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
                         {% endif %}
                     </div>
-                        <!--<div class="navbar-nav ml-auto py-0">
-                            <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
-                            <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
-                        </div>-->
                     </div>
                 </nav>
             </div>
@@ -161,7 +138,7 @@
 
 
     <!-- Page Header Start -->
-    <!--<div class="container-fluid bg-secondary mb-5">
+    <div class="container-fluid bg-secondary mb-5">
         <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
             <h1 class="font-weight-semi-bold text-uppercase mb-3">Our Shop</h1>
             <div class="d-inline-flex">
@@ -170,16 +147,16 @@
                 <p class="m-0">Shop</p>
             </div>
         </div>
-    </div>-->
+    </div>
     <!-- Page Header End -->
 
 
     <!-- Shop Start -->
     <div class="container-fluid pt-5">
-        <div class="row px-xl-5">
-            <!-- Shop Sidebar Start -->
-            <!--<div class="col-lg-3 col-md-12">
-                <!-- Price Start 
+        <!-- <div class="row px-xl-5">
+             Shop Sidebar Start 
+            <div class="col-lg-3 col-md-12">
+                Price Start 
                 <div class="border-bottom mb-4 pb-4">
                     <h5 class="font-weight-semi-bold mb-4">Filter by price</h5>
                     <form>
@@ -215,9 +192,9 @@
                         </div>
                     </form>
                 </div>
-                <!-- Price End -->
+                 Price End
                 
-                <!-- Color Start 
+                 Color Start  
                 <div class="border-bottom mb-4 pb-4">
                     <h5 class="font-weight-semi-bold mb-4">Filter by color</h5>
                     <form>
@@ -252,7 +229,7 @@
                             <span class="badge border font-weight-normal">168</span>
                         </div>
                     </form>
-                </div>
+                </div> -->
                 <!-- Color End -->
 
                 <!-- Size Start 
@@ -291,16 +268,16 @@
                         </div>
                     </form>
                 </div>
-                <!-- Size End 
+                Size End  
             </div>-->
             <!-- Shop Sidebar End -->
 
 
             <!-- Shop Product Start -->
-            <div class="col-lg-9 col-md-12">
-                <div class="row pb-3">
+            <!-- <div class="col-lg-9 col-md-12">
+                <div class="row pb-3"> -->
                     
-                    <!--<div class="col-12 pb-1">
+                    <!-- <div class="col-12 pb-1">
                         <div class="d-flex align-items-center justify-content-between mb-4">
                             <form action="">
                                 <div class="input-group">
@@ -324,42 +301,59 @@
                                 </div>
                             </div>
                         </div>
-                    </div>-->
-                    <div class="row">
-                        {% for product in products %}
-                        <div class="col-lg-4 col-md-6 col-sm-12 pb-3">
-                            <div class="card product-item border-0 mb-4">
-                                <div class="card-header product-img position-relative overflow-hidden bg-light border p-0">
-                                    <img class="img-fluid" src="{{ product.image_1.url }}" alt="{{ product.product_name }}">
-                                </div>
-                                <div class="card-body border-left border-right text-center p-0 pt-3 pb-2">
-                                    <h6 class="text-truncate mb-3">{{ product.product_name }}</h6>
-                                    <div class="d-flex justify-content-center">
-                                        <h6 class="mb-0">${{ product.current_price }}</h6>
-                                    </div>
-                                </div>
-                                <div class="card-footer bg-light border">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <a href="{% url 'product_details' product.id %}" class="btn btn-sm text-dark btn-block p-0">
-                                                <i class="fas fa-eye text-primary mr-1"></i>View Detail
-                                            </a>
-                                        </div>
-                                        <div class="col-6">
-                                            <form method="post" action="" class="mb-0">
-                                                {% csrf_token %}
-                                                <input type="hidden" name="product_id" value="{{ product.pk }}">
-                                                <button type="submit" class="btn btn-sm text-dark btn-block p-0">
-                                                    <i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart
-                                                </button>
-                                            </form>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        {% endfor %}
+                    </div> -->
+                    <!-- Start of product display section -->
+<div class="col-lg-9 col-md-12">
+    <div class="row pb-3">
+        <!-- Loop over each product -->
+        {% for product in products %}
+        <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+            <div class="card product-item border-0 mb-4">
+                <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                    <!-- Display product image -->
+                    {% if product.tbl_productimage_set.exists %}
+                        <img class="img-fluid w-100" src="{{ product.tbl_productimage_set.first.image.url }}" alt="{{ product.product_name }}">
+                    {% else %}
+                        <!-- If there are no images for the product, you can display a default placeholder image -->
+                        <img class="img-fluid w-100" src="{% static 'img/default_product_image.jpg' %}" alt="{{ product.product_name }}">
+                    {% endif %}
+                </div>
+                <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                    <!-- Display product name -->
+                    <h6 class="text-truncate mb-3">{{ product.product_name }}</h6>
+                    <!-- Display product category -->
+                    <p>Category: {{ product.category.category_name }}</p>
+                    <!-- Display product seller -->
+                    <p>Seller: {{ product.seller.seller_name }}</p>
+                    <!-- Display product price -->
+                    <div class="d-flex justify-content-center">
+                        <h6>${{ product.product_current_price }}</h6>
+                        <!-- You can add the discounted price here if applicable -->
+                        <!-- <h6 class="text-muted ml-2"><del>${{ product.discounted_price }}</del></h6> -->
                     </div>
+                    <!-- Display product description -->
+                    <p>{{ product.product_about_product }}</p>
+                    <!-- Display product material -->
+                    <p>Material: {{ product.product_material }}</p>
+                </div>
+                <div class="card-footer d-flex justify-content-between bg-light border">
+                    <!-- Link to view product details -->
+                    <a href="{% url 'product_details' product.pk %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                    <!-- Add to cart button -->
+                    <form method="post" action="{% url 'add_to_cart' %}" class="mb-0">
+                        {% csrf_token %}
+                        <input type="hidden" name="product_id" value="{{ product.pk }}">
+                        <button type="submit" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        <!-- End of product loop -->
+    </div>
+</div>
+<!-- End of product display section -->
+
                     
                     
                     
@@ -367,7 +361,7 @@
                     
 
 
-                    <!--<div class="col-lg-4 col-md-6 col-sm-12 pb-1">
+                    <!-- <div class="col-lg-4 col-md-6 col-sm-12 pb-1">
                         <div class="card product-item border-0 mb-4">
                             <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
                                 <img class="img-fluid w-100" src="{% static '/img/product-2.jpg' %}" alt="">
@@ -526,9 +520,9 @@
                     </div>
                 </div>
             </div>
-            <!-- Shop Product End
+             Shop Product End
         </div>
-    </div>
+    </div> -->
     <!-- Shop End -->
 
 
@@ -597,13 +591,10 @@
     <script src="{% static '/https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js' %}"></script>
     <script src="{% static '/lib/easing/easing.min.js' %}"></script>
     <script src="{% static '/lib/owlcarousel/owl.carousel.min.js' %}"></script>
-
-    <!-- Contact Javascript File -->
-    <script src="{% static '/mail/jqBootstrapValidation.min.js' %}"></script>
-    <script src="{% static '/mail/contact.js' %}"></script>
-
-    <!-- Template Javascript -->
-    <script src="{% static '/js/main.js' %}"></script>
-</body>
+    <script src="{% static 'js/bootstrap.bundle.min.js' %}"></script>
+    <script src="{% static 'js/jquery-3.4.1.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
+    
 
 </html>
