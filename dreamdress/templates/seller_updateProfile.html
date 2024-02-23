@@ -366,7 +366,45 @@
         pincodeError.textContent = ""; // Clear error message when the input field is focused
     });
 </script>
+<!-- district -->
+<script>
+    document.getElementById('district').addEventListener('input', function() {
+        var districtInput = this.value.trim();
+        var districtError = document.getElementById('district-error');
+        
+        if (!/^[a-zA-Z]+$/.test(districtInput)) {
+            districtError.textContent = "District should contain only letters.";
+        } else {
+            districtError.textContent = "";
+        }
+    });
+    
+    // Function to clear error message when the input field is focused
+    document.getElementById('district').addEventListener('focus', function() {
+        var districtError = document.getElementById('district-error');
+        districtError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
 
+<!-- state -->
+<script>
+    document.getElementById('state').addEventListener('input', function() {
+        var stateInput = this.value.trim();
+        var stateError = document.getElementById('state-error');
+        
+        if (!/^[a-zA-Z]+$/.test(stateInput)) {
+            stateError.textContent = "State should contain only letters.";
+        } else {
+            stateError.textContent = "";
+        }
+    });
+    
+    // Function to clear error message when the input field is focused
+    document.getElementById('state').addEventListener('focus', function() {
+        var stateError = document.getElementById('state-error');
+        stateError.textContent = ""; // Clear error message when the input field is focused
+    });
+</script>
 <!-- Bank Account Number -->
 <script>
     document.getElementById('bankAccountNumber').addEventListener('input', function() {

@@ -398,9 +398,7 @@ def user_count_view(request):
     user_count = Tbl_user.objects.count()
     return render(request, 'customerList_admin.html', {'user_count': user_count})
     
-# SHOP
-def shop(request):
-    return render(request, 'shop.html')
+
 
 #seller waiting page
 def seller_waiting(request):
@@ -466,11 +464,10 @@ def add_product(request):
         'sizes': Tbl_size.objects.all()
     })
 
-#shop-view porduct
-def products_view(request):
-   products = Tbl_product.objects.select_related('category', 'seller').prefetch_related('tbl_stock_set__colour', 'tbl_stock_set__size', 'tbl_productimage_set').all()
-   context = {'products': products}
-   return render(request, 'shop.html', context)
+#product - view -shop
+def shop_view(request):
+    products = Tbl_product.objects.all()
+    return render(request, 'shop.html', {'products': products})
 
 #   Check for colour  
 def check_color(request):
@@ -697,7 +694,44 @@ def delete_seller(request, seller_id):
     return redirect('sellor_approval')
 
 
-       
+ #tailor registeration
+def tailor_registeration(request):
+     if request.method=='POST':
+        email=request.POST['email']
+        if Tbl_user.objects.filter(email=email).exists():
+            messages.success(request,'Email Already Exists')
+            return redirect('seller_registration')
+        username= email
+        password=request.POST['password']
+        user_type = 'tailor' 
+        
+        user=Tbl_user.objects.create(username=username,email=email,password=password,user_type=user_type)
+        user.set_password(password)
+        
+        #authentication
+        user.is_active=False
+        user.save()
+        
+        # Tbl_tailor.objects.create(user=user)
+
+        current_site=get_current_site(request)  
+        email_subject="Activate your account"
+        message=render_to_string('activate.html',{
+                   'user':user,
+                   'domain':current_site.domain,
+                   'uid':urlsafe_base64_encode(force_bytes(user.pk)),
+                   'token':generate_token.make_token(user)
+
+
+            })
+        print(message)
+
+        email_message=EmailMessage(email_subject,message,settings.EMAIL_HOST_USER,[email],)
+        EmailThread(email_message).start()
+        messages.info(request,"Active your account by clicking the link send to your email")
+        return redirect('signin')
+     else:
+        return render(request,'tailor_registeration.html')   
 
 
 
@@ -712,12 +746,10 @@ def delete_seller(request, seller_id):
     
     
 
-def product_details(request,product_id):
-    product = get_object_or_404(Tbl_product, pk=product_id)
-    context = {
-        'product': product,
-    }
-    return render(request,'detail.html', context)
+
+def product_details(request):
+    return render(request, 'details.html')
+
 
 
 # def add_product(request):

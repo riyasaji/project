@@ -83,6 +83,18 @@
         .btn-primary {
             margin-top: 10px;
         }
+        .cancel-sign {
+            font-weight: bold;
+            color: red;
+        }
+        .invalid-feedback {
+        display: none;
+        color: red;
+    }
+        .is-invalid {
+            border: 1px solid red;
+        }
+
     </style>
     <title>Add Dress</title>
 </head>
@@ -185,99 +197,112 @@
 
 
 <!-- <manage stock -->
-<script>
-function addStockRow() {
-    // Create a new row for managing stock
-    var stockRow = `
-        <div class="stock-row">
-            <div class="color-fields">
-                <div class="form-group col-md-6">
-                    <label for="colors">Color</label>
-                    <div class="input-group">
-                        <select class="form-control color-dropdown" name="colour_id">
-                            <option value="" selected disabled>Select color</option>
-                            {% for color in colors %}
-                                <option value="{{ color.colour_id }}">{{ color.colour_name }}</option>
-                            {% endfor %}
-                        </select>
-                        <div class="input-group-append">
-                            <button type="button" class="btn btn-outline-primary add-color-button">+</button>
+    <script>
+        function addStockRow() {
+            // Create a new row for managing stock
+            var stockRow = `
+                <div class="stock-row">
+                    <div class="color-fields">
+                        <div class="form-group col-md-6">
+                            <label for="colors">Color</label>
+                            <div class="input-group">
+                                <select class="form-control color-dropdown" name="colour_id">
+                                    <option value="" selected disabled>Select color</option>
+                                    {% for color in colors %}
+                                        <option value="{{ color.colour_id }}">{{ color.colour_name }}</option>
+                                    {% endfor %}
+                                </select>
+                                <div class="input-group-append">
+                                    <button type="button" class="btn btn-outline-primary add-color-button">+</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
+                    <div class="form-group col-md-6">
+                        <label for="productImage">Product Image</label>
+                        <input type="file" class="form-control-file product-image" name="product_images[]" required>
+                    </div>
+                    <div class="sizes-section">
+                        <!-- This is where dynamically added size rows will go -->
+                    </div>
+                    <button type="button" class="btn btn-primary add-size-button">Add Size</button>
+                    <button type="button" class="btn btn-primary done-button">Done</button>
+                    <span class="cancel-sign">X</span> <!-- Cancel sign -->
                 </div>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="productImage">Product Image</label>
-                <input type="file" class="form-control-file product-image" name="product_images[]" required>
-            </div>
-            <div class="sizes-section">
-                <!-- This is where dynamically added size rows will go -->
-            </div>
-            <button type="button" class="btn btn-primary add-size-button">Add Size</button>
-            <button type="button" class="btn btn-primary done-button">Done</button>
-        </div>
-    `;
-
-    // Append the new row to the dynamic-stock-section
-    document.getElementById('dynamic-stock-section').insertAdjacentHTML('beforeend', stockRow);
-
-    // Attach event listener to the "Add Size" button
-    var addSizeButton = document.querySelector('.stock-row:last-child .add-size-button');
-    addSizeButton.addEventListener('click', function() {
-        addSizeRow(this); // Add a new size row when "Add Size" button is clicked
-    });
-
-    // Attach event listener to the "Done" button
-    var doneButton = document.querySelector('.stock-row:last-child .done-button');
-    doneButton.addEventListener('click', function() {
-        addStockRow(); // Add a new row when "Done" button is clicked
-    });
-}
-
-function addSizeRow(button) {
-    var sizeRow = `
-        <div class="size-row">
-            <div class="form-group col-md-6">
-                <label for="sizes">Size</label>
-                <select class="form-control sizes" name="size_id">
-                    <option selected disabled>Select size</option>
-                    {% for size in sizes %}
-                        <option value="{{ size.size_id }}">{{ size.size_name }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <div class="form-group col-md-6">
-                <label for="stockQuantity">Stock Quantity</label>
-                <input type="number" class="form-control text-center stock-quantity" value="1" name="stock_quantity[]">
-            </div>
-        </div>
-    `;
-
-    // Insert the new size row before the button
-    button.insertAdjacentHTML('beforebegin', sizeRow);
-}
-</script>
+            `;
+        
+            // Append the new row to the dynamic-stock-section
+            document.getElementById('dynamic-stock-section').insertAdjacentHTML('beforeend', stockRow);
+        
+            // Attach event listener to the "Add Size" button
+            var addSizeButton = document.querySelector('.stock-row:last-child .add-size-button');
+            addSizeButton.addEventListener('click', function() {
+                addSizeRow(this); // Add a new size row when "Add Size" button is clicked
+            });
+        
+            // Attach event listener to the "Done" button
+            var doneButton = document.querySelector('.stock-row:last-child .done-button');
+            doneButton.addEventListener('click', function() {
+                addStockRow(); // Add a new row when "Done" button is clicked
+            });
+            
+            // Attach event listener to the cancel sign
+            var cancelSign = document.querySelector('.stock-row:last-child .cancel-sign');
+            cancelSign.addEventListener('click', function() {
+                this.parentElement.remove(); // Remove the current stock row
+            });
+        }
+        
+        function addSizeRow(button) {
+            var sizeRow = `
+                <div class="size-row">
+                    <div class="form-group col-md-6">
+                        <label for="sizes">Size</label>
+                        <select class="form-control sizes" name="size_id">
+                            <option selected disabled>Select size</option>
+                            {% for size in sizes %}
+                                <option value="{{ size.size_id }}">{{ size.size_name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="stockQuantity">Stock Quantity</label>
+                        <input type="number" class="form-control text-center stock-quantity" value="1" name="stock_quantity[]" id="stockQuantity" required>
+                        <span class="error-message" style="color: red; display: none;">Stock quantity cannot be negative.</span>
+                    </div>
+                </div>
+            `;
+        
+            // Insert the new size row before the button
+            button.insertAdjacentHTML('beforebegin', sizeRow);
+        }
+        </script>
+        
 </form>
 
 
 <!-- stock quantity validation -->
 <script>
-    function validateStockQuantity(input) {
-        var inputValue = input.value.trim();
-        var errorElement = document.getElementById('stockQuantityError');
-
-        // Regular expression to allow only positive whole numbers
-        var wholeNumbersOnly = /^[1-9]\d*$/;
-
-        if (inputValue === '') {
-            errorElement.textContent = 'Stock quantity is required';
-        } else if (!wholeNumbersOnly.test(inputValue)) {
-            errorElement.textContent = 'Only positive whole numbers are allowed';
+    document.getElementById("stockQuantity").addEventListener("input", function() {
+        var inputValue = this.value;
+        console.log("Input value:", inputValue); // Log the input value to the console
+        
+        var errorMessage = document.querySelector('.error-message');
+        
+        if (inputValue < 0) {
+            errorMessage.style.display = "inline";
+            this.setCustomValidity("Stock quantity cannot be negative.");
         } else {
-            errorElement.textContent = '';
+            errorMessage.style.display = "none";
+            this.setCustomValidity("");
         }
-    }
+    });
 </script>
+
+    
+    
+    
+    
 
 
 <script>

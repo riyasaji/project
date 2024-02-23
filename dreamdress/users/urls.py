@@ -38,11 +38,11 @@ urlpatterns = [
     path('activate/<uidb64>/<token>',views.ActivateAccountView.as_view(),name='activate'),
     path('dashboard/',views.dashboard,name='dashboard'),
     path('profile_update/',views.profile_update,name='update_profile'),
-    path('shop/',views.shop,name='shop'),
+    path('shop/',views.shop_view,name='shop'),
     path('seller_registeration/',views.seller_registeration,name='seller_registeration'),
     path('seller_updateProfile/',views.seller_updateProfile,name='seller_updateProfile'),
     path('add_product/',views.add_product,name='add_product'),
-    path('product_details/<int:product_id>/',views.product_details,name='product_details'),
+    path('product_details', views.product_details, name='product_details'),
     path('cart/',views.cart,name='cart'),
     path('seller_waiting/',views.seller_waiting,name='seller_waiting'),
     path('seller_dashboard/',views.seller_dashboard,name='seller_dashboard'),
@@ -69,7 +69,7 @@ urlpatterns = [
     path('check_category/', views.check_category, name='check_category'),
     path('add_category/', views.add_category, name='add_category'),
     path('get_pincode_details/<str:pincode>/', views.get_pincode_details, name='get_pincode_details'),
-    
+    path('tailor_registeration/',views.tailor_registeration,name='tailor_registeration'),
 ]
 
 from django.conf import settings

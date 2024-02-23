@@ -64,7 +64,8 @@ class Tbl_seller(models.Model):
     seller_bank_name = models.CharField(max_length=100,null=True)
     seller_bank_account_number = models.CharField(max_length=50,null=True)
     seller_ifsc_code = models.CharField(max_length=20,null=True)
-    admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
+    seller_admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
+    seller_form_filled = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.seller_firstname} {self.seller_lastname}"
@@ -108,6 +109,40 @@ class Tbl_ProductImage(models.Model):
     image_id = models.AutoField(primary_key=True)
     product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/') 
+
+# Tbl Tailor
+class Tbli_tailor(models.Model):
+    PENDING = 'pending'
+    REJECTED = 'rejected'
+    APPROVED = 'approved'
+
+    ADMIN_APPROVAL_CHOICES = [
+        (PENDING, 'Pending'),
+        (REJECTED, 'Rejected'),
+        (APPROVED, 'Approved'),
+    ]
+
+    user = models.OneToOneField(Tbl_user, on_delete=models.CASCADE)
+    tailor_firstname = models.CharField(max_length=100, null=True)
+    tailor_lastname = models.CharField(max_length=100, null=True)
+    tailor_pan_number = models.CharField(max_length=15, null=True)
+    tailor_phone = models.CharField(max_length=15, null=True)
+    tailor_address = models.CharField(max_length=255, null=True)
+    tailor_pincode = models.CharField(max_length=10, null=True)
+    tailor_district = models.CharField(max_length=100, null=True)
+    tailor_state = models.CharField(max_length=100, null=True)
+    tailor_brand_name = models.CharField(max_length=255, null=True)
+    tailor_license_number = models.CharField(max_length=50, default='')
+    tailor_license_pdf = models.FileField(upload_to='tailor_certificates/', null=True)
+    tailor_gst_number = models.CharField(max_length=15, null=True)
+    tailor_bank_name = models.CharField(max_length=100, null=True)
+    tailor_bank_account_number = models.CharField(max_length=50, null=True)
+    tailor_ifsc_code = models.CharField(max_length=20, null=True)
+    tailor_admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
+    tailor_form_filled = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.tailor_firstname} {self.tailor_lastname}"
 
 # #model for category
 # class category(models.Model):
