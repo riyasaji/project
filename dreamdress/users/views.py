@@ -1,7 +1,7 @@
 
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
-from django.contrib.auth import login,authenticate,logout,get_user_model
+from django.contrib.auth import login,authenticate,logout as auth_logout
 from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
@@ -146,7 +146,9 @@ def signin(request):
 @csrf_protect
 def user_logout(request):
     if request.user.is_authenticated:
-        logout(request)
+         request.session.flush()
+         auth_logout(request)
+    
     return redirect('signin')
 
 #email activation
@@ -321,17 +323,50 @@ def dashboard(request):
 def extra(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     # product = get_object_or_404(Tbl_product.objects.select_related('category'), pk=product_id)
-    product_images = Tbl_ProductImage.objects.filter(product=product)
+    product_images = list(Tbl_ProductImage.objects.filter(product=product))
+    # Enumerate the product_images to get both the index and the image object
+    product_images_with_index = [(index, image) for index, image in enumerate(product_images)]
     sizes = Tbl_size.objects.filter(tbl_stock__product=product).distinct()
     colors = Tbl_colour.objects.filter(tbl_stock__product=product).distinct()
-    
+    print("Product Images:", product_images) 
+
     # Render the template with the product details
     return render(request, 'extra.html', {
         'product': product,
-        'product_images': product_images,
+       'product_images_with_index': product_images_with_index,
+        'sizes': sizes,
+
         'sizes': sizes,
         'colors': colors
     })
+
+
+# Colours for product
+def get_colors(request, image_id=None):
+    try:
+        if image_id is None:
+            # If no image ID is provided, get the first product image
+            product_image = Tbl_ProductImage.objects.filter(product=request.product).first()
+        else:
+            # Get the product image object based on the provided image ID
+            product_image = Tbl_ProductImage.objects.get(image_id=image_id)
+        
+        # Get the corresponding product
+        product = product_image.product
+        
+        # Get colors and sizes for the selected product image
+        colors = list(Tbl_colour.objects.filter(tbl_stock__product=product).values_list('colour_name', flat=True).distinct())
+
+        sizes = list(Tbl_size.objects.filter(tbl_stock__product=product).values_list('size_name', flat=True).distinct())
+
+        
+        # Return colors and sizes as JSON response
+        return JsonResponse({'colors': colors, 'sizes': sizes})
+    except Tbl_ProductImage.DoesNotExist:
+        return JsonResponse({'error': 'Product image not found'}, status=404)
+
+
+
 
 #users List
 def user_list(request):

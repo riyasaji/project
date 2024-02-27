@@ -55,6 +55,7 @@ urlpatterns = [
     
    
     path('extra/<int:product_id>/', views.extra, name='extra'),
+    path('get_colors/<int:image_id>/', views.get_colors, name='get_colors'),
     path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     path('change_password/',views.change_password,name='change_password'),
     path('customers/', views.customer_list, name='customer_list'),
