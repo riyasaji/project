@@ -64,7 +64,7 @@ class Tbl_seller(models.Model):
     seller_bank_name = models.CharField(max_length=100,null=True)
     seller_bank_account_number = models.CharField(max_length=50,null=True)
     seller_ifsc_code = models.CharField(max_length=20,null=True)
-    seller_admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
+    admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
     seller_form_filled = models.BooleanField(default=False)
 
     def __str__(self):
@@ -111,7 +111,7 @@ class Tbl_ProductImage(models.Model):
     image = models.ImageField(upload_to='product_images/') 
 
 # Tbl Tailor
-class Tbli_tailor(models.Model):
+class Tbl_tailor(models.Model):
     PENDING = 'pending'
     REJECTED = 'rejected'
     APPROVED = 'approved'

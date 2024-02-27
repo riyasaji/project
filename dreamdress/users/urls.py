@@ -52,7 +52,9 @@ urlpatterns = [
     path('base/',views.base,name='base'),
     path('temp/',views.temp,name='temp'),
     path('demo/',views.demo,name='demo'),
-    path('extra',views.extra,name='extra'),
+    
+   
+    path('extra/<int:product_id>/', views.extra, name='extra'),
     path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     path('change_password/',views.change_password,name='change_password'),
     path('customers/', views.customer_list, name='customer_list'),

@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout,get_user_model
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -318,8 +318,20 @@ def dashboard(request):
     return render(request, 'dashboard.html',context)
 
 
-def extra(request):
-    return render(request,'extra.html')
+def extra(request, product_id):
+    product = get_object_or_404(Tbl_product, pk=product_id)
+    # product = get_object_or_404(Tbl_product.objects.select_related('category'), pk=product_id)
+    product_images = Tbl_ProductImage.objects.filter(product=product)
+    sizes = Tbl_size.objects.filter(tbl_stock__product=product).distinct()
+    colors = Tbl_colour.objects.filter(tbl_stock__product=product).distinct()
+    
+    # Render the template with the product details
+    return render(request, 'extra.html', {
+        'product': product,
+        'product_images': product_images,
+        'sizes': sizes,
+        'colors': colors
+    })
 
 #users List
 def user_list(request):
@@ -700,7 +712,7 @@ def tailor_registeration(request):
         email=request.POST['email']
         if Tbl_user.objects.filter(email=email).exists():
             messages.success(request,'Email Already Exists')
-            return redirect('seller_registration')
+            return redirect('tailor_registeration')
         username= email
         password=request.POST['password']
         user_type = 'tailor' 
@@ -712,7 +724,7 @@ def tailor_registeration(request):
         user.is_active=False
         user.save()
         
-        # Tbl_tailor.objects.create(user=user)
+        Tbl_tailor.objects.create(user=user)
 
         current_site=get_current_site(request)  
         email_subject="Activate your account"
