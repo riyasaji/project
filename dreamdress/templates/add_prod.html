@@ -148,7 +148,14 @@
                                 <button type="button" class="btn btn-outline-primary add-category-button">+</button>
                             </div>
                         </div>
-                    </div>             
+                        <div class="input-group mt-3" style="display: none;" id="new-category">
+                            <input type="text" class="form-control" id="new-category-name" placeholder="Enter new category" style="width: 100%;">
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-primary check-category-button">Check</button>
+                            </div>
+                        </div>
+                    </div>
+                                
                 </div>
 
                 <!-- Description and Material -->
@@ -299,8 +306,51 @@
     });
 </script>
 
-    
-    
+
+<!-- add category    -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const addCategoryButton = document.querySelector('.add-category-button');
+        const newCategoryDiv = document.getElementById('new-category');
+        const checkCategoryButton = document.querySelector('.check-category-button');
+
+        addCategoryButton.addEventListener('click', function() {
+            newCategoryDiv.style.display = 'block';
+        });
+
+        checkCategoryButton.addEventListener('click', function() {
+            const newCategoryName = document.getElementById('new-category-name').value;
+            // Send AJAX request to check if category exists
+            fetch(`/check_category/?category_name=${newCategoryName}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.exists) {
+                    alert('Category already exists!');
+                } else {
+                    // Send AJAX request to add new category
+                    fetch(`/add_category/?category_name=${newCategoryName}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        alert('Category added successfully!');
+                        // Update dropdown with new category
+                        const categoryDropdown = document.querySelector('.category-dropdown');
+                        const option = document.createElement('option');
+                        option.value = data.category_id;
+                        option.textContent = newCategoryName;
+                        categoryDropdown.appendChild(option);
+                    })
+                    .catch(error => {
+                        console.error('Error adding category:', error);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error checking category:', error);
+            });
+        });
+    });
+</script>
+ 
     
     
 
