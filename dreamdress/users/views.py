@@ -181,6 +181,7 @@ def check_email(request):
 
 
 #seller registeration
+@never_cache
 def seller_registeration(request):
      if request.method=='POST':
         email=request.POST['email']
@@ -319,7 +320,7 @@ def dashboard(request):
     users = Tbl_user.objects.all()
     return render(request, 'dashboard.html',context)
 
-
+@never_cache
 def extra(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     # product = get_object_or_404(Tbl_product.objects.select_related('category'), pk=product_id)
@@ -563,7 +564,38 @@ def add_category(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
+@login_required
+def manage_stock(request):
+    user = request.user
+    print("User:", user)  # Print the user to check if it's correct
 
+    if user.user_type == 'seller':
+        # Retrieve the Tbl_seller instance associated with the user
+        try:
+            seller_instance = Tbl_seller.objects.get(user=user)
+        except Tbl_seller.DoesNotExist:
+            # Handle the case where Tbl_seller instance doesn't exist
+            return render(request, 'not_seller.html')
+
+        # Retrieve products added by the logged-in seller
+        seller_products = Tbl_product.objects.filter(seller=seller_instance)
+
+        # Retrieve stock information for each product
+        for product in seller_products:
+            product.stock = Tbl_stock.objects.filter(product=product)
+
+            # Retrieve images associated with each product
+            product.images = Tbl_ProductImage.objects.filter(product=product)
+
+        return render(request, 'managestock.html', {'seller_products': seller_products})
+    else:
+        # If the user is not a seller, handle the appropriate response
+        return render(request, 'not_seller.html')
+
+
+
+def not_seller(request):
+    return render(request, 'not_seller.html')
 
 @login_required(login_url='signin')
 def profile_update(request):

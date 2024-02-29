@@ -113,7 +113,7 @@
                     <div id="carouselExampleControls" class="carousel-inner">
                         {% for index, image in product_images_with_index %}
                         <div class="carousel-item {% if index == 0 %}active{% endif %}">
-                            <img src="{{ image.image.url }}" class="d-block" alt="Product Image" style="height: 100%;">
+                            <img src="{{ image.image.url }}" class="d-block w-100" alt="Product Image">
                         </div>
                         {% endfor %}
                     </div>
@@ -127,7 +127,6 @@
                     </a>
                 </div>
             </div>
-            
             
             <div class="col-lg-7 pb-5">
                 <h3 class="font-weight-semi-bold">{{ product.product_name }}</h3>

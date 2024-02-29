@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DreamDress Manage Stock</title>
+</head>
+<body>
+    <header>
+        <h1>Manage Stock</h1>
+    </header>
+
+    <main>
+        <div id="product-images">
+            {% for product in seller_products %}
+                <div class="product">
+                    <h2>{{ product.product_name }}</h2>
+                    {% for image in product.images %}
+                        <img src="{{ image.url }}" alt="{{ product.product_name }}">
+                    {% endfor %}
+                    <div class="stock">
+                        <h3>Stock</h3>
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Color</th>
+                                    <th>Size</th>
+                                    <th>Quantity</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for stock_entry in product.stock %}
+                                    <tr>
+                                        <td>{{ stock_entry.color }}</td>
+                                        <td>{{ stock_entry.size }}</td>
+                                        <td>{{ stock_entry.quantity }}</td>
+                                        <td>
+                                            <form action="{% url 'update_stock' %}" method="post">
+                                                {% csrf_token %}
+                                                <input type="hidden" name="stock_id" value="{{ stock_entry.id }}">
+                                                <input type="number" name="quantity" value="{{ stock_entry.quantity }}">
+                                                <button type="submit">Update</button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </main>
+    
+</body>
+</html>

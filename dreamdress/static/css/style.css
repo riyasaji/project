@@ -5868,7 +5868,15 @@ a.close.disabled {
   }
 }
 
-.carousel-item.active,
+.carousel-item.active {
+  display: block;
+}
+
+.carousel-item img {
+  width: 100%;
+  height: auto;
+}
+
 .carousel-item-next,
 .carousel-item-prev {
   display: block;
@@ -5914,7 +5922,8 @@ a.close.disabled {
 .carousel-control-prev,
 .carousel-control-next {
   position: absolute;
-  top: 0;
+  top: 50%;
+  transform: translateY(-50%);
   bottom: 0;
   z-index: 1;
   display: flex;
@@ -5925,6 +5934,13 @@ a.close.disabled {
   text-align: center;
   opacity: 0.5;
   transition: opacity 0.15s ease;
+}
+.carousel-control-prev {
+  left: 0;
+}
+
+.carousel-control-next {
+  right: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

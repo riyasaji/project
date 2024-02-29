@@ -73,6 +73,8 @@ urlpatterns = [
     path('add_category/', views.add_category, name='add_category'),
     path('get_pincode_details/<str:pincode>/', views.get_pincode_details, name='get_pincode_details'),
     path('tailor_registeration/',views.tailor_registeration,name='tailor_registeration'),
+    path('manage_stock/', views.manage_stock, name='manage_stock'),
+    path('not_seller/', views.not_seller, name='not_seller'),
 ]
 
 from django.conf import settings
