@@ -92,12 +92,22 @@
                         </div>
                         <div class="navbar-nav ml-auto py-0">
                             {% if user.is_authenticated %}
-                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">{{ user.username }}</a>
-                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Your Profile</a>
-                                <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                            <a href="" class="nav-item nav-link">{{ user.username }}</a>
+                            {% if user.user_type == 'seller' %}
+                                <a href="{% url 'seller_dashboard' %}" class="nav-item nav-link">Your Dashboard</a>
+                            {% elif user.user_type == 'tailor' %}
+                                <a href="" class="nav-item nav-link">Tailor Dashboard</a>
+                            {% elif user.is_superuser %}
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Admin Dashboard</a>
                             {% else %}
-                                <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
-                                <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                                <a href="{% url 'customer_dashboard' %}" class="nav-item nav-link">Your Profile</a>
+                            {% endif %}
+                            <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                            {% else %}
+                            <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+                            <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                            <a href="{% url 'seller_registeration' %}" class="nav-item nav-link">Become a Seller</a>
+                            <a href="{% url 'tailor_registeration' %}" class="nav-item nav-link">Become a Tailor</a>
                             {% endif %}
                         </div>
                     </div>

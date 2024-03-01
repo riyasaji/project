@@ -107,10 +107,13 @@
             <div class="col-md-4">
                 <img src="/static/img/favicon.png" alt="DreamDress Logo" class="img-fluid" style="max-height: 50px;">
 				<span style="color: crimson;">DreamDress</span>
+                <span></span>
+                <span style="color: crimson;"><a href="{% url 'seller_dashboard' %}">Dashboard</a></span>
             </div>
             <div class="col-md-4">
                 <h4 style="color:crimson;">Welcome  <span id="username">{{ user.username }}</span></h4>
             </div>
+            
             <div class="col-md-4 text-right">
                 <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
             </div>

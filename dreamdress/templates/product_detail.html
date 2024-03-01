@@ -31,25 +31,53 @@
         .navbar-dark .navbar-toggler-icon {
             background-color: #fff; 
         }
-        .product-container {
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4; /* Light gray background */
+        }
+
+        #product-details {
+            background-color: #fff; /* White background */
             padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
+            margin: 20px auto;
+            max-width: 800px;
         }
 
-        .product {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .product h2 {
-            margin-bottom: 10px;
-        }
-
-        .product-image {
+        .stock table {
             width: 100%;
-            height: 435px; 
-            object-fit: cover; 
+            border-collapse: collapse;
         }
 
+        .stock th, .stock td {
+            padding: 10px;
+            border: 1px solid #ddd; /* Light gray border */
+        }
+
+        .stock th {
+            background-color: #333; /* Dark gray background */
+            color: #fff; /* White text */
+            text-align: left;
+        }
+
+        .stock td input[type="number"] {
+            width: 60px;
+            padding: 5px;
+        }
+
+        .stock button {
+            padding: 5px 10px;
+            background-color: #ff69b4; /* Pink background */
+            color: #fff; /* White text */
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .stock button:hover {
+            background-color: #ff1493; /* Dark pink background on hover */
+        }
     </style>
 </head>
 <body>
@@ -103,36 +131,49 @@
 </nav>
 
 <body>
-    <div class="container">
-        <div class="card">
-            <div class="card-header">
-                <h5>Manage Stock</h5>
+    <main>
+        <div id="product-details">
+            <h2>{{ product.product_name }}</h2>
+            <p>Brand: {{ product.brand }}</p>
+            <p>Category: {{ product.category.category_name }}</p>
+            <p>Material: {{ product.product_material  }}</p>
+            <!-- Other product details here -->
+            <div class="stock">
+                <h3>Stock</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Color</th>
+                            <th>Size</th>
+                            <th>Quantity</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for stock_entry in stock_entries %}
+                            <tr>
+                                <td>{{ stock_entry.colour.colour_name }}</td>
+                                <td>{{ stock_entry.size.size_name }}</td>
+                                <td>
+                                    <form action="" method="post">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="stock_id" value="{{ stock_entry.id }}">
+                                        <input type="number" name="quantity" value="{{ stock_entry.stock_quantity }}"></td>
+                                        <td><button type="submit">Update</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
-            <main class="product-container">
-                <div id="product-images" class="row">
-                    {% for product in seller_products %}
-                        <div class="col-md-4">
-                            <div class="product">
-                                <h2>{{ product.product_name }}</h2>
-                                <div class="product-images">
-                                    {% for image in product.tbl_productimage_set.all %}
-                                        <a href="{% url 'product_detail' product_id=product.product_id %}">
-                                            <img src="{{ image.image.url }}" alt="{{ product.product_name }}" class="product-image">
-                                        </a>
-                                    {% endfor %}
-                                </div>
-                                <br>
-                                <a href="{% url 'product_detail' product_id=product.product_id %}" class="btn btn-primary">Update Stock</a>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            </main>
         </div>
-    </div>
+    </main>
     
     
- <!-- Bootstrap JS and jQuery -->
+
+
+<!-- Bootstrap JS and jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
@@ -140,3 +181,4 @@
   
 </body>
 </html>
+

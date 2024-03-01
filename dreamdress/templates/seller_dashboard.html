@@ -63,6 +63,9 @@
         <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav">
                 <li class="nav-item">
+                    <a class="nav-link" href="{% url 'seller_dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
                     <a class="nav-link" href="{% url 'add_product' %}">Add Products</a>
                 </li>
                 <li class="nav-item">
@@ -72,7 +75,7 @@
                     <a class="nav-link" href="#">Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'manage_stock' %}">ManageStocks</a>
+                    <a class="nav-link" href="{% url 'product_display' %}">ManageStocks</a>
                 </li><br>
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'home' %}">Home</a>

@@ -564,33 +564,80 @@ def add_category(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
-@login_required
-def manage_stock(request):
-    user = request.user
-    print("User:", user)  # Print the user to check if it's correct
+# @login_required
+# def manage_stock(request):
+#     user = request.user
+#     print("User:", user)  # Print the user to check if it's correct
 
-    if user.user_type == 'seller':
-        # Retrieve the Tbl_seller instance associated with the user
+#     if user.user_type == 'seller':
+#         # Retrieve the Tbl_seller instance associated with the user
+#         try:
+#             seller_instance = Tbl_seller.objects.get(user=user)
+#         except Tbl_seller.DoesNotExist:
+#             # Handle the case where Tbl_seller instance doesn't exist
+#             return render(request, 'not_seller.html')
+
+#         # Retrieve products added by the logged-in seller
+#         seller_products = Tbl_product.objects.filter(seller=seller_instance)
+
+#         # Retrieve stock information for each product
+#         for product in seller_products:
+#             product.stock = Tbl_stock.objects.filter(product=product)
+
+#             # Retrieve images associated with each product
+#             product.images = Tbl_ProductImage.objects.filter(product=product)
+
+#         return render(request, 'managestock.html', {'seller_products': seller_products})
+#     else:
+#         # If the user is not a seller, handle the appropriate response
+#         return render(request, 'not_seller.html')
+
+def product_display(request):
+    # Fetch products associated with the logged-in seller
+    seller_products = Tbl_product.objects.filter(seller=request.user.tbl_seller)
+
+    context = {
+        'seller_products': seller_products
+    }
+    return render(request, 'managestock.html', context)
+
+
+
+def product_detail(request, product_id):
+    product = get_object_or_404(Tbl_product, pk=product_id)
+    stock_entries = Tbl_stock.objects.filter(product=product)
+
+    if request.method == 'POST':
+        stock_id = request.POST.get('stock_id')
+        quantity = request.POST.get('quantity')
+        
         try:
-            seller_instance = Tbl_seller.objects.get(user=user)
-        except Tbl_seller.DoesNotExist:
-            # Handle the case where Tbl_seller instance doesn't exist
-            return render(request, 'not_seller.html')
+            quantity = int(quantity)
+        except ValueError:
+            return redirect('product_detail', product_id=product_id)
 
-        # Retrieve products added by the logged-in seller
-        seller_products = Tbl_product.objects.filter(seller=seller_instance)
 
-        # Retrieve stock information for each product
-        for product in seller_products:
-            product.stock = Tbl_stock.objects.filter(product=product)
+        stock_entry = get_object_or_404(Tbl_stock, pk=stock_id)
+        stock_entry.stock_quantity = quantity
+        stock_entry.save()
 
-            # Retrieve images associated with each product
-            product.images = Tbl_ProductImage.objects.filter(product=product)
+        # Redirect to the same page after updating stock
+        return redirect('product_detail', product_id=product_id)
 
-        return render(request, 'managestock.html', {'seller_products': seller_products})
-    else:
-        # If the user is not a seller, handle the appropriate response
-        return render(request, 'not_seller.html')
+    context = {
+        'product': product,
+        'stock_entries': stock_entries
+    }
+    return render(request, 'product_detail.html', context)
+
+
+
+def get_stock_quantity(product, color, size):
+    try:
+        stock_entry = Tbl_stock.objects.get(product=product, colour=color, size=size)
+        return stock_entry.stock_quantity
+    except Tbl_stock.DoesNotExist:
+        return 0
 
 
 
