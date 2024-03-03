@@ -1,0 +1,361 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dreamdress Admin Panel</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Dark sidebar and navbar theme -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/startbootstrap-sb-admin-2/4.1.4/css/sb-admin-2.min.css" rel="stylesheet">
+  <style>
+    /* Custom CSS for navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+    }
+
+    .navbar-brand {
+      font-size: 1.8rem; /* Larger font size */
+      font-weight: bold; /* Bold font weight */
+      display: flex; /* Use flexbox to align items */
+      align-items: center; /* Center items vertically */
+    }
+
+    .navbar-brand span {
+      margin-left: 10px; /* Add some space between the image and text */
+    }
+
+    .navbar-dark .navbar-brand {
+      color: #b6214e; /* White text color */
+    }
+
+    .navbar-dark .navbar-brand:hover {
+      color: #fff; /* White text color on hover */
+    }
+
+    /* Navbar background color */
+    .bg-dark {
+      background-color: #343a40 !important; /* Dark background color */
+    }
+
+    /* Active link */
+    .navbar-dark .navbar-nav .nav-link.active {
+      background-color: #007bff; /* Blue active link color */
+    }
+
+    /* Navbar links */
+    .navbar-dark .navbar-nav .nav-link {
+      color: #343a40; /* Semi-transparent white text color */
+    }
+
+    .navbar-dark .navbar-nav .nav-link:hover {
+      color: #343a40; /* Full white text color on hover */
+    }
+
+    /* Custom CSS for container-fluid */
+    .container-fluid {
+      padding-top: 80px; /* Adjusted for navbar height */
+    }
+
+    /* Main content */
+    .main-content {
+      padding: 20px;
+      color: #b6214e;;
+    }
+    /* Custom CSS for sidebar */
+    .sidebar {
+      background-color: #343a40; /* Dark background color */
+      color: #fff; /* White text color */
+      box-shadow: #343a40;; /* Shadow for depth */
+    }
+
+    .sidebar-sticky {
+      position: relative;
+      top: 60px;
+    }
+
+    .sidebar .nav-link {
+      padding: 12px 20px; /* Increased padding for better clickability */
+      color: #ebe4e4; /* White text color */
+      transition: background-color 0.3s ease; /* Smooth transition */
+    }
+
+    .sidebar .nav-link:hover {
+      background-color: #b6214e; /* Darker background color on hover */
+    }
+
+    .sidebar .active {
+      background-color: #6b7075;; /* Darker background color for active link */
+    }
+
+    .sidebar-heading {
+      padding: 10px 20px; /* Increased padding */
+      font-size: 1.2rem;
+      font-weight: bold;
+    }
+
+    .sidebar-heading + .nav-link {
+      padding-left: 30px; /* Indent nested links */
+    }
+
+    /* Footer background color */
+    footer {
+      background-color: #343a40;
+      color: #fff; /* White text color */
+      padding: 20px 0; /* Add padding top and bottom */
+    }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid #dee2e6; /* Border color */
+    }
+
+    th, td {
+        padding: 8px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6; /* Border color */
+    }
+
+    th {
+        background-color: #343a40; 
+        color: #fff; /* Header text color */
+    }
+
+    tbody tr:nth-child(even) {
+        background-color: #f2f2f2; /* Alternate row background color */
+    }
+
+    tbody tr:hover {
+        background-color: #ddd; /* Hover row background color */
+    }
+    .table-cell {
+        padding: 12px 8px;
+    }
+    .send-message-btn {
+        background-color: #b6214e; /* Pink color */
+        color: #fff; /* White text color */
+        border: none; /* Remove button border */
+        padding: 8px 16px; /* Padding for better appearance */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        border-radius: 4px; /* Rounded corners */
+    }
+
+    .send-message-btn:hover {
+        background-color: #343a40; 
+    }
+  </style>
+  <!-- Favicon -->
+  <link href="{% static '/img/favicon.png' %}" rel="icon">
+</head>
+<body>
+  <nav class="navbar navbar-dark bg-dark">
+    <span class="navbar-brand" style="text-align: left;">
+        <img src="{% static '/img/favicon.png' %}" alt="Logo" style="height: 30px; margin-right: 10px;">
+        Dreamdress Admin Panel
+    </span>
+	<span  style="text-align: right; color:#b6214e;"> 
+        <a href="{% url 'home' %}">Home </a>
+        <a href="{% url 'logout' %}">Logout</a>
+    </span>
+  </nav>
+
+<div class="container-fluid">
+    <div class="row">
+      <nav class="col-md-2 col-lg-2 d-md-block bg-dark sidebar">
+        <div class="sidebar-sticky">
+          <ul class="nav flex-column">
+			<li class="nav-item">
+				<a class="nav-link" href="{% url 'dashboard' %}">Dashboard</a>
+			</li>
+            <li class="nav-item">
+              <a class="nav-link active" href="{% url 'user_list' %}">User</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'seller_list' %}">Seller</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Tailors</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'manage_product_admin' %}">Manage Products</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'admin_approvals' %}">Admin Approvals</a>
+			        <span id="notification-sign" class="badge badge-pill badge-danger" style="display: none;">!</span>
+            </li>
+			      <li class="nav-item">
+				      <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+			      </li>
+          </ul>
+        </div>
+      </nav>
+
+
+      <main role="main" class="main-content col-md-10 ml-md-auto col-lg-10 px-4">
+        <div class="content">
+          <h1>Manage Product</h1>
+          <table border="1">
+            <thead>
+                <tr>
+                    <th>Product Image</th>
+                    <th>Seller Brand Name</th>
+                    <th>Stock Quantity</th>
+                    <th>Size</th>
+                    <th>Show Details</th>
+                    <th>Send Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                {% for stock in product.tbl_stock_set.all %}
+                {% if stock.stock_quantity <= 4 %}
+                <tr>
+                    <td>
+                        {% for product_image in product.tbl_productimage_set.all %}
+                        <img src="{{ product_image.image.url }}" alt="Product Image" style="max-width: 100px;">
+                        {% endfor %}
+                    </td>
+                    <td>{{ product.seller.seller_brand_name }}</td>
+                    <td>{{ stock.stock_quantity }}</td>
+                    <td>{{ stock.size.size_name }}</td>
+                    <td>
+                        <button class="btn btn-primary show-details-btn">
+                            <i class="fas fa-info-circle"></i> Show Details
+                        </button>
+                    </td>
+                    <td>
+                        <button class="send-message-btn" class="btn btn-primary onclick="sendMessageToSeller('{{ product.seller.user.email }}', '{{ product.product_id }}', '{{ stock.colour.colour_name }}', '{{ stock.size.size_name }}')">Send Message</button>
+                    </td>
+                </tr>
+                <tr class="details-row" style="display: none;">
+                    <td colspan="6">
+                        <div class="product-details" style="background-color: #dfe2e4; color: #343a40;">
+                            <p>Category: {{ product.category.category_name }}</p>
+                            <p>Size: {{ stock.size.size_name }}</p>
+                            <p>About Product: {{ product.product_about_product }}</p>
+                            <p>Material: {{ product.product_material }}</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+                {% for product in products %}
+                {% for stock in product.tbl_stock_set.all %}
+                {% if stock.stock_quantity > 4 %}
+                <tr>
+                    <td>
+                        {% for product_image in product.tbl_productimage_set.all %}
+                        <img src="{{ product_image.image.url }}" alt="Product Image" style="max-width: 100px;">
+                        {% endfor %}
+                    </td>
+                    <td>{{ product.seller.seller_brand_name }}</td>
+                    <td>{{ stock.stock_quantity }}</td>
+                    <td>{{ stock.size.size_name }}</td>
+                    <td>
+                        <button class="btn btn-primary show-details-btn">
+                            <i class="fas fa-info-circle"></i> Show Details
+                        </button>
+                    </td>
+                    <td></td> <!-- Empty column since Send Message is not applicable -->
+                </tr>
+                <tr class="details-row" style="display: none;">
+                    <td colspan="6">
+                        <div class="product-details" style="background-color: #dfe2e4; color: #343a40;">
+                            <p>Category: {{ product.category.category_name }}</p>
+                            <p>Size: {{ stock.size.size_name }}</p>
+                            <p>About Product: {{ product.product_about_product }}</p>
+                            <p>Material: {{ product.product_material }}</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        
+    
+        <script>
+            function sendMessage(sellerId) {
+                // Implement logic to send message to seller with sellerId
+                console.log('Sending message to seller:', sellerId);
+                // You can make AJAX request or perform any action you need
+            }
+        </script>
+
+        <!-- show details -->
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                $('.show-details-btn').click(function() {
+                    $(this).closest('tr').next('.details-row').slideToggle();
+                });
+            });
+        </script>
+        
+        </div>
+      </main>
+          
+    </div>
+</div>
+
+ <!-- send message        -->
+<!-- <script>
+  function sendMessage(email, productId, color, size) {
+      // AJAX request to Django view to send message
+      $.ajax({
+          type: 'POST',
+          url:  sendMessageUrl,
+          data: {
+              'email': email,
+              'product_id': productId,
+              'color': color,
+              'size': size,
+              'csrfmiddlewaretoken': '{{ csrf_token }}'
+          },
+          success: function(response) {
+              // Handle success if needed
+          },
+          error: function(xhr, status, error) {
+              // Handle error if needed
+          }
+      });
+  }
+</script>
+
+<script>
+  var sendMessageUrl = "{% url 'send_message_to_seller' %}";
+</script>      -->
+
+
+<script>
+  function sendMessageToSeller(sellerEmail, productId, color, size) {
+      // AJAX request to Django view
+      $.ajax({
+          type: "GET",
+          url: "{% url 'send_message_to_seller' %}",
+          data: {
+              'seller_email': sellerEmail,
+              'product_id': productId,
+              'color': color,
+              'size': size
+          },
+          success: function(response) {
+              // Optional: Handle success response
+              console.log('Message sent successfully.');
+          },
+          error: function(xhr, status, error) {
+              // Optional: Handle error response
+              console.error('Error sending message:', error);
+          }
+      });
+  }
+</script>
+
+</body>
+</html>

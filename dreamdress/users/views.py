@@ -17,7 +17,7 @@ from django.utils.http import urlsafe_base64_decode,urlsafe_base64_encode
 from django.utils.encoding import force_bytes,force_str
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
-
+from django.http import HttpResponseServerError
 from django.contrib.auth.hashers import check_password
 from django.contrib.auth import update_session_auth_hash
 from django.views.decorators.csrf import csrf_protect
@@ -151,6 +151,7 @@ def user_logout(request):
     
     return redirect('signin')
 
+
 #email activation
 class ActivateAccountView(View):
     def get(self,request,uidb64,token):
@@ -167,11 +168,6 @@ class ActivateAccountView(View):
         return render(request,"auth/activatefail.html")
     
 
-# def check_username(request):
-#     username = request.GET.get('username','')
-#     print(username)
-#     user_exists = Tbl_user.objects.filter(username=username).exists()
-#     return JsonResponse({'exists': user_exists})
 
 #check email
 def check_email(request):
@@ -320,6 +316,8 @@ def dashboard(request):
     users = Tbl_user.objects.all()
     return render(request, 'dashboard.html',context)
 
+
+#product -details , detail.html
 @never_cache
 def extra(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
@@ -592,8 +590,9 @@ def add_category(request):
 #         # If the user is not a seller, handle the appropriate response
 #         return render(request, 'not_seller.html')
 
+
+#manage stock
 def product_display(request):
-    # Fetch products associated with the logged-in seller
     seller_products = Tbl_product.objects.filter(seller=request.user.tbl_seller)
 
     context = {
@@ -602,7 +601,7 @@ def product_display(request):
     return render(request, 'managestock.html', context)
 
 
-
+#manage stock - update with product details
 def product_detail(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     stock_entries = Tbl_stock.objects.filter(product=product)
@@ -620,10 +619,7 @@ def product_detail(request, product_id):
         stock_entry = get_object_or_404(Tbl_stock, pk=stock_id)
         stock_entry.stock_quantity = quantity
         stock_entry.save()
-
-        # Redirect to the same page after updating stock
         return redirect('product_detail', product_id=product_id)
-
     context = {
         'product': product,
         'stock_entries': stock_entries
@@ -631,7 +627,7 @@ def product_detail(request, product_id):
     return render(request, 'product_detail.html', context)
 
 
-
+#product detail.html
 def get_stock_quantity(product, color, size):
     try:
         stock_entry = Tbl_stock.objects.get(product=product, colour=color, size=size)
@@ -640,9 +636,81 @@ def get_stock_quantity(product, color, size):
         return 0
 
 
+#product detail , update the stock
+def update_stock(request):
+    if request.method == 'POST':
+        try:
+            stock_id = request.POST.get('stock_id')
+            quantity = request.POST.get('quantity')
+            print("Stock ID:", stock_id)
+            print("Quantity:", quantity)
+            
+            stock_entry = Tbl_stock.objects.get(pk=stock_id)
+            print("Stock Entry:", stock_entry)
+            
+            stock_entry.stock_quantity = quantity
+            stock_entry.save()
+            print("Stock updated:", stock_entry.stock_quantity)
+
+            messages.success(request, 'Stock updated successfully!')
+            
+            return redirect('product_detail', product_id=stock_entry.product_id)  
+        except Tbl_stock.DoesNotExist:
+            return HttpResponseServerError("Stock entry does not exist.")
+        except Exception as e:
+            return HttpResponseServerError("An error occurred: " + str(e))
+    else:
+        return redirect('product_display')
+
+
 
 def not_seller(request):
     return render(request, 'not_seller.html')
+
+
+# manage_product by admin
+def manage_product_admin(request):
+    products = Tbl_product.objects.select_related('seller').prefetch_related('tbl_stock_set', 'tbl_productimage_set').all()
+    return render(request, 'manage_product.html', {'products': products})
+
+
+# send email to seller for less stock quantit
+def send_message_to_seller(request):
+    if request.method == 'GET':
+        seller_email = request.GET.get('seller_email')
+        product_id = request.GET.get('product_id')
+        color = request.GET.get('color')
+        size = request.GET.get('size')
+        
+        # Query to retrieve seller's email based on product_id
+        try:
+            seller_email = Tbl_user.objects.get(user_type='seller', tbl_seller__tbl_product__product_id=product_id).email
+            print(seller_email)
+        except Tbl_user.DoesNotExist:
+            # Handle case where seller's email is not found
+            seller_email = None
+        
+        if seller_email:
+            # Send email to seller
+            subject = 'Low Stock Alert'
+            message = f'Your product (ID: {product_id}) with color {color} and size {size} has a low stock quantity. Please update the stock.'
+            email_from = settings.EMAIL_HOST_USER
+            recipient_list = [seller_email]
+            try:
+                send_mail(subject, message, email_from, recipient_list)
+                print(message)
+                return JsonResponse({'success': True, 'message': 'Message sent successfully'})
+            except Exception as e:
+                return JsonResponse({'success': False, 'message': str(e)}, status=500)
+        else:
+            return JsonResponse({'success': False, 'message': 'Seller email not found'}, status=404)
+    else:
+        return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
+
+
+    
+
+
 
 @login_required(login_url='signin')
 def profile_update(request):

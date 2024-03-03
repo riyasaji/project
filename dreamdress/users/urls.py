@@ -77,6 +77,9 @@ urlpatterns = [
     # path('not_seller/', views.not_seller, name='not_seller'),
     path('products/', views.product_display, name='product_display'),
     path('product/<int:product_id>/', views.product_detail, name='product_detail'),
+    path('update_stock/', views.update_stock, name='update_stock'),
+    path('manage_product_admin/', views.manage_product_admin,name='manage_product_admin'),
+    path('send-message-to-seller/', views.send_message_to_seller, name='send_message_to_seller'),
 ]
 
 from django.conf import settings

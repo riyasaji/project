@@ -136,8 +136,7 @@
             <h2>{{ product.product_name }}</h2>
             <p>Brand: {{ product.brand }}</p>
             <p>Category: {{ product.category.category_name }}</p>
-            <p>Material: {{ product.product_material  }}</p>
-            <!-- Other product details here -->
+            <p>Material: {{ product.product_material }}</p>
             <div class="stock">
                 <h3>Stock</h3>
                 <table>
@@ -155,20 +154,33 @@
                                 <td>{{ stock_entry.colour.colour_name }}</td>
                                 <td>{{ stock_entry.size.size_name }}</td>
                                 <td>
-                                    <form action="" method="post">
+                                    <form action="{% url 'update_stock' %}" method="post">
                                         {% csrf_token %}
-                                        <input type="hidden" name="stock_id" value="{{ stock_entry.id }}">
-                                        <input type="number" name="quantity" value="{{ stock_entry.stock_quantity }}"></td>
-                                        <td><button type="submit">Update</button>
-                                    </form>
+                                        <input type="hidden" name="stock_id" value="{{ stock_entry.stock_id }}">
+                                        <input type="number" name="quantity" value="{{ stock_entry.stock_quantity }}">   
                                 </td>
+                                <td>
+                                    <button type="submit">Update</button>
+                                </td>
+                                    </form>
+                                    <!-- <p>Stock ID: {{ stock_entry.stock_id }}</p> -->
                             </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
+            {% for message in messages %}
+            {% if message.tags == 'success' %}
+                <div id="success-message" class="alert alert-success">
+                    <strong>{{ message }}</strong>
+                </div>
+            {% endif %}
+            {% endfor %}
         </div>
+       
+    
     </main>
+    
     
     
 
@@ -178,7 +190,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  
+
+<!-- timer for success message -->
+<script>
+    // Function to hide the success message after 4 seconds
+    setTimeout(function() {
+        var successMessage = document.getElementById('success-message');
+        if (successMessage) {
+            successMessage.style.display = 'none';
+        }
+    }, 4000);
+</script>
+
 </body>
 </html>
 
