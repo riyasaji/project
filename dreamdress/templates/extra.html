@@ -119,11 +119,11 @@
     <div class="container-fluid py-5">
         <div class="row px-xl-5">
             <div class="col-lg-5 pb-5">
-                <div id="product-carousel" class="carousel slide" data-ride="carousel">
-                    <div id="carouselExampleControls" class="carousel-inner">
+                <div id="product-carousel" class="carousel slide" data-ride="carousel" style="width: 400px;">
+                    <div class="carousel">
                         {% for index, image in product_images_with_index %}
                         <div class="carousel-item {% if index == 0 %}active{% endif %}">
-                            <img src="{{ image.image.url }}" class="d-block w-100" alt="Product Image">
+                            <img src="{{ image.image.url }}" class="d-block w-100" style="object-fit: cover;" alt="Product Image">
                         </div>
                         {% endfor %}
                     </div>
@@ -138,57 +138,62 @@
                 </div>
             </div>
             
+            
             <div class="col-lg-7 pb-5">
-                <h3 class="font-weight-semi-bold">{{ product.product_name }}</h3>
-                <div class="d-flex mb-3">
-                    <div class="text-primary mr-2">
-                        <!-- Add your rating stars or any other rating mechanism here -->
-                    </div>
-                    <!--<small class="pt-1">(50 Reviews)</small>-->
-                </div>
-                <h3 class="font-weight-semi-bold mb-4">Price: ₹{{ product.product_current_price }}</h3>
-                <p class="mb-4">{{ product.product_about_product }}</p>
-                 <div class="d-flex mb-3">
-                   <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:   </p>
-                    <form>
-                            <div id="size-display"></div>
-                    </form>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Category:</p>
+                <div class="card">
+                    <div class="card-body">
+                        <h3 class="font-weight-semi-bold">{{ product.product_name }}</h3>
+                        <!-- Add rating stars or any other rating mechanism here -->
+                        <h3 class="font-weight-semi-bold mb-4">Price: ₹{{ product.product_current_price }}</h3>
+                        <p class="mb-4">{{ product.product_about_product }}</p>
+                        <div class="d-flex mb-3">
+                            <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:</p>
+                            <form id="size-form">
+                                <div id="size-display"></div>
+                            </form>
+                        </div>
+                        <div class="d-flex mb-4">
+                            <p class="text-dark font-weight-medium mb-0 mr-3">Category:</p>
                             <p>{{ product.category.category_name }}</p>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
-                    <div id="color-display"></div>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Material:</p>
-                            <p>{{ product.product_material }}</p>
-                </div>
-                <!-- <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Stock:</p>
-                            <p>{{  product.stock }}</p>
-                </div> -->
-                <div class="d-flex align-items-center mb-4 pt-2">
-                    <div class="input-group quantity mr-3" style="width: 130px;">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary btn-minus">
-                                <i class="fa fa-minus"></i>
-                            </button>
                         </div>
-                        <input type="text" class="form-control bg-secondary text-center" value="1">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary btn-plus">
-                                <i class="fa fa-plus"></i>
-                            </button>
+                        <div class="d-flex mb-4">
+                            <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
+                            <form id="color-form">
+                            <div id="color-display"></div>
+                            </form>
+                        </div>
+                        <div class="d-flex mb-4">
+                            <p class="text-dark font-weight-medium mb-0 mr-3">Material:</p>
+                            <p>{{ product.product_material }}</p>
+                        </div>
+                        <!-- <div class="d-flex mb-4">
+                            <p class="text-dark font-weight-medium mb-0 mr-3">Stock:</p>
+                            <p>{{ product.stock }}</p>
+                        </div> -->
+                        <div class="d-flex align-items-center mb-4 pt-2">
+                            <div class="input-group quantity mr-3" style="width: 130px;">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-primary btn-minus" id="btn-minus">
+                                        <i class="fa fa-minus"></i>
+                                    </button>
+                                </div>
+                                <input type="text" class="form-control bg-secondary text-center" id="quantity" value="1">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-primary btn-plus" id="btn-plus">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <button class="btn btn-primary px-3" id="add-to-cart"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</button>
+                            <!-- <a href="{% url 'cart' %}" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</a> -->
                         </div>
                     </div>
-                    <a href="{% url 'cart' %}" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</a>
                 </div>
             </div>
+            
         </div>
     </div>
+    
 
     <!-- Footer Start -->
     <div class="container-fluid bg-secondary text-dark mt-5 pt-5">
@@ -199,7 +204,7 @@
                 </a>
                 <p>We firmly believe that with the right Outfit one can rule the world.</p>
                 <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
+                <!-- <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p> -->
                 <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
             </div>
             <div class="col-lg-8 col-md-12">
@@ -267,11 +272,13 @@
 
  <!-- Template Javascript -->
  <script src="{% static '/js/main.js'%}"></script>
- <script>// Get the image element and its parent container
+
+
+ <!-- images -->
+ <script>
      const image = document.getElementById('product-image');
      const imageContainer = document.querySelector('.carousel-inner');
-     
-     // Function to adjust image alignment
+    
      function alignImage() {
          const containerWidth = imageContainer.offsetWidth;
          const containerHeight = imageContainer.offsetHeight;
@@ -287,13 +294,13 @@
          }
      }
      
-     // Call the function initially and when the window is resized
      alignImage();
      window.addEventListener('resize', alignImage);
      </script>
 
+
+<!-- colours and sizes -->
 <script>
-    // Call showColors function for the first image when the page loads
     document.addEventListener("DOMContentLoaded", function() {
         // Get the ID of the first image
         const firstImageId = '{{ product_images_with_index.0.1.image_id }}'; // Accessing the first image ID
@@ -302,35 +309,112 @@
     });
 
     function showColors(imageId) {
-        // Clear previous color and size displays
         document.getElementById('color-display').innerHTML = '';
         document.getElementById('size-display').innerHTML = '';
     
-        // Fetch colors for the selected image using AJAX
-        fetch(`/get_colors/${imageId}/`)  // Make sure to append a trailing slash after imageId
+        
+        fetch(`/get_colors/${imageId}/`)  
         .then(response => response.json())
         .then(data => {
-            // Display colors
             data.colors.forEach(color => {
-                document.getElementById('color-display').innerHTML += `<div style="background-color:${color}; width: 30px; height: 30px; display: inline-block; margin-right: 5px;"></div>`;
-            });
-    
-            // Display sizes for the first color
-            if (data.sizes.length > 0) {
-                data.sizes.forEach(size => {
-                    document.getElementById('size-display').innerHTML += `<p>${size}</p>`;
+                const colorElement = document.createElement('input');
+                colorElement.type = 'checkbox';
+                colorElement.value = color;
+                colorElement.name = 'color';
+                colorElement.id = `color-${color}`;
+                colorElement.addEventListener('change', function() {
+                    if (this.checked) {
+                        document.querySelectorAll('input[name="color"]').forEach(checkbox => {
+                            if (checkbox !== this) {
+                                checkbox.checked = false;
+                            }
+                        });
+                    }
                 });
-            } else {
-                document.getElementById('size-display').innerHTML = '<p>No sizes available</p>';
-            }
+                
+                const label = document.createElement('label');
+                label.htmlFor = `color-${color}`;
+                label.textContent = color;
+                label.style.marginRight = '10px';
+                
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                
+                div.appendChild(colorElement);
+                div.appendChild(label);
+                
+                document.getElementById('color-display').appendChild(div);
+            });
+      
+        // Display sizes for the first color
+        const sizeForm = document.getElementById('size-form');
+            data.sizes.forEach(size => {
+                const sizeElement = document.createElement('input');
+                sizeElement.type = 'checkbox';
+                sizeElement.value = size;
+                sizeElement.name = 'size';
+                sizeElement.id = `size-${size}`;
+                
+                const label = document.createElement('label');
+                label.htmlFor = `size-${size}`;
+                label.textContent = size;
+                label.style.marginRight = '10px';
+                
+                const div = document.createElement('div');
+                div.style.display = 'flex';
+                div.style.alignItems = 'center';
+                
+                div.appendChild(sizeElement);
+                div.appendChild(label);
+                
+                sizeForm.appendChild(div);
+            });
         })
         .catch(error => {
             console.error('Error fetching colors:', error);
         });
     }
+    
 </script>
 
+<!-- add to cart -->
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+    document.getElementById("add-to-cart").addEventListener("click", function() {
+        const productId = '{{ product.product_id }}'; // Get the product ID
+        const color = document.querySelector('input[name="color"]:checked').value; // Get the selected color
+        const size = document.querySelector('input[name="size"]:checked').value; // Get the selected size
+        const quantity = document.getElementById("quantity").value; // Get the quantity
 
+        // Send a request to add the item to the cart
+        fetch('/add-to-cart/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': '{{ csrf_token }}'
+            },
+            body: JSON.stringify({
+                product_id: productId,
+                color: color,
+                size: size,
+                quantity: quantity
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Handle response, e.g., show a success message
+            alert("Item added to cart successfully!");
+        })
+        .catch(error => {
+            console.error('Error adding item to cart:', error);
+            // Handle error, e.g., show an error message
+            alert("Failed to add item to cart. Please try again later.");
+        });
+    });
+});
+
+</script>
 
 </body>
 

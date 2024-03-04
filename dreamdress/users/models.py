@@ -144,6 +144,34 @@ class Tbl_tailor(models.Model):
     def __str__(self):
         return f"{self.tailor_firstname} {self.tailor_lastname}"
 
+#add to cart user
+class Tbl_cart(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
+
+# cart item
+class Tbl_cartItem(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
+    cart = models.ForeignKey(Tbl_cart, on_delete=models.CASCADE, null=True, blank=True)
+    stock = models.ForeignKey(Tbl_stock, on_delete=models.CASCADE, null=True, blank=True)
+    quantity = models.IntegerField(default=1)
+
+    @property
+    def product(self):
+        return self.stock.product
+
+    @property
+    def colour(self):
+        return self.stock.colour
+
+    @property
+    def size(self):
+        return self.stock.size
+
+    @property
+    def price(self):
+        return self.product.product_current_price
+    
+
 # #model for category
 # class category(models.Model):
 #     category_name = models.CharField(max_length=255)

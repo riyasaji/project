@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout as auth_logout
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -674,41 +674,52 @@ def manage_product_admin(request):
     return render(request, 'manage_product.html', {'products': products})
 
 
-# send email to seller for less stock quantit
+# send email to seller for less stock quantity
+
 def send_message_to_seller(request):
-    if request.method == 'GET':
-        seller_email = request.GET.get('seller_email')
-        product_id = request.GET.get('product_id')
-        color = request.GET.get('color')
-        size = request.GET.get('size')
-        
-        # Query to retrieve seller's email based on product_id
-        try:
-            seller_email = Tbl_user.objects.get(user_type='seller', tbl_seller__tbl_product__product_id=product_id).email
-            print(seller_email)
-        except Tbl_user.DoesNotExist:
-            # Handle case where seller's email is not found
-            seller_email = None
-        
-        if seller_email:
-            # Send email to seller
-            subject = 'Low Stock Alert'
-            message = f'Your product (ID: {product_id}) with color {color} and size {size} has a low stock quantity. Please update the stock.'
-            email_from = settings.EMAIL_HOST_USER
-            recipient_list = [seller_email]
-            try:
-                send_mail(subject, message, email_from, recipient_list)
-                print(message)
-                return JsonResponse({'success': True, 'message': 'Message sent successfully'})
-            except Exception as e:
-                return JsonResponse({'success': False, 'message': str(e)}, status=500)
+    # Get data from the request
+    data = json.loads(request.body)
+    seller_email = data.get('email')
+    message = data.get('message')
+    print(message)
+    # Send the email
+    try:
+        send_mail(
+            'Low Stock Alert',
+            message,
+            'prxnv2832@gmail.com',  
+            [seller_email],
+            fail_silently=False,
+        )
+        return JsonResponse({'status': 'success'}, status=200)
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
+
+
+# add to cart
+def add_to_cart(request):
+    if request.method == 'POST' and request.is_ajax():
+        # Get data from the request
+        product_id = request.POST.get('product_id')
+        color = request.POST.get('color')
+        size = request.POST.get('size')
+        quantity = request.POST.get('quantity')
+
+        # Retrieve product and stock details
+        product = Tbl_product.objects.get(product_id=product_id)
+        stock = Tbl_stock.objects.filter(product=product, colour__colour_name=color, size__size_name=size).first()
+
+        if stock:
+            # Assuming you have a Cart model with a foreign key to the user
+            # You can replace 'request.user.cart' with your method to retrieve the user's cart
+            cart_item = Tbl_cartItem.objects.create(user=request.user, cart=request.user.cart, stock=stock, quantity=quantity)
+            cart_item.save()
+            return JsonResponse({'success': True})
         else:
-            return JsonResponse({'success': False, 'message': 'Seller email not found'}, status=404)
-    else:
-        return JsonResponse({'success': False, 'message': 'Method not allowed'}, status=405)
+            return JsonResponse({'success': False, 'error': 'Stock not available'})
 
+    return JsonResponse({'success': False, 'error': 'Invalid request'})
 
-    
 
 
 

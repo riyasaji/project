@@ -80,6 +80,7 @@ urlpatterns = [
     path('update_stock/', views.update_stock, name='update_stock'),
     path('manage_product_admin/', views.manage_product_admin,name='manage_product_admin'),
     path('send-message-to-seller/', views.send_message_to_seller, name='send_message_to_seller'),
+    path('add-to-cart/', views.add_to_cart, name='add_to_cart'),
 ]
 
 from django.conf import settings

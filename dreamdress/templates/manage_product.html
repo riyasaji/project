@@ -227,7 +227,11 @@
                         </button>
                     </td>
                     <td>
-                        <button class="send-message-btn" class="btn btn-primary onclick="sendMessageToSeller('{{ product.seller.user.email }}', '{{ product.product_id }}', '{{ stock.colour.colour_name }}', '{{ stock.size.size_name }}')">Send Message</button>
+                        <button  class="send-message-btn btn btn-primary" 
+                        data-seller-email="{{ product.seller.user.email }}" 
+                        data-product-id="{{ product.product_id }}" 
+                        data-colour-name="{{ stock.colour.colour_name }}" 
+                        data-size-name="{{ stock.size.size_name }}">Send Message</button>
                     </td>
                 </tr>
                 <tr class="details-row" style="display: none;">
@@ -297,6 +301,50 @@
                 });
             });
         </script>
+
+
+<script>
+  // Function to send a message to the seller
+  function sendMessageToSeller(email, productId, colourName, sizeName) {
+      var message = `Dear seller,\n\nThe stock for product with ID ${productId}, colour ${colourName}, size ${sizeName} is running low. Please restock as soon as possible.\n\nRegards,\nAdmin`;
+
+      fetch('/send-message-to-seller/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': '{{ csrf_token }}'
+          },
+          body: JSON.stringify({
+              email: email,
+              message: message
+          })
+      })
+      .then(response => {
+          if (response.ok) {
+              alert('Message sent successfully.');
+          } else {
+              throw new Error('Failed to send message.');
+          }
+      })
+      .catch(error => {
+          console.error('Error:', error);
+          alert('An error occurred while sending the message.');
+      });
+  }
+
+  // Add event listeners to "Send Message" buttons
+  document.querySelectorAll('.send-message-btn').forEach(button => {
+      button.addEventListener('click', function() {
+          var email = this.getAttribute('data-seller-email');
+          var productId = this.getAttribute('data-product-id');
+          var colourName = this.getAttribute('data-colour-name');
+          var sizeName = this.getAttribute('data-size-name');
+
+          sendMessageToSeller(email, productId, colourName, sizeName);
+      });
+  });
+</script>
+
         
         </div>
       </main>
@@ -304,58 +352,10 @@
     </div>
 </div>
 
- <!-- send message        -->
-<!-- <script>
-  function sendMessage(email, productId, color, size) {
-      // AJAX request to Django view to send message
-      $.ajax({
-          type: 'POST',
-          url:  sendMessageUrl,
-          data: {
-              'email': email,
-              'product_id': productId,
-              'color': color,
-              'size': size,
-              'csrfmiddlewaretoken': '{{ csrf_token }}'
-          },
-          success: function(response) {
-              // Handle success if needed
-          },
-          error: function(xhr, status, error) {
-              // Handle error if needed
-          }
-      });
-  }
-</script>
-
-<script>
-  var sendMessageUrl = "{% url 'send_message_to_seller' %}";
-</script>      -->
 
 
-<script>
-  function sendMessageToSeller(sellerEmail, productId, color, size) {
-      // AJAX request to Django view
-      $.ajax({
-          type: "GET",
-          url: "{% url 'send_message_to_seller' %}",
-          data: {
-              'seller_email': sellerEmail,
-              'product_id': productId,
-              'color': color,
-              'size': size
-          },
-          success: function(response) {
-              // Optional: Handle success response
-              console.log('Message sent successfully.');
-          },
-          error: function(xhr, status, error) {
-              // Optional: Handle error response
-              console.error('Error sending message:', error);
-          }
-      });
-  }
-</script>
+
+
 
 </body>
 </html>
