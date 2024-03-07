@@ -43,7 +43,7 @@ urlpatterns = [
     path('seller_updateProfile/',views.seller_updateProfile,name='seller_updateProfile'),
     path('add_product/',views.add_product,name='add_product'),
     path('product_details', views.product_details, name='product_details'),
-    path('cart/',views.cart,name='cart'),
+    path('cart/',views.view_cart,name='cart'),
     path('seller_waiting/',views.seller_waiting,name='seller_waiting'),
     path('seller_dashboard/',views.seller_dashboard,name='seller_dashboard'),
     path('checkout/',views.checkout,name='checkout'),
@@ -80,7 +80,9 @@ urlpatterns = [
     path('update_stock/', views.update_stock, name='update_stock'),
     path('manage_product_admin/', views.manage_product_admin,name='manage_product_admin'),
     path('send-message-to-seller/', views.send_message_to_seller, name='send_message_to_seller'),
-    path('add-to-cart/', views.add_to_cart, name='add_to_cart'),
+    path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
+
+
 ]
 
 from django.conf import settings

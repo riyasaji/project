@@ -321,16 +321,13 @@ def dashboard(request):
 @never_cache
 def extra(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
-    # product = get_object_or_404(Tbl_product.objects.select_related('category'), pk=product_id)
     product_images = list(Tbl_ProductImage.objects.filter(product=product))
-    # Enumerate the product_images to get both the index and the image object
     product_images_with_index = [(index, image) for index, image in enumerate(product_images)]
     sizes = Tbl_size.objects.filter(tbl_stock__product=product).distinct()
     colors = Tbl_colour.objects.filter(tbl_stock__product=product).distinct()
     print("Product Images:", product_images) 
 
-    # Render the template with the product details
-    return render(request, 'extra.html', {
+    return render(request, 'extra1.html', {
         'product': product,
        'product_images_with_index': product_images_with_index,
         'sizes': sizes,
@@ -338,6 +335,50 @@ def extra(request, product_id):
         'sizes': sizes,
         'colors': colors
     })
+
+
+# add to cartth
+def add_to_cart(request, product_id):
+    product = get_object_or_404(Tbl_product, pk=product_id)
+    if request.method == 'POST':
+        quantity = request.POST.get('quantity', 1)
+        size_name = request.POST.get('size')
+        color_name = request.POST.get('color')
+        
+        if not quantity:
+            quantity = 1
+
+        # Retrieve the stock associated with the selected product, color, and size
+        stock = get_object_or_404(Tbl_stock, product=product, colour__colour_name=color_name, size__size_name=size_name)
+
+        if int(quantity) > stock.stock_quantity:
+            print("Stock finished.")
+            return redirect('extra')  
+    
+        cart, created = Tbl_cart.objects.get_or_create(user=request.user)
+        
+        # Check if the product already exists in the user's cart
+        cart_item = Tbl_cartItem.objects.filter(cart=cart, cart_stock=stock).first()
+        
+        if cart_item:
+            # If the item already exists, update the quantity
+            cart_item.cart_quantity += int(quantity)
+            cart_item.save()
+        else:
+            # If the item does not exist, create a new cart item
+            cart_item = Tbl_cartItem.objects.create(cart=cart, cart_stock=stock, cart_quantity=int(quantity))
+            
+        return redirect('view_cart')  
+    else:   
+        return render(request, 'extra1.html', {'product': product})
+
+
+
+def view_cart(request):
+    stock_id = request.GET.get('stock_id')  # Assuming you're passing stock_id via GET method
+    # stock = get_stock_object(stock_id)  # Define how to get the stock object based on the stock_id
+    return render(request, 'cart.html',)
+   
 
 
 # Colours for product
@@ -515,7 +556,7 @@ def shop_view(request):
     products = Tbl_product.objects.all()
     return render(request, 'shop.html', {'products': products})
 
-#   Check for colour  
+#   Check for colour  in add product
 def check_color(request):
     if request.method == 'POST':
         color_name = request.POST.get('color_name')
@@ -528,7 +569,7 @@ def check_color(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
-# add Tbl_colour
+# add Tbl_colour in add product
 def add_color(request):
     if request.method == 'POST':
         color_name = request.POST.get('color_name')
@@ -539,7 +580,7 @@ def add_color(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
     
-#check category
+#check category in add product
 def check_category(request):
     if request.method == 'POST':
         category_name = request.POST.get('category_name')
@@ -552,7 +593,7 @@ def check_category(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
     
-# add category
+# add category in add product
 def add_category(request):
     if request.method == 'POST':
         category_name = request.POST.get('category_name')
@@ -696,29 +737,8 @@ def send_message_to_seller(request):
         return JsonResponse({'status': 'error', 'message': str(e)}, status=500)
 
 
-# add to cart
-def add_to_cart(request):
-    if request.method == 'POST' and request.is_ajax():
-        # Get data from the request
-        product_id = request.POST.get('product_id')
-        color = request.POST.get('color')
-        size = request.POST.get('size')
-        quantity = request.POST.get('quantity')
 
-        # Retrieve product and stock details
-        product = Tbl_product.objects.get(product_id=product_id)
-        stock = Tbl_stock.objects.filter(product=product, colour__colour_name=color, size__size_name=size).first()
 
-        if stock:
-            # Assuming you have a Cart model with a foreign key to the user
-            # You can replace 'request.user.cart' with your method to retrieve the user's cart
-            cart_item = Tbl_cartItem.objects.create(user=request.user, cart=request.user.cart, stock=stock, quantity=quantity)
-            cart_item.save()
-            return JsonResponse({'success': True})
-        else:
-            return JsonResponse({'success': False, 'error': 'Stock not available'})
-
-    return JsonResponse({'success': False, 'error': 'Invalid request'})
 
 
 
@@ -1008,9 +1028,6 @@ def product_details(request):
 
 
 
-
-def cart(request):
-    return render(request,'cart.html')
 
 def checkout(request):
     return render(request,'checkout.html')

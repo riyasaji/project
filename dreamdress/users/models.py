@@ -144,32 +144,28 @@ class Tbl_tailor(models.Model):
     def __str__(self):
         return f"{self.tailor_firstname} {self.tailor_lastname}"
 
-#add to cart user
+
+#cart
 class Tbl_cart(models.Model):
-    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.OneToOneField(Tbl_user, on_delete=models.CASCADE)
+   
 
-# cart item
+    def __str__(self):
+        return f"Cart for {self.user.username}"
+
+# cart -item
 class Tbl_cartItem(models.Model):
-    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
-    cart = models.ForeignKey(Tbl_cart, on_delete=models.CASCADE, null=True, blank=True)
-    stock = models.ForeignKey(Tbl_stock, on_delete=models.CASCADE, null=True, blank=True)
-    quantity = models.IntegerField(default=1)
+    cart = models.ForeignKey('Tbl_cart', on_delete=models.CASCADE)
+    cart_stock = models.ForeignKey(Tbl_stock, on_delete=models.CASCADE)  # Provide a default value)
+    cart_quantity = models.PositiveIntegerField(null=True)
+    cart_price=models.PositiveIntegerField(default=1)
+    
+    def __str__(self):
+        if self.cart_stock:
+            return f"{self.cart_quantity} x {self.cart_stock.product.name} - Size: {self.cart_stock.size.size_name}, Color: {self.cart_stock.colour.colour_name}"
+        else:
+            return f"{self.cart_quantity} x Unknown Product"
 
-    @property
-    def product(self):
-        return self.stock.product
-
-    @property
-    def colour(self):
-        return self.stock.colour
-
-    @property
-    def size(self):
-        return self.stock.size
-
-    @property
-    def price(self):
-        return self.product.product_current_price
     
 
 # #model for category
