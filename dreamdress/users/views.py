@@ -337,19 +337,22 @@ def extra(request, product_id):
     })
 
 
-# add to cartth
+# add to cart
 def add_to_cart(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     if request.method == 'POST':
         quantity = request.POST.get('quantity', 1)
         size_name = request.POST.get('size')
         color_name = request.POST.get('color')
-        
+        print("Quantity:", quantity)
+        print("Size:", size_name)
+        print("Color:", color_name)
         if not quantity:
             quantity = 1
 
-        # Retrieve the stock associated with the selected product, color, and size
+        
         stock = get_object_or_404(Tbl_stock, product=product, colour__colour_name=color_name, size__size_name=size_name)
+        print("Stock:", stock)
 
         if int(quantity) > stock.stock_quantity:
             print("Stock finished.")
@@ -357,9 +360,11 @@ def add_to_cart(request, product_id):
     
         cart, created = Tbl_cart.objects.get_or_create(user=request.user)
         
-        # Check if the product already exists in the user's cart
+   
         cart_item = Tbl_cartItem.objects.filter(cart=cart, cart_stock=stock).first()
-        
+        print("Cart:", cart)
+        print("Cart Item:", cart_item)
+
         if cart_item:
             # If the item already exists, update the quantity
             cart_item.cart_quantity += int(quantity)
@@ -375,7 +380,7 @@ def add_to_cart(request, product_id):
 
 
 def view_cart(request):
-    stock_id = request.GET.get('stock_id')  # Assuming you're passing stock_id via GET method
+    # stock_id = request.GET.get('stock_id')  # Assuming you're passing stock_id via GET method
     # stock = get_stock_object(stock_id)  # Define how to get the stock object based on the stock_id
     return render(request, 'cart.html',)
    

@@ -162,7 +162,7 @@ class Tbl_cartItem(models.Model):
     
     def __str__(self):
         if self.cart_stock:
-            return f"{self.cart_quantity} x {self.cart_stock.product.name} - Size: {self.cart_stock.size.size_name}, Color: {self.cart_stock.colour.colour_name}"
+            return f"{self.cart_quantity} - Size: {self.cart_stock.size.size_name}, Color: {self.cart_stock.colour.colour_name}"
         else:
             return f"{self.cart_quantity} x Unknown Product"
 
