@@ -1,44 +1,47 @@
+<!-- extra.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-    <style>
-    .carousel-inner {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
-    
-    #product-image {
-        max-width: 100%;
-        max-height: 100%;
-    }</style>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dream Dress- Product Details</title>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
-    <meta content="Free HTML Templates" name="keywords">
-    <meta content="Free HTML Templates" name="description">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Favicon -->
+    <link href="{% static '/img/favicon.png' %}" rel="icon">
+    <style>
+        .carousel-item img {
+            width: 100%;
+            height: auto;
+        }
+        /* Styling for product description, price, and category */
+        .product-description,
+.product-price,
+.product-category {
+    font-size: 16px;
+    line-height: 1.5;
+    color: #333;
+    margin-bottom: 20px;
+    font-weight: bold;
+    font-style: italic;
+}
 
-       <!-- Favicon -->
-       <link href="{% static '/img/favicon.png' %}" rel="icon">
 
-    <!-- Google Web Fonts -->
-    <link rel="preconnect" href="https://fonts.gstatic.com">
-    <link href="{% static '/css/style1.css' %}" rel="stylesheet"> 
 
+
+
+
+    </style>
     <!-- Font Awesome -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
 
     <!-- Libraries Stylesheet -->
     <link href="{% static '/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
 
-    <!-- Customized Bootstrap Stylesheet -->
-    <link href="{% static '/css/style.css' %}" rel="stylesheet">
+     <!-- Customized Bootstrap Stylesheet -->
+     <link href="{% static '/css/style.css' %}" rel="stylesheet">
 </head>
-
 <body>
-    <!-- Topbar Start -->
     <div class="container-fluid">
         <div class="row align-items-center py-3 px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
@@ -47,16 +50,17 @@
                 </a>
             </div>
             <div class="col-lg-6 col-6 text-left">
-                <form action="">
+                <form action="{% url 'search_products' %}" method="get">
                     <div class="input-group">
-                        <input type="text" class="form-control" placeholder="Search for products">
+                        <input type="text" class="form-control"  id="search-input"  name="q" placeholder="Search for products">
                         <div class="input-group-append">
-                            <span class="input-group-text bg-transparent text-primary">
+                            <button class="btn btn-primary" type="submit">
                                 <i class="fa fa-search"></i>
-                            </span>
+                            </button>
                         </div>
                     </div>
                 </form>
+                <div id="autocomplete-dropdown" class="autocomplete-dropdown" style="background-color: #e5aaaa; color: black;"></div>
             </div>
             <div class="col-lg-3 col-6 text-right">
                 <a href="" class="btn border">
@@ -115,279 +119,118 @@
             </div>
         </div>
     </div>
-    <!-- Shop Detail Start -->
-    <div class="container-fluid py-5">
-        <div class="row px-xl-5">
-            <div class="col-lg-5 pb-5">
-                <div id="product-carousel" class="carousel slide" data-ride="carousel">
-                    <div id="carouselExampleControls" class="carousel-inner">
+
+    <!-- product detils -->
+    <div class="container mt-5">
+        <div class="row">
+            
+            <div class="col-md-6">
+                <div id="carouselExampleIndicators" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
                         {% for index, image in product_images_with_index %}
-                        <div class="carousel-item {% if index == 0 %}active{% endif %}">
-                            <img src="{{ image.image.url }}" class="d-block w-100" alt="Product Image">
-                        </div>
+                            <li data-target="#carouselExampleIndicators" data-slide-to="{{ index }}" {% if forloop.first %}class="active"{% endif %}></li>
+                        {% endfor %}
+                    </ol>
+                    <div class="carousel-inner">
+                        {% for index, image in product_images_with_index %}
+                            <div class="carousel-item {% if index == 0 %}active{% endif %}">
+                                <img src="{{ image.image.url }}" class="d-block w-100" style="object-fit: cover;" alt="Product Image">
+                            </div>
                         {% endfor %}
                     </div>
-                    <a class="carousel-control-prev" href="#product-carousel" role="button" data-slide="prev">
-                        <i class="fa fa-2x fa-angle-left text-dark"></i>
+                    <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
                         <span class="sr-only">Previous</span>
                     </a>
-                    <a class="carousel-control-next" href="#product-carousel" role="button" data-slide="next">
-                        <i class="fa fa-2x fa-angle-right text-dark"></i>
+                    <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
                         <span class="sr-only">Next</span>
                     </a>
                 </div>
             </div>
-            
-            <div class="col-lg-7 pb-5">
-                <h3 class="font-weight-semi-bold">{{ product.product_name }}</h3>
-                <div class="d-flex mb-3">
-                    <div class="text-primary mr-2">
-                        <!-- Add your rating stars or any other rating mechanism here -->
+            <div class="col-md-6">
+                <h2>{{ product.product_name }}</h2>
+                <p class="product-description">Description: {{ product.product_about_product }}</p>
+                <p class="product-price">Price: ₹{{ product.product_current_price }}</p>
+                <p class="product-category">Category: {{ product.category.category_name }}</p>
+                <form action="{% url 'add_to_cart' product_id=product.product_id %}" method="post" id="add-to-cart-form" style="margin-bottom: 20px;">
+                    {% csrf_token %}
+                    <p>Select Size:</p>
+                    {% for size in sizes %}
+                    <div class="form-check form-check-inline" style="margin-right: 10px;">
+                        <input class="form-check-input" type="radio" name="size" id="size_{{ forloop.counter }}" value="{{ size.size_name }}" style="margin-top: 5px;">
+                        <label class="form-check-label" for="size_{{ forloop.counter }}">{{ size.size_name }}</label>
                     </div>
-                    <!--<small class="pt-1">(50 Reviews)</small>-->
-                </div>
-                <h3 class="font-weight-semi-bold mb-4">Price: ₹{{ product.product_current_price }}</h3>
-                <p class="mb-4">{{ product.product_about_product }}</p>
-                 <div class="d-flex mb-3">
-                   <p class="text-dark font-weight-medium mb-0 mr-3">Sizes:   </p>
-                    <form>
-                            <div id="size-display"></div>
-                    </form>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Category:</p>
-                            <p>{{ product.category.category_name }}</p>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Colors:</p>
-                    <div id="color-display"></div>
-                </div>
-                <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Material:</p>
-                            <p>{{ product.product_material }}</p>
-                </div>
-                <!-- <div class="d-flex mb-4">
-                    <p class="text-dark font-weight-medium mb-0 mr-3">Stock:</p>
-                            <p>{{  product.stock }}</p>
-                </div> -->
-                <div class="d-flex align-items-center mb-4 pt-2">
-                    <div class="input-group quantity mr-3" style="width: 130px;">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary btn-minus">
-                                <i class="fa fa-minus"></i>
-                            </button>
-                        </div>
-                        <input type="text" class="form-control bg-secondary text-center" value="1">
-                        <div class="input-group-btn">
-                            <button class="btn btn-primary btn-plus">
-                                <i class="fa fa-plus"></i>
-                            </button>
-                        </div>
+                    {% endfor %}
+                    <p>Select Color:</p>
+                    {% for color in colors %}
+                    <div class="form-check form-check-inline" style="margin-right: 10px;">
+                        <input class="form-check-input" type="radio" name="color" id="color_{{ forloop.counter }}" value="{{ color.colour_name }}" style="margin-top: 5px;">
+                        <label class="form-check-label" for="color_{{ forloop.counter }}">{{ color.colour_name }}</label>
                     </div>
-                    <a href="{% url 'cart' %}" class="btn btn-primary px-3"><i class="fa fa-shopping-cart mr-1"></i> Add To Cart</a>
-                </div>
+                    {% endfor %}
+                    <p>Quantity:</p>
+                    <input type="number" class="form-control" name="quantity" min="1" required style="width: 100%; margin-bottom: 10px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px;">
+                    <div class="invalid-feedback" style="color: red; margin-top: 5px; display: none;">Please enter a valid quantity.</div>
+                    <input type="submit" class="btn btn-primary mt-2" value="Add to Cart" style="padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                    <button type="button" class="btn btn-secondary mt-2" id="add-to-wishlist" style="padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">Add to Wishlist</button>
+                    <div id="error-message" class="text-danger mt-2" style="display: none;">Stock is finished.</div>
+                </form>
+            </div>
+            <!-- Right side: Display recommended products -->
+            <div class="col-md-6">
+                <h3>Recommended Products</h3>
+                <!-- Loop through recommended products -->
+                {% for product in recommended_products %}
+                    <div class="recommended-product">
+                        <!-- Display product image -->
+                        <img src="{{ product.tbl_productimage_set.first.image.url }}" alt="{{ product.product_name }}" class="recommended-product-image">
+                        <!-- View details button -->
+                        <a href="{% url 'details' product_id=product.product_id %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                    </div>
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    <!-- Footer Start -->
-    <div class="container-fluid bg-secondary text-dark mt-5 pt-5">
-        <div class="row px-xl-5 pt-5">
-            <div class="col-lg-4 col-md-12 mb-5 pr-3 pr-xl-5">
-                <a href="" class="text-decoration-none">
-                    <h1 class="mb-4 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border border-white px-3 mr-1">Dream</span>Dress</h1>
-                </a>
-                <p>We firmly believe that with the right Outfit one can rule the world.</p>
-                <p class="mb-2"><i class="fa fa-map-marker-alt text-primary mr-3"></i>123 Street, New York, USA</p>
-                <p class="mb-2"><i class="fa fa-envelope text-primary mr-3"></i>info@example.com</p>
-                <p class="mb-0"><i class="fa fa-phone-alt text-primary mr-3"></i>+012 345 67890</p>
-            </div>
-            <div class="col-lg-8 col-md-12">
-                <div class="row">
-                    <div class="col-md-4 mb-5">
-                        <h5 class="font-weight-bold text-dark mb-4">Quick Links</h5>
-                        <div class="d-flex flex-column justify-content-start">
-                            <a class="text-dark mb-2" href="{% url 'home' %}"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-dark mb-2" href="{% url 'shop' %}"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-dark" href="{% url 'contact' %}"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-5">
-                        <h5 class="font-weight-bold text-dark mb-4">Quick Links</h5>
-                        <div class="d-flex flex-column justify-content-start">
-                            <a class="text-dark mb-2" href="{% url 'home' %}"><i class="fa fa-angle-right mr-2"></i>Home</a>
-                            <a class="text-dark mb-2" href="{% url 'shop' %}"><i class="fa fa-angle-right mr-2"></i>Our Shop</a>
-                            <a class="text-dark" href="{% url 'contact' %}"><i class="fa fa-angle-right mr-2"></i>Contact Us</a>
-                        </div>
-                    </div>
-                    <div class="col-md-4 mb-5">
-                        <h5 class="font-weight-bold text-dark mb-4">Newsletter</h5>
-                        <form action="">
-                            <div class="form-group">
-                                <input type="text" class="form-control border-0 py-4" placeholder="Your Name" required="required" />
-                            </div>
-                            <div class="form-group">
-                                <input type="email" class="form-control border-0 py-4" placeholder="Your Email"
-                                    required="required" />
-                            </div>
-                            <div>
-                                <button class="btn btn-primary btn-block border-0 py-3" type="submit">Subscribe Now</button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row border-top border-light mx-xl-5 py-4">
-            <div class="col-md-6 px-xl-0">
-                <p class="mb-md-0 text-center text-md-left text-dark">
-                    &copy; <a class="text-dark font-weight-semi-bold" href="#">DreamDress</a>. All Rights Reserved. Designed
-                
-                </p>
-            </div>
-            <div class="col-md-6 px-xl-0 text-center text-md-right">
-                <img class="img-fluid" src="{% static 'img/payments.png' %}" alt="">
-            </div>
-        </div>
-    </div>
-    <!-- Footer End -->
- <!-- Back to Top -->
- <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
+<!-- managing quantity -->
 
-
- <!-- JavaScript Libraries -->
- <script src="{% static '/js/js1.js' %}"></script>
- <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.bundle.min.js"></script>
- <script src="{% static '/lib/easing/easing.min.js'%}"></script>
- <script src="{% static '/lib/owlcarousel/owl.carousel.min.js'%}"></script>
-
- <!-- Contact Javascript File -->
- <script src="{% static '/mail/jqBootstrapValidation.min.js'%}"></script>
- <script src="{% static '/mail/contact.js'%}"></script>
-
- <!-- Template Javascript -->
- <script src="{% static '/js/main.js'%}"></script>
- <script>// Get the image element and its parent container
-     const image = document.getElementById('product-image');
-     const imageContainer = document.querySelector('.carousel-inner');
-     
-     // Function to adjust image alignment
-     function alignImage() {
-         const containerWidth = imageContainer.offsetWidth;
-         const containerHeight = imageContainer.offsetHeight;
-         const imageWidth = image.naturalWidth;
-         const imageHeight = image.naturalHeight;
-     
-         if (imageWidth / imageHeight > containerWidth / containerHeight) {
-             image.style.width = '100%';
-             image.style.height = 'auto';
-         } else {
-             image.style.width = 'auto';
-             image.style.height = '100%';
-         }
-     }
-     
-     // Call the function initially and when the window is resized
-     alignImage();
-     window.addEventListener('resize', alignImage);
-     </script>
-
+<!-- autocomplete search bar menu -->
 <script>
-    // Call showColors function for the first image when the page loads
-    document.addEventListener("DOMContentLoaded", function() {
-        // Get the ID of the first image
-        const firstImageId = '{{ product_images_with_index.0.1.image_id }}'; // Accessing the first image ID
-        // Call showColors function with the ID of the first image
-        showColors(firstImageId);
-    });
 
-    function showColors(imageId) {
-        // Clear previous color and size displays
-        document.getElementById('color-display').innerHTML = '';
-        document.getElementById('size-display').innerHTML = '';
+    const searchInput = document.getElementById('search-input');
+    const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
     
-        // Fetch colors for the selected image using AJAX
-        fetch(`/get_colors/${imageId}/`)  // Make sure to append a trailing slash after imageId
-        .then(response => response.json())
-        .then(data => {
-            // Display colors
-            data.colors.forEach(color => {
-                document.getElementById('color-display').innerHTML += `<div style="background-color:${color}; width: 30px; height: 30px; display: inline-block; margin-right: 5px;"></div>`;
-            });
-    
-            // Display sizes for the first color
-            if (data.sizes.length > 0) {
-                data.sizes.forEach(size => {
-                    document.getElementById('size-display').innerHTML += `<p>${size}</p>`;
+    searchInput.addEventListener('input', function() {
+        const inputValue = this.value.trim();
+        if (inputValue.length > 0) {
+            // Send AJAX request to fetch autocomplete suggestions
+            fetch(`/autocomplete/?q=${inputValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update dropdown menu with suggestions
+                    autocompleteDropdown.innerHTML = '';
+                    data.forEach(suggestion => {
+                        const option = document.createElement('div');
+                        option.textContent = suggestion;
+                        option.addEventListener('click', function() {
+                            searchInput.value = suggestion;
+                            autocompleteDropdown.innerHTML = '';  // Clear dropdown after selection
+                        });
+                        autocompleteDropdown.appendChild(option);
+                    });
                 });
-            } else {
-                document.getElementById('size-display').innerHTML = '<p>No sizes available</p>';
-            }
-        })
-        .catch(error => {
-            console.error('Error fetching colors:', error);
-        });
-    }
-</script>
-
-
-
+        } else {
+            // Clear dropdown menu if input field is empty
+            autocompleteDropdown.innerHTML = '';
+        }
+    });
+    
+    
+    </script>     
+    
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 </body>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-<!-- Display Product Details
-<h2>{{ product.product_name }}</h2>
-<p>Price: ${{ product.product_current_price }}</p>
-<p>About Product: {{ product.product_about_product }}</p>
-<p>Material: {{ product.product_material }}</p>
-<p>Category: {{ product.category.category_name }}</p>
-
-Display Product Images 
-<h3>Images</h3>
-<div class="row">
-    {% for image in product_images %}
-        Image ID: {{ image.image_id }}<br>
-        <div class="col-md-3 mb-3">
-            <img src="{{ image.image.url }}" alt="Product Image">
-        </div>
-    {% endfor %}
-</div>
-
- Display Available Sizes 
-<h3>Sizes</h3>
-<div id="size-display"></div>
-
- Display Available Colors 
-<h3>Colors</h3>
-<div id="color-display"></div> -->
-
-
+</html>

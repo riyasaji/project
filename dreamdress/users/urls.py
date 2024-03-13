@@ -42,7 +42,6 @@ urlpatterns = [
     path('seller_registeration/',views.seller_registeration,name='seller_registeration'),
     path('seller_updateProfile/',views.seller_updateProfile,name='seller_updateProfile'),
     path('add_product/',views.add_product,name='add_product'),
-    path('product_details', views.product_details, name='product_details'),
     path('view_cart/',views.view_cart,name='view_cart'),
     path('seller_waiting/',views.seller_waiting,name='seller_waiting'),
     path('seller_dashboard/',views.seller_dashboard,name='seller_dashboard'),
@@ -52,9 +51,9 @@ urlpatterns = [
     path('base/',views.base,name='base'),
     path('temp/',views.temp,name='temp'),
     path('demo/',views.demo,name='demo'),
-    
-   
-    path('extra/<int:product_id>/', views.extra, name='extra'),
+    path('search/', views.search_products, name='search_products'),
+    path('autocomplete/', views.autocomplete_products, name='autocomplete_products'),
+    path('details/<int:product_id>/', views.details, name='details'),
     path('get_colors/<int:image_id>/', views.get_colors, name='get_colors'),
     path('customer_dashboard/',views.customer_dashboard,name='customer_dashboard'),
     path('change_password/',views.change_password,name='change_password'),

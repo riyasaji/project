@@ -35,6 +35,7 @@ from django.contrib.auth.tokens import default_token_generator
 from django.shortcuts import get_object_or_404
 import requests
 import json
+from django.db.models import Q
 #threading
 import threading
 class EmailThread(threading.Thread):
@@ -319,21 +320,22 @@ def dashboard(request):
 
 #product -details , detail.html
 @never_cache
-def extra(request, product_id):
+def details(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     product_images = list(Tbl_ProductImage.objects.filter(product=product))
     product_images_with_index = [(index, image) for index, image in enumerate(product_images)]
     sizes = Tbl_size.objects.filter(tbl_stock__product=product).distinct()
     colors = Tbl_colour.objects.filter(tbl_stock__product=product).distinct()
     print("Product Images:", product_images) 
+    recommended_products = Tbl_product.objects.filter(category=product.category).exclude(pk=product_id)[:3]
 
-    return render(request, 'extra1.html', {
+    return render(request, 'detail.html', {
         'product': product,
        'product_images_with_index': product_images_with_index,
         'sizes': sizes,
-
         'sizes': sizes,
-        'colors': colors
+        'colors': colors,
+        'recommended_products': recommended_products
     })
 
 
@@ -356,7 +358,7 @@ def add_to_cart(request, product_id):
 
         if int(quantity) > stock.stock_quantity:
             print("Stock finished.")
-            return redirect('extra')  
+            return redirect('details')  
     
         cart, created = Tbl_cart.objects.get_or_create(user=request.user)
         
@@ -375,7 +377,7 @@ def add_to_cart(request, product_id):
             
         return redirect('view_cart')  
     else:   
-        return render(request, 'extra1.html', {'product': product})
+        return render(request, 'detail.html', {'product': product})
 
 
 
@@ -501,7 +503,6 @@ def seller_waiting(request):
 def add_product(request):
     if request.method == 'POST':
         try:
-            # Extract data from the form
             brand_name = request.POST.get('brand_name')
             category_id = request.POST.get('category_id')
             about_product = request.POST.get('about_product')
@@ -743,7 +744,56 @@ def send_message_to_seller(request):
 
 
 
+# search_products
+def search_products(request):
+    query = request.GET.get('q')
+    products = None
+    no_results_message = None
+    
+    print("Search query:", query)  # Debugging: Print the search query
+    
+    if query:
+        products = Tbl_product.objects.filter(
+            Q(category__category_name__icontains=query) |
+            Q(tbl_stock__colour__colour_name__icontains=query) |
+            Q(tbl_stock__size__size_name__icontains=query) |
+            Q(product_about_product__icontains=query) |
+            Q(product_material__icontains=query)
+        ).distinct()
+        
+        print("Filtered products:", products)  # Debugging: Print the filtered products
+        
+        if not products:
+            # If no products are found for the search query
+            no_results_message = "No products found."
+    else:
+        # If no search query is provided, show all products
+        products = Tbl_product.objects.all()
+        
+        if not products:
+            # If there are no products available
+            no_results_message = "No products found."
+    
+    context = {
+        'products': products,
+        'query': query,
+        'no_results_message': no_results_message
+    }
+    
+    return render(request, 'serach_result.html', context)
 
+
+#autocomplete search bar menu
+def autocomplete_products(request):
+    query = request.GET.get('q', '')
+    suggestions = []
+
+    # Query database for product names containing the query string
+    if query:
+        products = Tbl_product.objects.filter(product_about_product__icontains=query)[:10]  # Limit to 10 suggestions
+        suggestions = [product.product_about_product for product in products]
+
+    return JsonResponse(suggestions, safe=False)
 
 
 
@@ -977,8 +1027,7 @@ def tailor_registeration(request):
     
 
 
-def product_details(request):
-    return render(request, 'details.html')
+
 
 
 

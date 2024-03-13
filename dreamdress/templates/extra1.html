@@ -1,21 +1,108 @@
 <!-- extra.html -->
-
+{% load static %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ product.product_name }}</title>
+    <title>Dream Dress- Product Details</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    
+    <!-- Favicon -->
+    <link href="{% static '/img/favicon.png' %}" rel="icon">
     <style>
         .carousel-item img {
             width: 100%;
             height: auto;
         }
     </style>
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static '/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+     <!-- Customized Bootstrap Stylesheet -->
+     <link href="{% static '/css/style.css' %}" rel="stylesheet">
 </head>
 <body>
+    <div class="container-fluid">
+        <div class="row align-items-center py-3 px-xl-5">
+            <div class="col-lg-3 d-none d-lg-block">
+                <a href="" class="text-decoration-none">
+                    <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Dream</span>Dress</h1>
+                </a>
+            </div>
+            <div class="col-lg-6 col-6 text-left">
+                <form action="">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search for products">
+                        <div class="input-group-append">
+                            <span class="input-group-text bg-transparent text-primary">
+                                <i class="fa fa-search"></i>
+                            </span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="col-lg-3 col-6 text-right">
+                <a href="" class="btn border">
+                    <i class="fas fa-heart text-primary"></i>
+                    <span class="badge">0</span>
+                </a>
+                <a href="" class="btn border">
+                    <i class="fas fa-shopping-cart text-primary"></i>
+                    <span class="badge">0</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+
+     <!-- Navbar Start -->
+     <div class="container-fluid">
+        <div class="row border-top px-xl-5">
+            <div class="col-lg-9">
+                <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                    <a href="" class="text-decoration-none d-block d-lg-none">
+                        <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Dream</span>Dress</h1>
+                    </a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto py-0">
+                            <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
+                            <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
+                            
+                            <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+                        </div>
+                        <div class="navbar-nav ml-auto py-0">
+                            {% if user.is_authenticated %}
+                            <a href="" class="nav-item nav-link">{{ user.username }}</a>
+                            {% if user.user_type == 'seller' %}
+                                <a href="{% url 'seller_dashboard' %}" class="nav-item nav-link">Your Dashboard</a>
+                            {% elif user.user_type == 'tailor' %}
+                                <a href="" class="nav-item nav-link">Tailor Dashboard</a>
+                            {% elif user.is_superuser %}
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Admin Dashboard</a>
+                            {% else %}
+                                <a href="{% url 'customer_dashboard' %}" class="nav-item nav-link">Your Profile</a>
+                            {% endif %}
+                            <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                            {% else %}
+                            <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+                            <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                            <a href="{% url 'seller_registeration' %}" class="nav-item nav-link">Become a Seller</a>
+                            <a href="{% url 'tailor_registeration' %}" class="nav-item nav-link">Become a Tailor</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+
+    <!-- product detils -->
     <div class="container mt-5">
         <div class="row">
             <div class="col-md-6">
