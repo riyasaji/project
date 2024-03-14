@@ -28,7 +28,18 @@
 
 
 
+p {
+        font-weight: bold; /* Make the text bold */
+        color: #333; /* Dark color */
+        font-style: italic; /* Italicize the text */
+    }
 
+    /* CSS for form-check elements within the loop */
+    .form-check-label {
+        font-weight: bold; 
+        color: #a28282; /* Dark color */
+        font-style: italic; /* Italicize the labels */
+    }
 
 
     </style>
@@ -153,27 +164,27 @@
                 <p class="product-description">Description: {{ product.product_about_product }}</p>
                 <p class="product-price">Price: ₹{{ product.product_current_price }}</p>
                 <p class="product-category">Category: {{ product.category.category_name }}</p>
-                <form action="{% url 'add_to_cart' product_id=product.product_id %}" method="post" id="add-to-cart-form" style="margin-bottom: 20px;">
+                <form action="{% url 'add_to_cart' product_id=product.product_id %}" method="post" id="add-to-cart-form">
                     {% csrf_token %}
                     <p>Select Size:</p>
                     {% for size in sizes %}
                     <div class="form-check form-check-inline" style="margin-right: 10px;">
-                        <input class="form-check-input" type="radio" name="size" id="size_{{ forloop.counter }}" value="{{ size.size_name }}" style="margin-top: 5px;">
+                        <input class="form-check-input" type="radio" name="size" id="size_{{ forloop.counter }}" value="{{ size.size_name }}" >
                         <label class="form-check-label" for="size_{{ forloop.counter }}">{{ size.size_name }}</label>
                     </div>
                     {% endfor %}
                     <p>Select Color:</p>
                     {% for color in colors %}
                     <div class="form-check form-check-inline" style="margin-right: 10px;">
-                        <input class="form-check-input" type="radio" name="color" id="color_{{ forloop.counter }}" value="{{ color.colour_name }}" style="margin-top: 5px;">
+                        <input class="form-check-input" type="radio" name="color" id="color_{{ forloop.counter }}" value="{{ color.colour_name }}">
                         <label class="form-check-label" for="color_{{ forloop.counter }}">{{ color.colour_name }}</label>
                     </div>
                     {% endfor %}
                     <p>Quantity:</p>
-                    <input type="number" class="form-control" name="quantity" min="1" required style="width: 100%; margin-bottom: 10px; padding: 8px 12px; border: 1px solid #ced4da; border-radius: 4px;">
+                    <input type="number" class="form-control" name="quantity" min="1" required >
                     <div class="invalid-feedback" style="color: red; margin-top: 5px; display: none;">Please enter a valid quantity.</div>
                     <input type="submit" class="btn btn-primary mt-2" value="Add to Cart" style="padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-                    <button type="button" class="btn btn-secondary mt-2" id="add-to-wishlist" style="padding: 8px 16px; border-radius: 4px; cursor: pointer; margin-right: 10px;">Add to Wishlist</button>
+                    <input type="submit" class="btn btn-primary mt-2" value="Add to Wishlist" style="padding: 8px 16px; border-radius: 4px; cursor: pointer;">
                     <div id="error-message" class="text-danger mt-2" style="display: none;">Stock is finished.</div>
                 </form>
             </div>

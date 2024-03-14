@@ -339,7 +339,8 @@ def details(request, product_id):
     })
 
 
-# add to cart
+
+@login_required
 def add_to_cart(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     if request.method == 'POST':
@@ -377,16 +378,80 @@ def add_to_cart(request, product_id):
             
         return redirect('view_cart')  
     else:   
-        return render(request, 'detail.html', {'product': product})
+        if request.user.is_authenticated:
+            return render(request, 'detail.html', {'product': product})
+        else:
+            # Redirect to popup_message view if user is not authenticated
+            messages.info(request, 'Please sign in or register to add items to your cart.')
+            return redirect('popup_message')
 
 
+# # add to cart
+# def add_to_cart(request, product_id):
+#     product = get_object_or_404(Tbl_product, pk=product_id)
+#     if request.method == 'POST':
+#         quantity = request.POST.get('quantity', 1)
+#         size_name = request.POST.get('size')
+#         color_name = request.POST.get('color')
+#         print("Quantity:", quantity)
+#         print("Size:", size_name)
+#         print("Color:", color_name)
+#         if not quantity:
+#             quantity = 1
 
-def view_cart(request):
-    # stock_id = request.GET.get('stock_id')  # Assuming you're passing stock_id via GET method
-    # stock = get_stock_object(stock_id)  # Define how to get the stock object based on the stock_id
-    return render(request, 'cart.html',)
+        
+#         stock = get_object_or_404(Tbl_stock, product=product, colour__colour_name=color_name, size__size_name=size_name)
+#         print("Stock:", stock)
+
+#         if int(quantity) > stock.stock_quantity:
+#             print("Stock finished.")
+#             return redirect('details')  
+    
+#         cart, created = Tbl_cart.objects.get_or_create(user=request.user)
+        
    
+#         cart_item = Tbl_cartItem.objects.filter(cart=cart, cart_stock=stock).first()
+#         print("Cart:", cart)
+#         print("Cart Item:", cart_item)
 
+#         if cart_item:
+#             # If the item already exists, update the quantity
+#             cart_item.cart_quantity += int(quantity)
+#             cart_item.save()
+#         else:
+#             # If the item does not exist, create a new cart item
+#             cart_item = Tbl_cartItem.objects.create(cart=cart, cart_stock=stock, cart_quantity=int(quantity))
+            
+#         return redirect('view_cart')  
+#     else:   
+#         return render(request, 'detail.html', {'product': product})
+
+
+# view my cart
+def view_cart(request):
+
+    cart_items = Tbl_cartItem.objects.filter(cart__user=request.user)
+    return render(request, 'cart.html', {'cart_items': cart_items})
+
+ #error message if the user is not logged in cart   
+def popup_cart(request):
+    message = "Please sign in or register to add items to your cart."
+    return render(request, 'popup_cart.html', {'message': message})
+
+#update quantity , cart.html
+def update_quantity(request, cart_item_id):
+    if request.method == 'POST' :
+        cart_item = get_object_or_404(Tbl_cartItem, pk=cart_item_id)
+        new_quantity = int(request.POST.get('quantity', 0))
+        if new_quantity > 0:
+            cart_item.cart_quantity = new_quantity
+            cart_item.save()
+            return JsonResponse({'success': True, 'new_quantity': new_quantity})
+        else:
+            return JsonResponse({'success': False, 'error': 'Invalid quantity'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
+    
 
 # Colours for product
 def get_colors(request, image_id=None):
