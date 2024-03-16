@@ -62,13 +62,13 @@
             </div>
             <!-- end search -->
             <div class="col-lg-3 col-6 text-right">
-                <a href="" class="btn border">
+                <a href="{%url 'view_wishlist' %}" class="btn border">
                     <i class="fas fa-heart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge">{{ wishlist_count }}</span>
                 </a>
-                <a href="" class="btn border">
+                <a href="{% url 'view_cart' %}" class="btn border">
                     <i class="fas fa-shopping-cart text-primary"></i>
-                    <span class="badge">0</span>
+                    <span class="badge">{{ cart_item_count }}</span>
                 </a>
             </div>
         </div>
@@ -154,9 +154,9 @@
         <div class="d-flex flex-column align-items-center justify-content-center" style="min-height: 300px">
             <h1 class="font-weight-semi-bold text-uppercase mb-3">Our Shop</h1>
             <div class="d-inline-flex">
-                <p class="m-0"><a href="">Home</a></p>
+                <p class="m-0"><a href="{% url 'home' %}">Home</a></p>
                 <p class="m-0 px-2">-</p>
-                <p class="m-0">Shop</p>
+                <p class="m-0"><a href="{% url 'shop' %}">Shop</a>/p>
             </div>
         </div>
     </div> -->
@@ -187,7 +187,10 @@
                             {% else %}
                             <p>Product ID is empty or invalid.</p>
                             {% endif %}
-                            <a href="" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
+                            <form action="{% url 'add_to_wishlist' product_id=product.product_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm text-dark p-0"><i class="fas fa-heart text-primary"></i>Add To Wishlist</button>
+                            </form>
                         </div>
                     </div>
                 </div>

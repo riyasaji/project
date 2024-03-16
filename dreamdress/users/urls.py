@@ -80,7 +80,10 @@ urlpatterns = [
     path('manage_product_admin/', views.manage_product_admin,name='manage_product_admin'),
     path('send-message-to-seller/', views.send_message_to_seller, name='send_message_to_seller'),
     path('add_to_cart/<int:product_id>/', views.add_to_cart, name='add_to_cart'),
-
+    path('delete_cartitem/<int:cart_id>/', views.delete_cartitem, name='delete_cartitem'),
+    path('add-to-wishlist/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
+    path('wishlist/remove/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
+     path('view_wishlist/',views.view_wishlist,name='view_wishlist'),
 
 ]
 

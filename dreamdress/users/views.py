@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout as auth_logout
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -51,7 +51,13 @@ from django.contrib.auth.tokens import PasswordResetTokenGenerator
 @login_required(login_url='signin')
 @never_cache
 def home(request):
-    return render(request,'home.html') 
+    cart_item_count = 0
+    wishlist_count = 0
+    
+    if request.user.is_authenticated:
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+        wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
+    return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
 
 
 def index(request):
@@ -328,6 +334,10 @@ def details(request, product_id):
     colors = Tbl_colour.objects.filter(tbl_stock__product=product).distinct()
     print("Product Images:", product_images) 
     recommended_products = Tbl_product.objects.filter(category=product.category).exclude(pk=product_id)[:3]
+    
+    if request.user.is_authenticated:
+            cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+            wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
 
     return render(request, 'detail.html', {
         'product': product,
@@ -335,7 +345,9 @@ def details(request, product_id):
         'sizes': sizes,
         'sizes': sizes,
         'colors': colors,
-        'recommended_products': recommended_products
+        'recommended_products': recommended_products,
+        'cart_item_count': cart_item_count, 
+        'wishlist_count': wishlist_count
     })
 
 
@@ -386,52 +398,47 @@ def add_to_cart(request, product_id):
             return redirect('popup_message')
 
 
-# # add to cart
-# def add_to_cart(request, product_id):
-#     product = get_object_or_404(Tbl_product, pk=product_id)
-#     if request.method == 'POST':
-#         quantity = request.POST.get('quantity', 1)
-#         size_name = request.POST.get('size')
-#         color_name = request.POST.get('color')
-#         print("Quantity:", quantity)
-#         print("Size:", size_name)
-#         print("Color:", color_name)
-#         if not quantity:
-#             quantity = 1
-
-        
-#         stock = get_object_or_404(Tbl_stock, product=product, colour__colour_name=color_name, size__size_name=size_name)
-#         print("Stock:", stock)
-
-#         if int(quantity) > stock.stock_quantity:
-#             print("Stock finished.")
-#             return redirect('details')  
-    
-#         cart, created = Tbl_cart.objects.get_or_create(user=request.user)
-        
-   
-#         cart_item = Tbl_cartItem.objects.filter(cart=cart, cart_stock=stock).first()
-#         print("Cart:", cart)
-#         print("Cart Item:", cart_item)
-
-#         if cart_item:
-#             # If the item already exists, update the quantity
-#             cart_item.cart_quantity += int(quantity)
-#             cart_item.save()
-#         else:
-#             # If the item does not exist, create a new cart item
-#             cart_item = Tbl_cartItem.objects.create(cart=cart, cart_stock=stock, cart_quantity=int(quantity))
-            
-#         return redirect('view_cart')  
-#     else:   
-#         return render(request, 'detail.html', {'product': product})
 
 
 # view my cart
 def view_cart(request):
+    cart_items = Tbl_cartItem.objects.all()  # Fetch cart items from the database
+    subtotal = 0  # Initialize subtotal variable
+    for cart_item in cart_items:
+        cart_item.total_price = cart_item.cart_stock.product.product_current_price * cart_item.cart_quantity
+        subtotal += cart_item.total_price  # Add each item's total price to subtotal
+        total = subtotal + 10 
 
-    cart_items = Tbl_cartItem.objects.filter(cart__user=request.user)
-    return render(request, 'cart.html', {'cart_items': cart_items})
+    context = {
+        'cart_items': cart_items,
+        'subtotal': subtotal,
+        'total': total
+    }
+
+    if request.user.is_authenticated:
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+        wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
+        context.update({
+            'cart_item_count': cart_item_count,
+            'wishlist_count': wishlist_count
+        })
+
+    return render(request, 'cart.html', context)
+
+
+#cart_count
+def cart_item_count(request):
+    cart_item_count = 0
+    if request.user.is_authenticated:
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+    return {'cart_item_count': cart_item_count}
+
+#payment
+def payment_success(request):
+    return render(request, 'payment_success.html')
+
+def payment_failure(request):
+    return render(request, 'payment_failure.html')
 
  #error message if the user is not logged in cart   
 def popup_cart(request):
@@ -451,8 +458,16 @@ def update_quantity(request, cart_item_id):
             return JsonResponse({'success': False, 'error': 'Invalid quantity'})
     else:
         return JsonResponse({'success': False, 'error': 'Invalid request method or not an AJAX request'})
-    
 
+ #remove from cart   
+def delete_cartitem(request, cart_id):
+    cart_item = get_object_or_404(Tbl_cartItem, id=cart_id)
+
+    if request.method == 'POST':
+        cart_item.delete()
+        print("deleted cart item")
+        return redirect('view_cart')
+    
 # Colours for product
 def get_colors(request, image_id=None):
     try:
@@ -625,7 +640,20 @@ def add_product(request):
 #product - view -shop
 def shop_view(request):
     products = Tbl_product.objects.all()
-    return render(request, 'shop.html', {'products': products})
+    cart_item_count = 0
+    wishlist_count = 0
+
+    if request.user.is_authenticated:
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+        wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
+
+    context = {
+        'products': products,
+        'cart_item_count': cart_item_count,
+        'wishlist_count': wishlist_count
+    }
+
+    return render(request, 'shop.html', context)
 
 #   Check for colour  in add product
 def check_color(request):
@@ -673,34 +701,6 @@ def add_category(request):
         return JsonResponse({'success': True})
     else:
         return JsonResponse({'error': 'Invalid request method'})
-
-# @login_required
-# def manage_stock(request):
-#     user = request.user
-#     print("User:", user)  # Print the user to check if it's correct
-
-#     if user.user_type == 'seller':
-#         # Retrieve the Tbl_seller instance associated with the user
-#         try:
-#             seller_instance = Tbl_seller.objects.get(user=user)
-#         except Tbl_seller.DoesNotExist:
-#             # Handle the case where Tbl_seller instance doesn't exist
-#             return render(request, 'not_seller.html')
-
-#         # Retrieve products added by the logged-in seller
-#         seller_products = Tbl_product.objects.filter(seller=seller_instance)
-
-#         # Retrieve stock information for each product
-#         for product in seller_products:
-#             product.stock = Tbl_stock.objects.filter(product=product)
-
-#             # Retrieve images associated with each product
-#             product.images = Tbl_ProductImage.objects.filter(product=product)
-
-#         return render(request, 'managestock.html', {'seller_products': seller_products})
-#     else:
-#         # If the user is not a seller, handle the appropriate response
-#         return render(request, 'not_seller.html')
 
 
 #manage stock
@@ -787,7 +787,6 @@ def manage_product_admin(request):
 
 
 # send email to seller for less stock quantity
-
 def send_message_to_seller(request):
     # Get data from the request
     data = json.loads(request.body)
@@ -860,6 +859,72 @@ def autocomplete_products(request):
 
     return JsonResponse(suggestions, safe=False)
 
+
+# payment
+from decimal import Decimal
+
+
+
+
+
+
+# wishlist
+def add_to_wishlist(request, product_id):
+    if request.method == "POST" and request.user.is_authenticated:
+        user = request.user
+        product = Tbl_product.objects.get(product_id=product_id)
+        wishlist_item, created = Tbl_wishlist.objects.get_or_create(user=user, product=product)
+        if created:
+            # Wishlist item was successfully added
+            # You can add a success message here if needed
+            pass
+        else:
+            messages.warning(request, 'This item is already in your wishlist.')
+        
+        wishlist_products = Tbl_wishlist.objects.filter(user=user)
+    else:
+        wishlist_products = None
+
+    return render(request, 'wishlist.html', {'wishlist_products': wishlist_products}) 
+
+
+def remove_from_wishlist(request, product_id):
+    if request.method == "POST" and request.user.is_authenticated:
+        user = request.user
+        product = get_object_or_404(Tbl_wishlist, user=user, product_id=product_id)
+        product.delete()
+        messages.success(request, 'Item removed from your wishlist successfully.')
+    else:
+        messages.error(request, 'Failed to remove item from wishlist. Please try again later.')
+
+    return redirect('shop') 
+
+def view_wishlist(request):
+    cart_item_count = 0
+    wishlist_count = 0
+    wishlist_products = None
+
+    if request.user.is_authenticated:
+        wishlist_products = Tbl_wishlist.objects.filter(user=request.user)
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+        wishlist_count = wishlist_products.count()
+
+    context = {
+        'cart_item_count': cart_item_count,
+        'wishlist_count': wishlist_count,
+        'wishlist_products': wishlist_products,
+    }
+
+    return render(request, 'wishlist.html', context)
+
+
+# cart_item_count = 0
+#     wishlist_count = 0
+    
+#     if request.user.is_authenticated:
+#         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+#         wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
+#     return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
 
 
 
@@ -1152,7 +1217,14 @@ def checkout(request):
     return render(request,'checkout.html')
 
 def contact(request):
-    return render(request,'contact.html')
+    cart_item_count = 0
+    wishlist_count = 0
+    
+    if request.user.is_authenticated:
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+        wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
+    return render(request, 'contact.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
+   
 
 def base(request):
     return render(request,'base.html')

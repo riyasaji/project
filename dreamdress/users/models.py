@@ -166,71 +166,21 @@ class Tbl_cartItem(models.Model):
         else:
             return f"{self.cart_quantity} x Unknown Product"
 
-    
+#payment
+class Tbl_payment(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
+    cart = models.ForeignKey(Tbl_cart, on_delete=models.CASCADE, null=True, blank=True)
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_date = models.DateTimeField(auto_now_add=True)
 
-# #model for category
-# class category(models.Model):
-#     category_name = models.CharField(max_length=255)
-#     category_description = models.CharField(max_length=900)
-#     category_picture = models.ImageField(upload_to='category_pictures/', null=True, blank=True)
-#     category_verify = models.BooleanField(default=True)
-
-
-# #model for subcategory
-# # class sub_category(models.Model):  
-# #         sub_category_name = models.CharField(max_length=255)
-# #         sub_category_description = models.CharField(max_length=900)
-# #         sub_category_picture = models.ImageField(upload_to='category_pictures/', null=True, blank=True)
-# #         sub_category_verify = models.BooleanField(default=True)
-# #         category_id = models.ForeignKey(category, on_delete=models.DO_NOTHING, null=True, blank=True)
+    def __str__(self):
+        return f"Payment - {self.payment_date}"
 
 
-# #model for size
-# class Size(models.Model):
-#     name = models.CharField(max_length=50)
+class Tbl_wishlist(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE)
+    product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
+    added_date = models.DateTimeField(auto_now_add=True)
 
-
-# #model for product
-# class Product(models.Model):
-#     # Product Information Fields
-#     brand_name = models.CharField(max_length=255,null=True)
-#     product_name = models.CharField(max_length=255)
-#     product_number= models.CharField(max_length=100,unique=True,null=True)
-#     stock = models.IntegerField()
-#     about_product = models.TextField()
-#     current_price = models.DecimalField(max_digits=10, decimal_places=2)
-#     category_id = models.ForeignKey(category, on_delete=models.DO_NOTHING,null=True, blank=True)
-#     # sub_category_id = models.ForeignKey(sub_category, on_delete=models.DO_NOTHING,null=True, blank=True)
-#     seller_id = models.ForeignKey(tbl_user, on_delete=models.DO_NOTHING,null=True, blank=True)
-#     color = models.CharField(max_length=255)
-#     material = models.CharField(max_length=255)
-#     product_status = models.BooleanField(default=True)
-#     image_1 = models.ImageField(upload_to='product_main_images/', blank=True, null=True)
-#     sizes = models.ManyToManyField(Size)
-
-
-
-# #model for images
-# class product_images(models.Model):  
-#     image_data = models.ImageField(upload_to='product_images/', blank=True, null=True)
-#     product_id = models.ForeignKey(Product, on_delete=models.DO_NOTHING, null=True, blank=True)
-
-
-
-# #model for cart
-# class Cart(models.Model):
-#     user           =     models.ForeignKey(tbl_user, on_delete=models.CASCADE,null=True,blank=True)
-
-
-# class Cart_items(models.Model):
-#     user           =     models.ForeignKey(tbl_user, on_delete=models.CASCADE,null=True,blank=True)
-#     product        =     models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
-#     cart        =     models.ForeignKey(Cart,on_delete=models.CASCADE,null=True,blank=True)
-#     quantity       =     models.IntegerField(default=1)
-#     cart_verify    =     models.BooleanField(default=False)
-#     # id_number_info =     models.IntegerField(default=1)
-
-
-# class MYcart(models.Model):
-#     user           =     models.ForeignKey(tbl_user, on_delete=models.CASCADE,null=True,blank=True)
-#     product        =     models.ForeignKey(Product,on_delete=models.CASCADE,null=True,blank=True)
+    def __str__(self):
+        return f"Wishlist Item - {self.product.product_name} added by {self.user.username}"

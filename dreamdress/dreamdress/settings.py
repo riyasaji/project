@@ -85,6 +85,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                
             ],
         },
     },
@@ -170,3 +171,6 @@ AUTHENTICATION_BACKENDS = (
 
 LOGIN_REDIRECT_URL ='home'
 LOGOUT_REDIRECT_URL='/'
+
+RAZORPAY_API_KEY = 'rzp_test_yVbEiFHBIces70'
+RAZORPAY_API_SECRET = 'vlcrxr0Tkei8vzWy8adH4o4m'
