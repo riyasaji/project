@@ -1,0 +1,14 @@
+<form action="{% url 'success' %}" method="POST">
+    {% csrf_token %}
+    <script src="https://checkout.razorpay.com/v1/checkout.js" 
+            data-key="rzp_test_GfzsM6qWehBGju" 
+            data-amount="{{ order_amount }}" 
+            data-currency="INR" 
+            data-order_id="{{ order_id }}" 
+            data-buttontext="Pay with Razorpay" 
+            data-name="DreamDress" 
+            data-description="Order payment" 
+            data-prefill.email="customer@example.com" 
+            data-prefill.contact="9999999999"></script>
+    {% comment %} <button class="btn btn-primary" type="submit">Complete Payment</button> {% endcomment %}
+</form>

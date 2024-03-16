@@ -57,8 +57,11 @@ def home(request):
     if request.user.is_authenticated:
         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
         wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
-    return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
+    categories = Tbl_category.objects.all()  # Fetch all categories
+    return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count, 'categories': categories})
 
+# categories = Tbl_category.objects.all()
+# 'categories': categories
 
 def index(request):
     return render(request,'index.html')
@@ -434,6 +437,32 @@ def cart_item_count(request):
     return {'cart_item_count': cart_item_count}
 
 #payment
+import razorpay
+@login_required
+def initiate_payment(request):
+    cart_items = Tbl_cartItem.objects.filter(cart__user=request.user)
+    
+    subtotal = 0
+    for cart_item in cart_items:
+        cart_item.total_price = cart_item.cart_stock.product.product_current_price * cart_item.cart_quantity
+        subtotal += cart_item.total_price
+    total = subtotal + 10 
+    
+    client = razorpay.Client(auth=('rzp_test_GfzsM6qWehBGju','4ZZkYgLAtHFGy89EjiHpDCyE'))
+    
+    order_amount = total * 100
+    order_currency = 'INR'
+    order_receipt = 'order_rcptid_11'
+    notes = {'Shipping address': 'Dummy Address'}
+    order = client.order.create({'amount': order_amount, 'currency': order_currency, 'receipt': order_receipt, 'notes': notes})
+    
+    return render(request, 'razorpay_checkout.html', {'order_id': order['id'], 'order_amount': order_amount})
+
+
+
+def success(request):
+    return render(request,'success.html')
+
 def payment_success(request):
     return render(request, 'payment_success.html')
 
@@ -640,6 +669,7 @@ def add_product(request):
 #product - view -shop
 def shop_view(request):
     products = Tbl_product.objects.all()
+    categories = Tbl_category.objects.all()
     cart_item_count = 0
     wishlist_count = 0
 
@@ -650,7 +680,8 @@ def shop_view(request):
     context = {
         'products': products,
         'cart_item_count': cart_item_count,
-        'wishlist_count': wishlist_count
+        'wishlist_count': wishlist_count,
+        'categories': categories
     }
 
     return render(request, 'shop.html', context)
@@ -925,6 +956,33 @@ def view_wishlist(request):
 #         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
 #         wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
 #     return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
+
+# fileter products
+def filter_products(request):
+    # Retrieve cart item count and wishlist count
+    cart_item_count = 0
+    wishlist_count = 0
+    if request.user.is_authenticated:
+        cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
+        wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
+
+    # Retrieve all categories
+    categories = Tbl_category.objects.all()
+
+    # Filter products based on selected category
+    selected_category = request.GET.get('category')
+    if selected_category:
+        products = Tbl_product.objects.filter(category__category_id=selected_category)
+    else:
+        products = Tbl_product.objects.all()
+
+    # Filter products based on price range
+    min_price = request.GET.get('min_price')
+    max_price = request.GET.get('max_price')
+    if min_price and max_price:
+        products = products.filter(product_current_price__gte=min_price, product_current_price__lte=max_price)
+
+    return render(request, 'filter_page.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count, 'categories': categories, 'products': products})
 
 
 
@@ -1217,26 +1275,19 @@ def checkout(request):
     return render(request,'checkout.html')
 
 def contact(request):
+    
     cart_item_count = 0
     wishlist_count = 0
-    
+
+
+
     if request.user.is_authenticated:
         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
         wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
     return render(request, 'contact.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
    
 
-def base(request):
-    return render(request,'base.html')
 
-
-def temp(request):
-     products = [
-        {'id': 1, 'name': 'Product 1', 'description': 'Description for Product 1', 'price': 10.0, 'image': 'product1.jpg'},
-        {'id': 2, 'name': 'Product 2', 'description': 'Description for Product 2', 'price': 15.0, 'image': 'product2.jpg'},
-        # Add more products here...
-    ]
-     return render(request,'temp.html',{'products': products})
 
 
 

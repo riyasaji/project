@@ -48,8 +48,6 @@ urlpatterns = [
     path('checkout/',views.checkout,name='checkout'),
     path('contact/',views.contact,name='contact'),
     path('admin_authenticate/',views.admin_authenticate,name='admin_authenticate'),
-    path('base/',views.base,name='base'),
-    path('temp/',views.temp,name='temp'),
     path('demo/',views.demo,name='demo'),
     path('search/', views.search_products, name='search_products'),
     path('autocomplete/', views.autocomplete_products, name='autocomplete_products'),
@@ -83,7 +81,10 @@ urlpatterns = [
     path('delete_cartitem/<int:cart_id>/', views.delete_cartitem, name='delete_cartitem'),
     path('add-to-wishlist/<int:product_id>/', views.add_to_wishlist, name='add_to_wishlist'),
     path('wishlist/remove/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
-     path('view_wishlist/',views.view_wishlist,name='view_wishlist'),
+    path('view_wishlist/',views.view_wishlist,name='view_wishlist'),
+    path('filter_products/',views.filter_products,name='filter_products'),
+    path('success',views.success, name='success'),
+    path('initiate-payment/', views.initiate_payment, name='initiate_payment'),
 
 ]
 

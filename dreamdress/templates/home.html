@@ -82,32 +82,47 @@
     <div class="container-fluid mb-5">
         <div class="row border-top px-xl-5">
             <div class="col-lg-3 d-none d-lg-block">
-                <a class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#navbar-vertical" style="height: 65px; margin-top: -1px; padding: 0 30px;">
-                    <h6 class="m-0">Categories</h6>
-                    <i class="fa fa-angle-down text-dark"></i>
-                </a>
-                <nav class="collapse show navbar navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0" id="navbar-vertical">
-                    <div class="navbar-nav w-100 overflow-hidden" style="height: 410px">
-                        <div class="nav-item dropdown">
-                            <a href="#" class="nav-link" data-toggle="dropdown">Dresses <i class="fa fa-angle-down float-right mt-1"></i></a>
-                            <div class="dropdown-menu position-absolute bg-secondary border-0 rounded-0 w-100 m-0">
-                                <a href="" class="dropdown-item">Men's Dresses</a>
-                                <a href="" class="dropdown-item">Women's Dresses</a>
-                                <a href="" class="dropdown-item">Baby's Dresses</a>
-                            </div>
-                        </div>
-                        <a href="" class="nav-item nav-link">Shirts</a>
-                        <a href="" class="nav-item nav-link">Jeans</a>
-                        <a href="" class="nav-item nav-link">Swimwear</a>
-                        <a href="" class="nav-item nav-link">Sleepwear</a>
-                        <a href="" class="nav-item nav-link">Sportswear</a>
-                        <a href="" class="nav-item nav-link">Jumpsuits</a>
-                        <a href="" class="nav-item nav-link">Blazers</a>
-                        <a href="" class="nav-item nav-link">Jackets</a>
-                        <a href="" class="nav-item nav-link">Shoes</a>
+                <form action="{% url 'filter_products' %}" method="GET">
+                    <div class="btn shadow-none d-flex align-items-center justify-content-between bg-primary text-white w-100" data-toggle="collapse" href="#filtersCollapse" style="height: 65px; margin-top: -1px; padding: 0 30px;">
+                        <h6 class="m-0">Apply Filters <i class="fa fa-filter" style="color: black;"></i></h6>
+
+                        <i class="fa fa-angle-down text-dark"></i>
                     </div>
-                </nav>
+                    <div class="collapse show" id="filtersCollapse">
+                        <nav class="navbar-vertical navbar-light align-items-start p-0 border border-top-0 border-bottom-0" style="max-height: 410px; overflow-y: auto;">
+                            <h6 class="m-0" style="font-weight: bold;">Categories: </h6>
+                            <div class="navbar-nav w-100">
+                                {% for category in categories %}
+                                <label class="nav-item nav-link">
+                                    <input type="radio" name="category" value="{{ category.category_id }}">
+                                    {{ category.category_name }}
+                                </label>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-3">
+                                <label for="price" class="mr-2" style="color: black;font-weight: bold;">Price Range:</label>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background-color: black; color: white;">₹</span>
+                                    </div>
+                                    <input type="number" id="min_price" name="min_price" class="form-control" placeholder="Min Price" value="{{ min_price }}" style="color: black;" min="0">
+                                </div>
+                                <div class="input-group mb-3">
+                                    <div class="input-group-prepend">
+                                        <span class="input-group-text" style="background-color: black; color: white;">₹</span>
+                                    </div>
+                                    <input type="number" id="max_price" name="max_price" class="form-control" placeholder="Max Price" value="{{ max_price }}" style="color: black;" min="0">
+                                </div>
+                            </div>
+                            
+                        </nav>
+                        <button type="submit" class="btn btn-primary mt-3">Apply Filters</button>
+                    </div>
+                </form>
             </div>
+            
+            
+
             <div class="col-lg-9">
                 <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
                     <a href="" class="text-decoration-none d-block d-lg-none">
@@ -160,7 +175,7 @@
                                 <div class="p-3" style="max-width: 700px;">
                                     <h4 class="text-light text-uppercase font-weight-medium mb-3">10% Off Your First Order</h4>
                                     <h3 class="display-4 text-white font-weight-semi-bold mb-4">Fashionable Dress</h3>
-                                    <a href="" class="btn btn-light py-2 px-3">Shop Now</a>
+                                    <a href="{% url 'shop' %}" class="btn btn-light py-2 px-3">Shop Now</a>
                                 </div>
                             </div>
                         </div>
@@ -767,6 +782,26 @@ searchInput.addEventListener('input', function() {
 
 
 </script>
+
+<!--price validation -->
+<script>
+    document.getElementById("min_price").addEventListener("input", function() {
+        if (this.value < 0) {
+            this.setCustomValidity("Min price cannot be negative.");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
+
+    document.getElementById("max_price").addEventListener("input", function() {
+        if (this.value < 0) {
+            this.setCustomValidity("Max price cannot be negative.");
+        } else {
+            this.setCustomValidity("");
+        }
+    });
+</script>
+
 
     <!-- Back to Top -->
     <a href="#" class="btn btn-primary back-to-top"><i class="fa fa-angle-double-up"></i></a>
