@@ -437,27 +437,60 @@ def cart_item_count(request):
     return {'cart_item_count': cart_item_count}
 
 #payment
+# import razorpay
+# @login_required
+# def initiate_payment(request):
+#     cart_items = Tbl_cartItem.objects.filter(cart__user=request.user)
+    
+#     subtotal = 0
+#     for cart_item in cart_items:
+#         cart_item.total_price = cart_item.cart_stock.product.product_current_price * cart_item.cart_quantity
+#         subtotal += cart_item.total_price
+#     total = subtotal + 10 
+    
+#     client = razorpay.Client(auth=('rzp_test_GfzsM6qWehBGju','4ZZkYgLAtHFGy89EjiHpDCyE'))
+    
+#     order_amount = total * 100
+#     order_currency = 'INR'
+#     order_receipt = 'order_rcptid_11'
+#     notes = {'Shipping address': 'Dummy Address'}
+#     order = client.order.create({'amount': order_amount, 'currency': order_currency, 'receipt': order_receipt, 'notes': notes})
+    
+#     return render(request, 'razorpay_checkout.html', {'order_id': order['id'], 'order_amount': order_amount})
+
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from .models import Tbl_cartItem
 import razorpay
+
 @login_required
 def initiate_payment(request):
-    cart_items = Tbl_cartItem.objects.filter(cart__user=request.user)
+    total, order_amount = calculate_total_and_order_amount(request.user)
+    order_id = create_order(order_amount)
     
+    return render(request, 'razorpay_checkout.html', {'order_id': order_id, 'order_amount': order_amount})
+
+def calculate_total_and_order_amount(user):
+    cart_items = Tbl_cartItem.objects.filter(cart__user=user)
     subtotal = 0
+    
     for cart_item in cart_items:
         cart_item.total_price = cart_item.cart_stock.product.product_current_price * cart_item.cart_quantity
         subtotal += cart_item.total_price
-    total = subtotal + 10 
     
-    client = razorpay.Client(auth=('rzp_test_GfzsM6qWehBGju','4ZZkYgLAtHFGy89EjiHpDCyE'))
-    
+    total = subtotal + 10
     order_amount = total * 100
+    
+    return total, order_amount
+
+def create_order(order_amount):
+    client = razorpay.Client(auth=('rzp_test_GfzsM6qWehBGju','4ZZkYgLAtHFGy89EjiHpDCyE'))
     order_currency = 'INR'
     order_receipt = 'order_rcptid_11'
     notes = {'Shipping address': 'Dummy Address'}
     order = client.order.create({'amount': order_amount, 'currency': order_currency, 'receipt': order_receipt, 'notes': notes})
     
-    return render(request, 'razorpay_checkout.html', {'order_id': order['id'], 'order_amount': order_amount})
-
+    return order['id']
 
 
 def success(request):
