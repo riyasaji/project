@@ -1,4 +1,4 @@
-<form action="{% url 'success' %}" method="POST">
+<!-- <form action="{% url 'success' %}" method="POST">
     {% csrf_token %}
     <script src="https://checkout.razorpay.com/v1/checkout.js" 
             data-key="rzp_test_GfzsM6qWehBGju" 
@@ -11,4 +11,70 @@
             data-prefill.email="customer@example.com" 
             data-prefill.contact="9999999999"></script>
     {% comment %} <button class="btn btn-primary" type="submit">Complete Payment</button> {% endcomment %}
-</form>
+</form> -->
+
+
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Razorpay Checkout</title>
+    <!-- Favicon -->
+    <link href="{% static '/img/favicon.png' %}" rel="icon">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+        header {
+            background-color: #333;
+            color: white;
+            padding: 10px 0;
+            text-align: center;
+        }
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .razorpay-btn {
+            display: inline-block;
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+            margin-right: 10px;
+        }
+        .razorpay-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Dreamdress</h1>
+    </header>
+    <div class="container">
+        <form action="{% url 'success' %}" method="POST">
+            {% csrf_token %}
+            <script src="https://checkout.razorpay.com/v1/checkout.js" 
+                    data-key="rzp_test_GfzsM6qWehBGju" 
+                    data-amount="{{ order_amount }}" 
+                    data-currency="INR" 
+                    data-order_id="{{ order_id }}" 
+                    data-buttontext="Pay with Razorpay" 
+                    data-name="DreamDress" 
+                    data-description="Order payment" 
+                    data-prefill.email="customer@example.com" 
+                    data-prefill.contact="9999999999"></script>
+                    {% comment %} <button class="btn btn-primary" type="submit">Complete Payment</button> {% endcomment %}
+        </form>
+    </div>
+</body>
+</html>

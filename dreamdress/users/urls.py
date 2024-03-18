@@ -83,8 +83,10 @@ urlpatterns = [
     path('wishlist/remove/<int:product_id>/', views.remove_from_wishlist, name='remove_from_wishlist'),
     path('view_wishlist/',views.view_wishlist,name='view_wishlist'),
     path('filter_products/',views.filter_products,name='filter_products'),
-    path('success',views.success, name='success'),
+    path('success/', views.success, name='success'),
     path('initiate-payment/', views.initiate_payment, name='initiate_payment'),
+    path('generate-pdf-bill/', views.generate_pdf_bill, name='generate_pdf_bill'),
+    
 
 ]
 

@@ -110,6 +110,52 @@ class Tbl_ProductImage(models.Model):
     product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
     image = models.ImageField(upload_to='product_images/') 
 
+
+#cart
+class Tbl_cart(models.Model):
+    user = models.OneToOneField(Tbl_user, on_delete=models.CASCADE)
+   
+
+    def __str__(self):
+        return f"Cart for {self.user.username}"
+
+# cart -item
+class Tbl_cartItem(models.Model):
+    cart = models.ForeignKey('Tbl_cart', on_delete=models.CASCADE)
+    cart_stock = models.ForeignKey(Tbl_stock, on_delete=models.CASCADE)  # Provide a default value)
+    cart_quantity = models.PositiveIntegerField(null=True)
+    cart_price=models.PositiveIntegerField(default=1)
+    
+    def __str__(self):
+        if self.cart_stock:
+            return f"{self.cart_quantity} - Size: {self.cart_stock.size.size_name}, Color: {self.cart_stock.colour.colour_name}"
+        else:
+            return f"{self.cart_quantity} x Unknown Product"
+
+
+#payment
+class Tbl_payment(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
+    cart = models.ForeignKey(Tbl_cart, on_delete=models.CASCADE, null=True, blank=True)
+    payment_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment_date = models.DateTimeField(auto_now_add=True)
+    payment_method = models.CharField(max_length=50,null=True)  
+    transaction_id = models.CharField(max_length=100,null=True)  
+
+    def __str__(self):
+        return f"Payment - {self.payment_date}"
+
+
+#wishlist
+class Tbl_wishlist(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE)
+    product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
+    added_date = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Wishlist Item - {self.product.product_name} added by {self.user.username}"
+    
+
 # Tbl Tailor
 class Tbl_tailor(models.Model):
     PENDING = 'pending'
@@ -143,44 +189,3 @@ class Tbl_tailor(models.Model):
 
     def __str__(self):
         return f"{self.tailor_firstname} {self.tailor_lastname}"
-
-
-#cart
-class Tbl_cart(models.Model):
-    user = models.OneToOneField(Tbl_user, on_delete=models.CASCADE)
-   
-
-    def __str__(self):
-        return f"Cart for {self.user.username}"
-
-# cart -item
-class Tbl_cartItem(models.Model):
-    cart = models.ForeignKey('Tbl_cart', on_delete=models.CASCADE)
-    cart_stock = models.ForeignKey(Tbl_stock, on_delete=models.CASCADE)  # Provide a default value)
-    cart_quantity = models.PositiveIntegerField(null=True)
-    cart_price=models.PositiveIntegerField(default=1)
-    
-    def __str__(self):
-        if self.cart_stock:
-            return f"{self.cart_quantity} - Size: {self.cart_stock.size.size_name}, Color: {self.cart_stock.colour.colour_name}"
-        else:
-            return f"{self.cart_quantity} x Unknown Product"
-
-#payment
-class Tbl_payment(models.Model):
-    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE, null=True, blank=True)
-    cart = models.ForeignKey(Tbl_cart, on_delete=models.CASCADE, null=True, blank=True)
-    payment_amount = models.DecimalField(max_digits=10, decimal_places=2)
-    payment_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Payment - {self.payment_date}"
-
-
-class Tbl_wishlist(models.Model):
-    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE)
-    product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
-    added_date = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"Wishlist Item - {self.product.product_name} added by {self.user.username}"

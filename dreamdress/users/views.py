@@ -407,6 +407,7 @@ def add_to_cart(request, product_id):
 def view_cart(request):
     cart_items = Tbl_cartItem.objects.all()  # Fetch cart items from the database
     subtotal = 0  # Initialize subtotal variable
+    total=0
     for cart_item in cart_items:
         cart_item.total_price = cart_item.cart_stock.product.product_current_price * cart_item.cart_quantity
         subtotal += cart_item.total_price  # Add each item's total price to subtotal
@@ -458,16 +459,22 @@ def cart_item_count(request):
     
 #     return render(request, 'razorpay_checkout.html', {'order_id': order['id'], 'order_amount': order_amount})
 
-from django.shortcuts import render
-from django.contrib.auth.decorators import login_required
-from .models import Tbl_cartItem
 import razorpay
 
 @login_required
 def initiate_payment(request):
     total, order_amount = calculate_total_and_order_amount(request.user)
     order_id = create_order(order_amount)
-    
+    payment_method = "Online Payment"  # Example: You can customize this based on your requirements
+    transaction_id = "1234567890"  # Example: You can customize this based on your requirements
+    # Create Tbl_payment instance to store payment details
+    payment = Tbl_payment.objects.create(
+        user=request.user,
+        cart=request.user.tbl_cart,
+        payment_amount=order_amount / 100,  
+        payment_method=payment_method,
+        transaction_id=transaction_id
+    )
     return render(request, 'razorpay_checkout.html', {'order_id': order_id, 'order_amount': order_amount})
 
 def calculate_total_and_order_amount(user):
@@ -493,8 +500,151 @@ def create_order(order_amount):
     return order['id']
 
 
+from django.db.models import F
 def success(request):
-    return render(request,'success.html')
+    user_cart = Tbl_cart.objects.get(user=request.user)
+    cart_items = user_cart.tbl_cartitem_set.all()  
+    for cart_item in cart_items:
+        stock_item = cart_item.cart_stock
+        stock_item.stock_quantity -= cart_item.cart_quantity
+        stock_item.save()
+    cart_items.delete()
+    return render(request, 'success.html')
+
+# def success(request):
+#     user_cart = Tbl_cart.objects.get(user=request.user)
+#     cart_items = user_cart.tbl_cartitem_set.all()
+#     for cart_item in cart_items:
+#         stock_item = cart_item.cart_stock
+#         stock_item.stock_quantity -= cart_item.cart_quantity
+#         stock_item.save()
+#     cart_items.delete()
+
+#     # Retrieve the payment ID associated with the current transaction
+#     try:
+#         payment= Tbl_payment.objects.filter(user=request.user)
+#         payment_id = payment.id  # Assuming the payment ID is stored in the ID field
+#     except Tbl_payment.DoesNotExist:
+#         payment_id = None
+
+#     if payment_id:
+#         # Render the success.html template with the payment_id
+#         return render(request, 'success.html', {'payment_id': payment_id})
+#     else:
+#         # Handle the case where payment_id is not available
+#         return HttpResponse("Payment ID not found.")
+
+
+# from django.http import HttpResponse
+# from reportlab.lib.pagesizes import letter
+# from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+# from reportlab.platypus import SimpleDocTemplate, Paragraph
+
+# def generate_pdf_bill(request, payment_id):
+#     # Retrieve payment details from the database based on the payment_id
+#     try:
+#         payment = Tbl_payment.objects.get(pk=payment_id)
+#     except Tbl_payment.DoesNotExist:
+#         return HttpResponse("Payment not found.")
+
+#     # Create a response object
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = f'attachment; filename="transaction_bill_{payment_id}.pdf"'
+
+#     # Create a PDF document
+#     doc = SimpleDocTemplate(response, pagesize=letter)
+#     styles = getSampleStyleSheet()
+#     style_heading = styles['Heading1']
+#     style_body = styles['BodyText']
+
+#     # Add Dreamdress heading
+#     heading = Paragraph("Dreamdress Transaction Bill", style_heading)
+
+#     # Add transaction details
+#     details = [
+#         f"Payment ID: {payment_id}",
+#         f"Amount: {payment.payment_amount}",
+#         f"Order Date: {payment.payment_date.strftime('%Y-%m-%d %H:%M:%S')}",  # Format date as needed
+#         f"Payment Method: {payment.payment_method}",
+#         f"Transaction ID: {payment.transaction_id}",
+#     ]
+#     paragraphs = [Paragraph(detail, style_body) for detail in details]
+
+#     # Build PDF content
+#     content = [heading] + paragraphs
+
+#     # Add content to the PDF document
+#     doc.build(content)
+
+#     return response
+
+
+# # from reportlab.pdfgen import canvas
+
+# def download_bill(request):
+#     # Create a PDF document
+#     response = HttpResponse(content_type='application/pdf')
+#     response['Content-Disposition'] = 'attachment; filename="bill.pdf"'
+
+#     # Generate the PDF content
+#     p = canvas.Canvas(response)
+#     p.drawString(100, 750, "Dreamdress Bill")
+#     # Add more content here as needed
+#     p.showPage()
+#     p.save()
+
+#     return response
+# from django.http import HttpResponse
+# from reportlab.lib.pagesizes import letter
+# from reportlab.lib import colors
+# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+# from .models import Tbl_payment
+
+from django.http import HttpResponse
+from reportlab.lib.pagesizes import letter
+from reportlab.lib import colors
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
+
+def generate_pdf_bill(request):
+    # Create a response object
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="transaction_bill.pdf"'
+
+    # Create a PDF document
+    doc = SimpleDocTemplate(response, pagesize=letter)
+    elements = []
+
+    # Create data for the PDF (example data)
+    data = [
+        ['Transaction ID', 'Amount', 'Date'],
+        ['123456', '$100', '2024-03-18'],
+        ['789012', '$150', '2024-03-19'],
+        # Add more rows as needed
+    ]
+
+    # Create a table from the data
+    table = Table(data)
+
+    # Add style to the table
+    style = TableStyle([('BACKGROUND', (0, 0), (-1, 0), colors.gray),
+                        ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                        ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                        ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                        ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+                        ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+                        ('GRID', (0, 0), (-1, -1), 1, colors.black)])
+    table.setStyle(style)
+
+    # Add table to the elements list
+    elements.append(table)
+
+    # Build the PDF document
+    doc.build(elements)
+
+    return response
+
+
+
 
 def payment_success(request):
     return render(request, 'payment_success.html')
