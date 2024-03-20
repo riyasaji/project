@@ -182,18 +182,37 @@
                             <img class="img-fluid w-100" src="{{ product.tbl_productimage_set.first.image.url }}" alt="{{ product.category.category_name }}">
                         </div>
                         <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                            <h3 class="text-truncate mb-3" style="color: #D19C97; font-family: cursive;">{{ product.brand.brand_name }}</h3>
+
                             <h6 class="text-truncate mb-3">{{ product.category.category_name }}</h6>
                             <div class="d-flex justify-content-center">
                                 <h6>₹{{ product.product_current_price }}</h6>
                             </div>
                         </div>
+                        <div>
+                            <!-- WhatsApp Sharing Button -->
+                            <a href="https://wa.me/?text=Check out this product: {{ product.category.category_name }} - {{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-whatsapp"></i>
+                            </a>
+                            <!-- Instagram Sharing Button -->
+                            <a href="https://www.instagram.com/" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-instagram"></i>
+                            </a>
+                            <!-- Facebook Sharing Button -->
+                            <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.build_absolute_uri }}" target="_blank" rel="noopener noreferrer">
+                                <i class="fab fa-facebook"></i>
+                            </a>
+                        </div>
                         {% if product.product_id %}
                         <div class="card-footer d-flex justify-content-between bg-light border">
-                            <a href="{% url 'extra' product_id=product.product_id %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
+                            <a href="{% url 'details' product_id=product.product_id %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
                             {% else %}
                             <p>Product ID is empty or invalid.</p>
                             {% endif %}
-                            <a href="" class="btn btn-sm text-dark p-0"><i class="fas fa-shopping-cart text-primary mr-1"></i>Add To Cart</a>
+                            <form action="{% url 'add_to_wishlist' product_id=product.product_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm text-dark p-0"><i class="fas fa-heart text-primary"></i>Add To Wishlist</button>
+                            </form>
                         </div>
                     </div>
                 </div>

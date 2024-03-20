@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout as auth_logout
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -70,6 +70,7 @@ def about(request):
     return render(request,'about.html')
 
 #customer registeration
+@never_cache
 def registration(request):
     if request.method=='POST':
         email=request.POST['email']
@@ -356,6 +357,7 @@ def details(request, product_id):
 
 
 @login_required
+@never_cache
 def add_to_cart(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     if request.method == 'POST':
@@ -404,6 +406,7 @@ def add_to_cart(request, product_id):
 
 
 # view my cart
+@never_cache
 def view_cart(request):
     cart_items = Tbl_cartItem.objects.all()  # Fetch cart items from the database
     subtotal = 0  # Initialize subtotal variable
@@ -499,26 +502,187 @@ def create_order(order_amount):
     
     return order['id']
 
-
+from django.db import transaction
+from django.db import transaction
 from django.db.models import F
+
 def success(request):
     user_cart = Tbl_cart.objects.get(user=request.user)
     cart_items = user_cart.tbl_cartitem_set.all()  
-    for cart_item in cart_items:
-        stock_item = cart_item.cart_stock
-        stock_item.stock_quantity -= cart_item.cart_quantity
-        stock_item.save()
-    cart_items.delete()
+
+    with transaction.atomic():
+        created_orders = []
+
+        # Create an order for each item in the cart
+        for cart_item in cart_items:
+            order = Tbl_order.objects.create(
+                user=request.user,
+                order_amount=cart_item.cart_price,
+                # payment=cart_item.cart.payment,  # Assign the payment associated with the cart
+                # You can add other fields to the order as needed
+            )
+
+            # Create an order item for the current cart item
+            Tbl_orderItem.objects.create(
+                order=order,
+                product=cart_item.cart_stock.product,
+                quantity=cart_item.cart_quantity,
+                price=cart_item.cart_stock.product.product_current_price,
+                # You can add other fields to the order item as needed
+            )
+
+            created_orders.append(order)
+
+            # Decrease stock quantity
+            stock_item = cart_item.cart_stock
+            stock_item.stock_quantity -= cart_item.cart_quantity
+            stock_item.save()
+
+        # Once orders are created, delete the cart items
+        cart_items.delete()
+
     return render(request, 'success.html')
 
+@never_cache
+def order_history(request):
+    # Assuming you have the user object available in the request
+    user = request.user
+    
+    # Query the orders associated with the user
+    orders = Tbl_order.objects.filter(user=user)
+    
+    # Create a list to hold order data
+    order_data = []
+    
+    # Iterate through each order
+    for order in orders:
+        # Query the order items associated with the current order
+        order_items = Tbl_orderItem.objects.filter(order=order)
+        
+        # Create a list to hold order item data
+        order_item_data = []
+        
+        # Iterate through each order item
+        for order_item in order_items:
+            # Query the product associated with the order item
+            product = Tbl_product.objects.get(pk=order_item.product_id)
+            
+            # Query the product image associated with the product
+            product_image = Tbl_ProductImage.objects.filter(product=product).first()
+            
+            # Append the order item data to the list
+            order_item_data.append({
+                'product_id': order_item.product_id,
+                'category_name': product.category.category_name,
+                'price': order_item.price,
+                'quantity': order_item.quantity,
+                'image_url': product_image.image.url if product_image else None
+            })
+        
+        # Append the order and its items to the order_data list
+        order_data.append((order, order_item_data))
+    
+    context = {
+        'order_data': order_data,
+    }
+    
+    return render(request, 'oredr_history.html', context)
+
+
+
+# revieww
+@never_cache
+def submit_review(request):
+    if request.method == 'POST':
+        product_id = request.POST.get('product_id')
+        user = request.user
+        text = request.POST.get('text')
+        rating = request.POST.get('rating')
+
+        try:
+            # Assuming you have a model named Product
+            product =Tbl_product.objects.get(pk=product_id)
+
+            # Create a new review
+            review = Review.objects.create(
+                product=product,
+                user=user,
+                text=text,
+                rating=rating
+            )
+
+            return JsonResponse({'success': True})
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+# def submit_review(request):
+#     if request.method == 'POST':
+#         product_id = request.POST.get('product_id')
+#         user = request.user
+#         text = request.POST.get('text')
+#         rating = request.POST.get('rating')
+
+#         try:
+#             # Check if a review already exists for the current user and product
+#             existing_review = Review.objects.filter(product_id=product_id, user=user).first()
+
+#             if existing_review:
+#                 # Update the existing review
+#                 existing_review.text = text
+#                 existing_review.rating = rating
+#                 existing_review.save()
+#                 return JsonResponse({'success': True, 'edit': True})
+#             else:
+#                 # Create a new review
+#                 product = get_object_or_404(Tbl_product, pk=product_id)
+#                 Review.objects.create(product=product, user=user, text=text, rating=rating)
+#                 return JsonResponse({'success': True, 'edit': False})
+#         except Exception as e:
+#             return JsonResponse({'success': False, 'error': str(e)})
+
+#     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+# def order_history(request):
+#     user_orders = Tbl_order.objects.filter(user=request.user)
+
+#     # Fetch product images for all products in the order history
+#     product_images = Tbl_ProductImage.objects.filter(product__tbl_orderitem__order__user=request.user)
+
+#     # Create a dictionary to map product IDs to image URLs
+#     product_image_urls = {}
+#     for image in product_images:
+#         product_image_urls[image.product_id] = image.image.url
+
+#     return render(request, 'oredr_history.html', {'user_orders': user_orders, 'product_image_urls': product_image_urls})
+
+
+# def order_history(request):
+#     user_orders = Tbl_order.objects.filter(user=request.user)
+    
+#     # Retrieve product images for each order item
+#     product_image_urls = {}
+#     for order in user_orders:
+#         for order_item in order.tbl_orderitem_set.all():
+#             product_image_urls[order_item.product.id] = order_item.product.tbl_productimage_set.first().image.url
+    
+#     return render(request, 'oredr_history.html', {'user_orders': user_orders, 'product_image_urls': product_image_urls})
+
+# from django.db.models import F
 # def success(request):
 #     user_cart = Tbl_cart.objects.get(user=request.user)
-#     cart_items = user_cart.tbl_cartitem_set.all()
+#     cart_items = user_cart.tbl_cartitem_set.all()  
 #     for cart_item in cart_items:
 #         stock_item = cart_item.cart_stock
 #         stock_item.stock_quantity -= cart_item.cart_quantity
 #         stock_item.save()
 #     cart_items.delete()
+#     return render(request, 'success.html')
+
+
 
 #     # Retrieve the payment ID associated with the current transaction
 #     try:
@@ -795,17 +959,22 @@ def seller_waiting(request):
 def add_product(request):
     if request.method == 'POST':
         try:
-            brand_name = request.POST.get('brand_name')
+            brand_id = request.POST.get('brand_id')
             category_id = request.POST.get('category_id')
             about_product = request.POST.get('about_product')
             material = request.POST.get('material')
             current_price = request.POST.get('current_price')
-            
+            print(request.method)
+            print(brand_id)
             # Retrieve category object
             category = get_object_or_404(Tbl_category, pk=category_id)
             
             # Get the logged-in seller
             seller = request.user.tbl_seller
+
+            # Get the brand object
+            brand = get_object_or_404(Tbl_brand, pk=brand_id)
+        
             
             # Create the product object
             product = Tbl_product.objects.create(
@@ -813,7 +982,8 @@ def add_product(request):
                 category=category,
                 product_about_product=about_product,
                 product_material=material,
-                product_current_price=current_price
+                product_current_price=current_price,
+                brand=brand
             )
             
             # Handle stock entries
@@ -846,7 +1016,8 @@ def add_product(request):
     return render(request, 'add_prod.html', {
         'categories': Tbl_category.objects.all(),
         'colors': Tbl_colour.objects.all(),
-        'sizes': Tbl_size.objects.all()
+        'sizes': Tbl_size.objects.all(),
+        'brands': Tbl_brand.objects.all() 
     })
 
 #product - view -shop
@@ -913,6 +1084,41 @@ def add_category(request):
         new_category = Tbl_category(category_name=category_name)
         new_category.save()
         return JsonResponse({'success': True})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
+from django.http import JsonResponse
+from .models import Tbl_brand
+
+# Check brand in add product
+from django.http import JsonResponse
+from .models import Tbl_brand
+
+# Check brand in add product
+def check_brand(request):
+    if request.method == 'GET':
+        brand_name = request.GET.get('brand_name')
+        if Tbl_brand.objects.filter(brand_name=brand_name).exists():
+            # If the brand already exists in the database
+            return JsonResponse({'exists': True})
+        else:
+            # If the brand doesn't exist in the database
+            return JsonResponse({'exists': False})
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
+# Add brand in add product
+def add_brand(request):
+    if request.method == 'GET':
+        brand_name = request.GET.get('brand_name')
+        if Tbl_brand.objects.filter(brand_name=brand_name).exists():
+            # If the brand already exists in the database
+            return JsonResponse({'success': False, 'message': 'Brand already exists!'})
+        else:
+            # If the brand doesn't exist in the database, add it
+            new_brand = Tbl_brand(brand_name=brand_name)
+            new_brand.save()
+            return JsonResponse({'success': True, 'message': 'Brand added successfully!'})
     else:
         return JsonResponse({'error': 'Invalid request method'})
 

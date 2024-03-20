@@ -48,7 +48,7 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             padding: 12px;
-            background: #f8f9fa url('https://cdn3.iconfinder.com/data/icons/iconic-1/32/sync_32x32.png') no-repeat right center / 18px;
+            background: #f8f9fa ;
         }
         
         input[type="submit"] {
@@ -134,10 +134,25 @@
                 <!-- Brand Name and Category -->
                 <div class="form-row">
                     <div class="form-group col-md-6">
-                        <label for="brandName">Brand Name</label>
-                        <input type="text" class="form-control" name="brand_name" id="brand_name" required oninput="validateBrandName()" placeholder="Enter brand name">
-                        <div id="brand_name_error" class="error"></div>
+                        <label >Brand Name</label>
+                        <div class="input-group">
+                            <select class="form-control brand-dropdown" name="brand_id">
+                                <option value="" selected disabled>Select brand</option>
+                                {% for brand in brands %}
+                                    <option value="{{ brand.brand_id }}">{{ brand.brand_name }}</option>
+                                {% endfor %}
+                            </select>
+                            <div class="input-group-append">
+                                <button type="button" class="btn btn-outline-primary add-brand-button">+</button>
+                            </div>
+                        </div>
+                        <div id="new-brand" style="display: none;">
+                            <input type="text" class="form-control" id="new-brand-name" placeholder="New brand name">
+                            <button type="button" class="btn btn-primary check-brand-button">Check</button>
+                        </div>
                     </div>
+                    
+                    
                     <div class="form-group col-md-6">
                         <label for="categories">Category</label>
                         <div class="input-group">
@@ -179,7 +194,7 @@
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="price">Price</label>
-                        <input type="text" class="form-control" name="current_price" id="current_price" step="0.01" required oninput="validateCurrentPrice()" placeholder="Enter price">
+                        <input type="text" class="form-control" name="current_price" id="current_price" step="0.01" required  placeholder="Enter price" min="1">
                         <div id="current_price_error" class="error"></div>
                     </div>
                 </div>
@@ -292,22 +307,6 @@
 
 
 <!-- stock quantity validation -->
-<script>
-    document.getElementById("stockQuantity").addEventListener("input", function() {
-        var inputValue = this.value;
-        console.log("Input value:", inputValue); // Log the input value to the console
-        
-        var errorMessage = document.querySelector('.error-message');
-        
-        if (inputValue < 0) {
-            errorMessage.style.display = "inline";
-            this.setCustomValidity("Stock quantity cannot be negative.");
-        } else {
-            errorMessage.style.display = "none";
-            this.setCustomValidity("");
-        }
-    });
-</script>
 
 
 <!-- add category    -->
@@ -355,37 +354,58 @@
 </script>
  
     
+<!-- brand name -->
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addBrandButton = document.querySelector('.add-brand-button');
+    const newBrandDiv = document.getElementById('new-brand');
+    const checkBrandButton = document.querySelector('.check-brand-button');
+
+    addBrandButton.addEventListener('click', function() {
+        newBrandDiv.style.display = 'block';
+    });
+
+    checkBrandButton.addEventListener('click', function() {
+        const newBrandName = document.getElementById('new-brand-name').value;
+        // Send AJAX request to check if brand exists
+        fetch(`/check_brand/?brand_name=${newBrandName}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.exists) {
+                alert('Brand already exists!');
+            } else {
+                // Send AJAX request to add new brand
+                fetch(`/add_brand/?brand_name=${newBrandName}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Brand added successfully!');
+                        // Update dropdown with new brand
+                        const brandDropdown = document.querySelector('.brand-dropdown');
+                        const option = document.createElement('option');
+                        option.value = newBrandName;
+                        option.textContent = newBrandName;
+                        brandDropdown.appendChild(option);
+                    } else {
+                        alert(data.message); // Display message if brand already exists
+                    }
+                })
+                .catch(error => {
+                    console.error('Error adding brand:', error);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error checking brand:', error);
+        });
+    });
+});
+
+</script>
+
     
 
 
-<script>
-    function addImageField() {
-        var container = document.getElementById('image-container');
-        var numImages = container.getElementsByTagName('input').length + 1;
-
-        var input = document.createElement('input');
-        input.type = 'file';
-        input.name = 'image_' + numImages;
-        container.appendChild(input);
-
-        document.getElementById('num_images').value = numImages;
-    }
-
-    // Add validation function for the main image
-    function validateMainImage() {
-        var mainImageInput = document.querySelector('input[name="main_image"]');
-        var mainImageError = document.getElementById('main_image_error');
-
-        if (!mainImageInput.files.length) {
-            mainImageError.textContent = 'Main Image is required';
-        } else {
-            mainImageError.textContent = '';
-        }
-    }
-
-    // Add event listener for input change
-    document.querySelector('input[name="main_image"]').addEventListener('change', validateMainImage);
-</script>
 
 <!--Dynamic adding of colours-->
 <script>
@@ -482,82 +502,7 @@
     });
 </script>
 
-<!-- categor dynamically -->
-<script>
-    // // Function to add a new category field
-    // function addCategoryField() {
-    //     var newCategoryField = `
-    //         <div class="input-group mt-2">
-    //             <input type="text" class="form-control new-category-input" placeholder="Enter new category">
-    //             <div class="input-group-append">
-    //                 <button type="button" class="btn btn-outline-primary check-category-button">Check</button>
-    //                 <button type="button" class="btn btn-outline-danger remove-category-button">-</button>
-    //             </div>
-    //         </div>
-    //     `;
-    //     $('.category-fields').append(newCategoryField);
-    // }
 
-    // // Event listener for the plus button to add a new category field
-    // $(document).on('click', '.add-category-button', function() {
-    //     addCategoryField();
-    // });
-
-    // // Event listener for the minus button to remove a category field
-    // $(document).on('click', '.remove-category-button', function() {
-    //     $(this).closest('.input-group').remove();
-    // });
-
-    // // Event listener for the check category button
-    // $(document).on('click', '.check-category-button', function() {
-    //     var categoryInput = $(this).closest('.input-group').find('.new-category-input');
-    //     var category = categoryInput.val().trim(); // Get the entered category
-
-    //     // Check if the category is empty
-    //     if (category === '') {
-    //         alert('Please enter a category.');
-    //         return;
-    //     }
-
-    //     // Send an AJAX request to check if the category exists in the database
-    //     $.ajax({
-    //         url: '/check_category/',
-    //         method: 'POST',
-    //         headers: { "X-CSRFToken": csrftoken }, // Add CSRF token to headers
-    //         data: {
-    //             'category_name': category
-    //         },
-    //         success: function(response) {
-    //             if (response.exists) {
-    //                 alert('This category already exists.');
-    //             } else {
-    //                 // If the category doesn't exist, add it to the database
-    //                 $.ajax({
-    //                     url: '/add_category/',
-    //                     method: 'POST',
-    //                     headers: { "X-CSRFToken": csrftoken }, // Add CSRF token to headers
-    //                     data: {
-    //                         'category_name': category
-    //                     },
-    //                     success: function(response) {
-    //                         if (response.success) {
-    //                             alert('Category added successfully.');
-    //                         } else {
-    //                             alert('Failed to add category.');
-    //                         }
-    //                     },
-    //                     error: function(xhr, status, error) {
-    //                         alert('An error occurred while adding the category.');
-    //                     }
-    //                 });
-    //             }
-    //         },
-    //         error: function(xhr, status, error) {
-    //             alert('An error occurred while checking the category.');
-    //         }
-    //     });
-    // });
-</script>
 
 
 <!-- field validation -->
@@ -677,6 +622,7 @@ function validateCurrentPrice() {
         }
 
 </script>
+
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 <script>
     $(document).ready(function () {

@@ -122,7 +122,7 @@
 
 <!-- display product -->
 <div class="container-fluid pt-5">             
-    <div class="col-lg-9 col-md-12">
+    <div class="col-lg-11 col-md-12">
         <div class="row pb-3">
             <div class="row">
                 {% for product in products %}
@@ -133,6 +133,7 @@
                             <img class="img-fluid w-100" src="{{ product.tbl_productimage_set.first.image.url }}" alt="{{ product.category.category_name }}">
                         </div>
                         <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                            <h2 class="text-truncate mb-3" style="color: #D19C97; font-family: cursive;">{{ product.brand.brand_name }}</h2>
                             <h6 class="text-truncate mb-3">{{ product.category.category_name }}</h6>
                             <div class="d-flex justify-content-center">
                                 <h6>₹{{ product.product_current_price }}</h6>
@@ -142,10 +143,10 @@
                             <div class="d-flex justify-content-between">
                                 <a href="{% url 'details' product_id=product.product_id %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
                                 <!-- Add to wishlist button -->
-                                <!-- <form id="add-to-wishlist-form" action="{% url 'add_to_wishlist' product_id=product.product_id %}" method="post">
+                                <form id="add-to-wishlist-form" action="{% url 'add_to_wishlist' product_id=product.product_id %}" method="post">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-sm text-dark p-0"><i class="fas fa-heart text-danger mr-1"></i>Add to Wishlist</button>
-                                </form> -->
+                                </form>
                             </div>
                         </div>
                     </div>

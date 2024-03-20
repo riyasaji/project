@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>DreamDress-Dashboard</title>
+  <title>DreamDress-Order</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <!-- Favicon -->
   <link href="/static/img/favicon.png" rel="icon">
@@ -21,7 +21,7 @@
 
     .navbar-brand {
       font-weight: bold;
-      color: #a55850 /* Baby pink text color */
+      color: #a55850; /* Baby pink text color */
     }
 
     .navbar-nav .nav-link {
@@ -44,44 +44,56 @@
     .container {
       margin-top: 20px;
       color: #333333; /* Dark text color */
-      .card {
+    }
+
+    /* Table adjustments */
+    table {
+      width: 100%;
+      border-collapse: collapse;
       margin-bottom: 20px;
-      border-radius: 10px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
     }
 
-    .card-header {
-      background-color: #a55850; /* Baby pink header */
-      color: #ffffff; /* White text color */
-      border-bottom: none;
-      border-radius: 10px 10px 0 0;
+    th, td {
+      padding: 10px;
+      border-bottom: 1px solid #cebfbf; /* Light gray border bottom */
+      text-align: left;
     }
 
-    .card-body {
-      background-color: #ffffff; /* White card background */
+    th {
+      background-color: #f2f2f2; /* Light gray background for header */
       color: #333333; /* Dark text color */
     }
 
-    .card-body p {
-      margin-bottom: 0;
+    /* Image adjustments */
+    .product-image {
+      max-width: 100px; /* Adjust image max-width as needed */
+      height: auto;
     }
+    .rating .star.selected {
+    color: gold; /* Change the color of selected stars */
+}
+/* Change the background color of the button */
+.btn-primary {
+    background-color: #D19C97; /* Change to the desired color */
+}
 
-    .card-body a {
-      color: #a55850; /* Baby pink link color */
-    }
+/* Change the text color of the button */
+.btn-primary {
+    color: #151414; /* Change to the desired text color */
+}
 
-    .card-body a:hover {
-      text-decoration: none;
-      color: #a55850; /* Light purple on hover */
-    }
-    }
+/* Optional: Change the color when hovering over the button */
+.btn-primary:hover {
+    background-color: #f0847a; /* Change to the desired color */
+}
+
   </style>
 </head>
 <body>
 
   <nav class="navbar navbar-expand-lg navbar-light">
     <div class="container-fluid">
-      <a class="navbar-brand" href="#">DreamDress </a>
+      <a class="navbar-brand" href="#">DreamDress</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
@@ -91,7 +103,7 @@
             <a class="nav-link" href="{% url 'home' %}">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="{% url 'update_profile' %}">Profile</a>
+            <a class="nav-link" href="{% url 'customer_dashboard' %}">Dashboard</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" href="{% url 'logout' %}">Logout</a>
@@ -103,60 +115,145 @@
   </nav>
 
   <div class="container mt-4">
-    <div class="row">
-      <div class="col-md-3">
-        <!-- Sidebar -->
-        <div class="list-group">
-          <a href="{% url 'update_profile' %}" class="list-group-item list-group-item-action">Update Profile</a>
-          <a href="{% url 'change_password' %}" class="list-group-item list-group-item-action">Change Password</a>
-          <a href="#" class="list-group-item list-group-item-action">Your Orders</a>
-          <a href="#" class="list-group-item list-group-item-action">Payments</a>
-          <a href="#" class="list-group-item list-group-item-action">Settings</a>
-        </div>
-      </div>
-      <div class="col-md-9">
-        <!-- Enhanced Content Area -->
-        <div class="card">
-          <div class="card-header">
-            Welcome to the DreamDress Customer Dashboard
-          </div>
-          <div class="card-body">
-            <p>This is the main content area where your dashboard data will be displayed.</p>
-            <a href="#" class="btn btn-outline-secondary">View Details</a>
-          </div>
-        </div>
-
-        <div class="card">
-          <div class="card-header">
-            Notifications
-          </div>
-          <div class="card-body">
-            <p>No new notifications at the moment.</p>
-            <a href="#" class="btn btn-outline-secondary">Check Later</a>
-          </div>
-        </div>
-
-        {% if messages %}
-    <ul class="messages" id="messages" style="color: red;">
-        {% for message in messages %}
-            <li>{{ message }}</li>
+    <h1>Order History</h1>
+    <table class="table" style="width: 100%; border-collapse: collapse;">
+      <thead style="background-color: #9da4ac;">
+        <tr>
+          <th style="padding: 8px;">Category</th>
+          <th style="padding: 8px;">Price</th>
+          <th style="padding: 8px;">Quantity</th>
+          <th style="padding: 8px;">Image</th>
+          <th style="padding: 8px;">Download Reciept</th>
+          <th style="padding: 8px;">Reviews</th>
+          <th style="padding: 8px;">Ratings</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order, order_item_data in order_data %}
+          {% for order_item in order_item_data %}
+            <tr>
+              <td style="padding: 8px;">{{ order_item.category_name }}</td>
+              <td style="padding: 8px;">{{ order_item.price }}</td>
+              <td style="padding: 8px;">{{ order_item.quantity }}</td>
+              <td style="padding: 8px;">
+                {% if order_item.image_url %}
+                  <img src="{{ order_item.image_url }}" alt="Product Image" class="product-image" style="max-width: 100px; height: auto;">
+                {% else %}
+                  No image available
+                {% endif %}
+                <td><a href="{% url 'generate_pdf_bill' %}">Download Receipt</a></td>
+               
+                <form method="post" action="{% url 'submit_review' %}" id="review-form">
+                  {% csrf_token %}
+                  <input type="hidden" name="product_id" value="{{ order_item.product_id }}">
+                  <td>
+                    <textarea class="form-control" name="text" rows="3" placeholder="Write your review here"></textarea>
+                  </td>
+                  <td>
+                    <div class="rating">
+                        <span class="star" data-rating="1">&#9733;</span>
+                        <span class="star" data-rating="2">&#9733;</span>
+                        <span class="star" data-rating="3">&#9733;</span>
+                        <span class="star" data-rating="4">&#9733;</span>
+                        <span class="star" data-rating="5">&#9733;</span>
+                    </div>
+                    <input type="hidden" class="rating-value" name="rating" value="0"> <!-- Hidden input field to store the selected rating -->
+                </td>
+                
+                  <td>
+                    <button type="submit" class="btn btn-primary submit-review">Submit</button>
+                    
+                  </td>
+                </form>
+                
+            
+          
+            
+            </tr>
+          {% endfor %}
         {% endfor %}
-    </ul>
-    <script>
-        setTimeout(function() {
-            var messages = document.getElementById('messages');
-            if (messages) {
-                messages.style.display = 'none'; // Hide the messages after 30 seconds
+      </tbody>
+    </table>
+
+    
+</div>
+
+<!-- ratings -->
+<script>
+  // Add event listener to stars
+  document.querySelectorAll('.star').forEach(function(star) {
+      star.addEventListener('click', function() {
+          // Get the selected rating from data-rating attribute
+          var rating = this.getAttribute('data-rating');
+
+          // Update the value of the hidden input field
+          document.querySelector('.rating-value').value = rating;
+
+          // Highlight the selected star and unhighlight the others
+          document.querySelectorAll('.star').forEach(function(s) {
+              if (s.getAttribute('data-rating') <= rating) {
+                  s.classList.add('active');
+              } else {
+                  s.classList.remove('active');
+              }
+          });
+      });
+  });
+</script>
+
+<script>
+  // Get all star elements
+  const stars = document.querySelectorAll('.rating .star');
+
+  // Add click event listener to each star
+  stars.forEach(star => {
+      star.addEventListener('click', function() {
+          // Get the selected rating from the data-rating attribute
+          const rating = this.getAttribute('data-rating');
+
+          // Highlight all stars up to the selected rating
+          stars.forEach(s => {
+              if (s.getAttribute('data-rating') <= rating) {
+                  s.classList.add('selected');
+              } else {
+                  s.classList.remove('selected');
+              }
+          });
+
+          // You can store the selected rating in a hidden input field or send it to the server via AJAX
+          // Example: document.getElementById('ratingInput').value = rating;
+      });
+  });
+</script> 
+
+<!-- rating and review submission -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('#review-form').submit(function(e) {
+        e.preventDefault(); // Prevent the default form submission
+        
+        // Submit the form via AJAX
+        $.ajax({
+            type: 'POST',
+            url: $(this).attr('action'),
+            data: $(this).serialize(),
+            success: function(response) {
+                if (response.success) {
+                    // Show the success message after 2 seconds
+                    $('#success-message').fadeIn().delay(2000).fadeOut();
+                } else {
+                    alert('Failed to add review. Please try again.');
+                }
+            },
+            error: function() {
+                alert('An error occurred while processing your request.');
             }
-        }, 10000); // 30 seconds in milliseconds
-    </script>
-{% endif %}
+        });
+    });
+});
 
-<!-- Your profile page content -->
-
-      </div>
-    </div>
-  </div>
+</script>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

@@ -190,6 +190,9 @@
                             <img class="img-fluid w-100" src="{{ product.tbl_productimage_set.first.image.url }}" alt="{{ product.category.category_name }}">
                         </div>
                         <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                            <h3 class="text-truncate mb-3" style="color: #D19C97; font-family: cursive;">{{ product.brand.brand_name }}</h3>
+
+
                             <h6 class="text-truncate mb-3">{{ product.category.category_name }}</h6>
                             <div class="d-flex justify-content-center">
                                 <h6>₹{{ product.product_current_price }}</h6>

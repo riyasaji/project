@@ -110,7 +110,7 @@ p {
                     </button>
                     <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
                         <div class="navbar-nav mr-auto py-0">
-                            <a href="{% url 'index' %}" class="nav-item nav-link">Home</a>
+                            <a href="{% url 'home' %}" class="nav-item nav-link">Home</a>
                             <a href="{% url 'shop' %}" class="nav-item nav-link">Shop</a>
                             
                             <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
@@ -170,7 +170,7 @@ p {
                 </div>
             </div>
             <div class="col-md-6">
-                <h2>{{ product.product_name }}</h2>
+                <h2 class="text-truncate mb-3" style="color: #D19C97; font-family: cursive;">{{ product.brand.brand_name }}</h2>
                 <p class="product-description">Description: {{ product.product_about_product }}</p>
                 <p class="product-price">Price: ₹{{ product.product_current_price }}</p>
                 <p class="product-category">Category: {{ product.category.category_name }}</p>
@@ -194,9 +194,13 @@ p {
                     <input type="number" class="form-control" name="quantity" min="1" required >
                     <div class="invalid-feedback" style="color: red; margin-top: 5px; display: none;">Please enter a valid quantity.</div>
                     <input type="submit" class="btn btn-primary mt-2" value="Add to Cart" style="padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-                    <input type="submit" class="btn btn-primary mt-2" value="Add to Wishlist" style="padding: 8px 16px; border-radius: 4px; cursor: pointer;">
-                    <div id="error-message" class="text-danger mt-2" style="display: none;">Stock is finished.</div>
                 </form>
+                <form action="{% url 'add_to_wishlist' product_id=product.product_id %}" method="post">
+                    {% csrf_token %}
+                    <input type="submit" class="btn btn-primary mt-2" value="Add to Wishlist" style="padding: 8px 16px; border-radius: 4px; cursor: pointer;">
+                </form>
+                    <div id="error-message" class="text-danger mt-2" style="display: none;">Stock is finished.</div>
+                
                 <!-- Social media sharing links -->
                 <div class="container mt-3">
                     <div class="row">
@@ -211,18 +215,18 @@ p {
             </div>
             
             <!-- Right side: Display recommended products -->
-            <div class="col-md-6">
+             <!--<div class="col-md-6">
                 <h3>Recommended Products</h3>
-                <!-- Loop through recommended products -->
-                {% for product in recommended_products %}
+                  Loop through recommended products -->
+                <!-- {% for product in recommended_products %}
                     <div class="recommended-product">
-                        <!-- Display product image -->
+                         Display product image -->
                         <img src="{{ product.tbl_productimage_set.first.image.url }}" alt="{{ product.product_name }}" class="recommended-product-image">
-                        <!-- View details button -->
+                        <!-- View details button 
                         <a href="{% url 'details' product_id=product.product_id %}" class="btn btn-sm text-dark p-0"><i class="fas fa-eye text-primary mr-1"></i>View Detail</a>
                     </div>
                 {% endfor %}
-            </div>
+            </div> -- -->
         </div>
     </div>
 

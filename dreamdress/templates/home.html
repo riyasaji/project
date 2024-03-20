@@ -60,7 +60,7 @@
             <!-- end search -->
             <div class="col-lg-6 col-6 text-right">
                 {% if request.user.is_authenticated %}
-                    <p>Welcome, {{ request.user.username }}</p>
+                    <p>{{ request.user.username }}</p>
                 {% endif %}
             </div>
            <div class="col-lg-3 col-6 text-right">

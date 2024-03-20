@@ -124,7 +124,7 @@
 
     <!-- wishlist start -->
     <div class="container-fluid pt-5">             
-        <div class="col-lg-9 col-md-12">
+        <div class="col-lg-11 col-md-12">
             <div class="row pb-3">
                 <div class="row">
                     {% for wishlist_item in wishlist_products %}
@@ -135,6 +135,7 @@
                                 <img class="img-fluid w-100" src="{{ wishlist_item.product.tbl_productimage_set.first.image.url }}" alt="{{ wishlist_item.product.category.category_name }}">
                             </div>
                             <div class="card-body border-left border-right text-center p-0 pt-4 pb-3">
+                                <h3 class="text-truncate mb-3" style="color: #D19C97; font-family: cursive;">{{ wishlist_item.product.brand.brand_name }}</h3>
                                 <h6 class="text-truncate mb-3">{{ wishlist_item.product.category.category_name }}</h6>
                                 <div class="d-flex justify-content-center">
                                     <h6>₹{{ wishlist_item.product.product_current_price }}</h6>

@@ -82,6 +82,15 @@ class Tbl_colour(models.Model):
     colour_id = models.AutoField(primary_key=True)
     colour_name = models.CharField(max_length=20, null=False)
 
+#brand
+class Tbl_brand(models.Model):
+    brand_id = models.AutoField(primary_key=True)
+    brand_name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.brand_name
+
+
 #model for product
 class Tbl_product(models.Model):
     product_id = models.AutoField(primary_key=True)
@@ -90,11 +99,16 @@ class Tbl_product(models.Model):
     product_current_price = models.IntegerField(null=False)
     product_about_product = models.CharField(max_length=200, null=False)  
     product_material = models.CharField(max_length=20, null=False)
+    brand = models.ForeignKey(Tbl_brand, on_delete=models.CASCADE,null=True)
+
+    
 
 #model for size
 class Tbl_size(models.Model):
     size_id = models.AutoField(primary_key=True)
     size_name = models.CharField(max_length=20, null=False)
+    
+
 
 #model for stock
 class Tbl_stock(models.Model):
@@ -145,6 +159,26 @@ class Tbl_payment(models.Model):
     def __str__(self):
         return f"Payment - {self.payment_date}"
 
+#order
+class Tbl_order(models.Model):
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE)
+    order_date = models.DateTimeField(auto_now_add=True)
+    order_amount = models.DecimalField(max_digits=10, decimal_places=2)
+    payment = models.ForeignKey(Tbl_payment, on_delete=models.SET_NULL, null=True, blank=True)
+
+    def __str__(self):
+        return f"Order for {self.user.username} - {self.order_date}"
+
+#order-item
+class Tbl_orderItem(models.Model):
+    order = models.ForeignKey(Tbl_order, on_delete=models.CASCADE)
+    product = models.ForeignKey('Tbl_product', on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+
+    def __str__(self):
+        return f"Order Item: Quantity: {self.quantity}"
+    
 
 #wishlist
 class Tbl_wishlist(models.Model):
@@ -153,8 +187,21 @@ class Tbl_wishlist(models.Model):
     added_date = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Wishlist Item - {self.product.product_name} added by {self.user.username}"
+        return f"Wishlist Item {self.user.username}"
     
+
+# review
+class Review(models.Model):
+    product = models.ForeignKey(Tbl_product, on_delete=models.CASCADE)
+    user = models.ForeignKey(Tbl_user, on_delete=models.CASCADE)
+    text = models.TextField()
+    rating = models.IntegerField()  
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f'Review by {self.user.username}'
+
+
 
 # Tbl Tailor
 class Tbl_tailor(models.Model):

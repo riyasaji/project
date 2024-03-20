@@ -68,6 +68,8 @@ urlpatterns = [
     path('add_color/', views.add_color, name='add_color'),
     path('check_category/', views.check_category, name='check_category'),
     path('add_category/', views.add_category, name='add_category'),
+    path('check_brand/', views.check_brand, name='check_brand'),
+    path('add_brand/', views.add_brand, name='add_brand'),
     path('get_pincode_details/<str:pincode>/', views.get_pincode_details, name='get_pincode_details'),
     path('tailor_registeration/',views.tailor_registeration,name='tailor_registeration'),
     # path('manage_stock/', views.manage_stock, name='manage_stock'),
@@ -85,8 +87,9 @@ urlpatterns = [
     path('filter_products/',views.filter_products,name='filter_products'),
     path('success/', views.success, name='success'),
     path('initiate-payment/', views.initiate_payment, name='initiate_payment'),
+    path('order_history/', views.order_history, name='order_history'),
     path('generate-pdf-bill/', views.generate_pdf_bill, name='generate_pdf_bill'),
-    
+    path('submit_review/', views.submit_review, name='submit_review'),
 
 ]
 
