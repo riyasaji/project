@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>DreamDress-Order</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
   <!-- Favicon -->
   <link href="/static/img/favicon.png" rel="icon">
 
@@ -119,6 +120,7 @@
     <table class="table" style="width: 100%; border-collapse: collapse;">
       <thead style="background-color: #9da4ac;">
         <tr>
+          <th style="padding: 8px;">Brand</th>
           <th style="padding: 8px;">Category</th>
           <th style="padding: 8px;">Price</th>
           <th style="padding: 8px;">Quantity</th>
@@ -132,6 +134,7 @@
         {% for order, order_item_data in order_data %}
           {% for order_item in order_item_data %}
             <tr>
+              <td style="padding: 8px;">{{ order_item.brand_name }}</td>
               <td style="padding: 8px;">{{ order_item.category_name }}</td>
               <td style="padding: 8px;">{{ order_item.price }}</td>
               <td style="padding: 8px;">{{ order_item.quantity }}</td>
@@ -147,8 +150,38 @@
                   {% csrf_token %}
                   <input type="hidden" name="product_id" value="{{ order_item.product_id }}">
                   <td>
-                    <textarea class="form-control" name="text" rows="3" placeholder="Write your review here"></textarea>
+                    <div style="position: relative;">
+                        <textarea class="form-control" name="text" rows="3" placeholder="Write your review here" {% if order_item.existing_review %}readonly{% endif %}>{% if order_item.existing_review %}{{ order_item.existing_review.text }}{% endif %}</textarea>
+                        <button type="button" class="btn btn-outline-secondary edit-icon" style="position: absolute; top: 5px; right: 5px;" onclick="toggleEdit()"> 
+                            <i class="fa fa-pencil-alt"></i> <!-- Edit icon -->
+                        </button>
+                        <!-- Display existing review if it exists -->
+                          <!-- {% if order_item.existing_review %}
+                          <div class="mt-2">
+                              <strong>Your existing review:</strong>
+                              <p>{{ order_item.existing_review.text }}</p>
+                              <p>Rating: {{ order_item.existing_review.rating }}</p>
+                          </div>
+                          {% endif %} 
+                    </div>-->
                   </td>
+                  <script>
+                    function toggleEdit() {
+                        var textarea = document.querySelector('textarea[name="text"]');
+                        var editButton = document.querySelector('.edit-icon');
+                
+                        // Toggle the readonly attribute of the textarea
+                        textarea.readOnly = !textarea.readOnly;
+                
+                        // Change the button icon based on readonly state
+                        if (textarea.readOnly) {
+                            editButton.innerHTML = '<i class="fa fa-pencil-alt"></i>';
+                        } else {
+                            editButton.innerHTML = '<i class="fa fa-check"></i>'; // Change icon to a check mark or any appropriate icon
+                            textarea.focus(); // Focus on the textarea for editing
+                        }
+                    }
+                </script>
                   <td>
                     <div class="rating">
                         <span class="star" data-rating="1">&#9733;</span>
@@ -174,7 +207,10 @@
         {% endfor %}
       </tbody>
     </table>
-
+    <!-- Success message for review submission -->
+    <div id="success-message" class="alert alert-success mt-3" style="display: none;">
+      Review submitted successfully
+  </div>
     
 </div>
 

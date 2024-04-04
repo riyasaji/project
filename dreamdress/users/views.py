@@ -327,6 +327,15 @@ def dashboard(request):
     users = Tbl_user.objects.all()
     return render(request, 'dashboard.html',context)
 
+from django.template.defaulttags import register
+
+@register.filter
+def range_stars(value):
+    return range(value)
+
+@register.filter
+def inverse_range_stars(value):
+    return range(5 - value)
 
 #product -details , detail.html
 @never_cache
@@ -337,8 +346,10 @@ def details(request, product_id):
     sizes = Tbl_size.objects.filter(tbl_stock__product=product).distinct()
     colors = Tbl_colour.objects.filter(tbl_stock__product=product).distinct()
     print("Product Images:", product_images) 
-    recommended_products = Tbl_product.objects.filter(category=product.category).exclude(pk=product_id)[:3]
-    
+    similar_products = Tbl_product.objects.filter(category=product.category).exclude(pk=product_id)[:3]
+    reviews = Review.objects.filter(product=product)
+    cart_item_count=0
+    wishlist_count=0
     if request.user.is_authenticated:
             cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
             wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
@@ -349,9 +360,10 @@ def details(request, product_id):
         'sizes': sizes,
         'sizes': sizes,
         'colors': colors,
-        'recommended_products': recommended_products,
+        'similar_products': similar_products,
         'cart_item_count': cart_item_count, 
-        'wishlist_count': wishlist_count
+        'wishlist_count': wishlist_count,
+        'reviews': reviews
     })
 
 
@@ -440,35 +452,15 @@ def cart_item_count(request):
         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
     return {'cart_item_count': cart_item_count}
 
-#payment
-# import razorpay
-# @login_required
-# def initiate_payment(request):
-#     cart_items = Tbl_cartItem.objects.filter(cart__user=request.user)
-    
-#     subtotal = 0
-#     for cart_item in cart_items:
-#         cart_item.total_price = cart_item.cart_stock.product.product_current_price * cart_item.cart_quantity
-#         subtotal += cart_item.total_price
-#     total = subtotal + 10 
-    
-#     client = razorpay.Client(auth=('rzp_test_GfzsM6qWehBGju','4ZZkYgLAtHFGy89EjiHpDCyE'))
-    
-#     order_amount = total * 100
-#     order_currency = 'INR'
-#     order_receipt = 'order_rcptid_11'
-#     notes = {'Shipping address': 'Dummy Address'}
-#     order = client.order.create({'amount': order_amount, 'currency': order_currency, 'receipt': order_receipt, 'notes': notes})
-    
-#     return render(request, 'razorpay_checkout.html', {'order_id': order['id'], 'order_amount': order_amount})
 
+#payment
 import razorpay
 
 @login_required
 def initiate_payment(request):
     total, order_amount = calculate_total_and_order_amount(request.user)
     order_id = create_order(order_amount)
-    payment_method = "Online Payment"  # Example: You can customize this based on your requirements
+    payment_method = "Online Payment"  
     transaction_id = "1234567890"  # Example: You can customize this based on your requirements
     # Create Tbl_payment instance to store payment details
     payment = Tbl_payment.objects.create(
@@ -545,38 +537,26 @@ def success(request):
 
 @never_cache
 def order_history(request):
-    # Assuming you have the user object available in the request
     user = request.user
-    
-    # Query the orders associated with the user
     orders = Tbl_order.objects.filter(user=user)
     
-    # Create a list to hold order data
+   
     order_data = []
-    
-    # Iterate through each order
     for order in orders:
-        # Query the order items associated with the current order
         order_items = Tbl_orderItem.objects.filter(order=order)
-        
-        # Create a list to hold order item data
         order_item_data = []
-        
-        # Iterate through each order item
         for order_item in order_items:
-            # Query the product associated with the order item
             product = Tbl_product.objects.get(pk=order_item.product_id)
-            
-            # Query the product image associated with the product
             product_image = Tbl_ProductImage.objects.filter(product=product).first()
-            
-            # Append the order item data to the list
+            existing_review = Review.objects.filter(product=product, user=user).first()
             order_item_data.append({
                 'product_id': order_item.product_id,
                 'category_name': product.category.category_name,
+                'brand_name': product.brand.brand_name,
                 'price': order_item.price,
                 'quantity': order_item.quantity,
-                'image_url': product_image.image.url if product_image else None
+                'image_url': product_image.image.url if product_image else None,
+                'existing_review': existing_review
             })
         
         # Append the order and its items to the order_data list
@@ -600,18 +580,22 @@ def submit_review(request):
         rating = request.POST.get('rating')
 
         try:
-            # Assuming you have a model named Product
             product =Tbl_product.objects.get(pk=product_id)
+            existing_review = Review.objects.filter(product=product, user=user).first()
+           
+            if existing_review:
+                existing_review.text = text
+                existing_review.rating = rating
+                existing_review.save()
+            else:
+                Review.objects.create(
+                    product=product,
+                    user=user,
+                    text=text,
+                    rating=rating
+                )
 
-            # Create a new review
-            review = Review.objects.create(
-                product=product,
-                user=user,
-                text=text,
-                rating=rating
-            )
-
-            return JsonResponse({'success': True})
+            return JsonResponse({'success': True, 'message': 'Review submitted successfully'})
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
 
@@ -809,12 +793,6 @@ def generate_pdf_bill(request):
 
 
 
-
-def payment_success(request):
-    return render(request, 'payment_success.html')
-
-def payment_failure(request):
-    return render(request, 'payment_failure.html')
 
  #error message if the user is not logged in cart   
 def popup_cart(request):
@@ -1137,7 +1115,7 @@ def product_display(request):
 def product_detail(request, product_id):
     product = get_object_or_404(Tbl_product, pk=product_id)
     stock_entries = Tbl_stock.objects.filter(product=product)
-
+    
     if request.method == 'POST':
         stock_id = request.POST.get('stock_id')
         quantity = request.POST.get('quantity')
@@ -1154,7 +1132,8 @@ def product_detail(request, product_id):
         return redirect('product_detail', product_id=product_id)
     context = {
         'product': product,
-        'stock_entries': stock_entries
+        'stock_entries': stock_entries,
+        
     }
     return render(request, 'product_detail.html', context)
 
@@ -1280,8 +1259,7 @@ def autocomplete_products(request):
     return JsonResponse(suggestions, safe=False)
 
 
-# payment
-from decimal import Decimal
+
 
 
 
