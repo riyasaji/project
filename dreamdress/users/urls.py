@@ -63,6 +63,7 @@ urlpatterns = [
      path('update_quantity/<int:cart_item_id>/',views.update_quantity, name='update_quantity'),
     path('user_list/', views.user_list, name='user_list'),
     path('seller_list/', views.seller_list, name='seller_list'),
+    path('tailor_list/', views.tailor_list, name='tailor_list'),
     path('admin_approvals/', views.admin_approvals, name='admin_approvals'),
     path('check_color/', views.check_color, name='check_color'),
     path('add_color/', views.add_color, name='add_color'),
@@ -90,6 +91,11 @@ urlpatterns = [
     path('order_history/', views.order_history, name='order_history'),
     path('generate-pdf-bill/', views.generate_pdf_bill, name='generate_pdf_bill'),
     path('submit_review/', views.submit_review, name='submit_review'),
+    path('tailor_updateProfile/', views.tailor_updateProfile, name='tailor_updateProfile'),
+    path('approve_tailor/<int:tailor_id>/', views.approve_tailor, name='approve_tailor'),
+    path('reject_tailor/<int:tailor_id>/', views.reject_tailor, name='reject_tailor'),
+    path('tailor_dashboard/',views.tailor_dashboard,name='tailor_dashboard'),
+    
 
 ]
 

@@ -153,7 +153,7 @@
                             {% if user.user_type == 'seller' %}
                                 <a href="{% url 'seller_dashboard' %}" class="nav-item nav-link">Your Dashboard</a>
                             {% elif user.user_type == 'tailor' %}
-                                <a href="" class="nav-item nav-link">Tailor Dashboard</a>
+                                <a href="{% url 'tailor_dashboard' %}" class="nav-item nav-link">Tailor Dashboard</a>
                             {% elif user.is_superuser %}
                                 <a href="{% url 'dashboard' %}" class="nav-item nav-link">Admin Dashboard</a>
                             {% else %}

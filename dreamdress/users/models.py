@@ -227,12 +227,26 @@ class Tbl_tailor(models.Model):
     tailor_brand_name = models.CharField(max_length=255, null=True)
     tailor_license_number = models.CharField(max_length=50, default='')
     tailor_license_pdf = models.FileField(upload_to='tailor_certificates/', null=True)
+    tailor_brand_logo = models.ImageField(upload_to='brand_logos/', null=True)
     tailor_gst_number = models.CharField(max_length=15, null=True)
     tailor_bank_name = models.CharField(max_length=100, null=True)
+    tailor_bank_branch = models.CharField(max_length=100, null=True)
     tailor_bank_account_number = models.CharField(max_length=50, null=True)
     tailor_ifsc_code = models.CharField(max_length=20, null=True)
-    tailor_admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
+    admin_approval = models.CharField(max_length=10, choices=ADMIN_APPROVAL_CHOICES, default=PENDING)
     tailor_form_filled = models.BooleanField(default=False)
 
     def __str__(self):
         return f"{self.tailor_firstname} {self.tailor_lastname}"
+    
+
+#demo products for tailoring
+class Tbl_tailorDemoProduct(models.Model):
+    tailor = models.ForeignKey(Tbl_tailor, on_delete=models.CASCADE, related_name='demo_products')
+    product_name = models.CharField(max_length=255)
+    product_description = models.TextField()
+    product_image = models.ImageField(upload_to='demo_products/')
+
+    def __str__(self):
+        return self.product_name
+

@@ -142,6 +142,20 @@ def signin(request):
                     except Tbl_seller.DoesNotExist:
                         messages.error(request, 'Seller account not found.')
                         return redirect('seller_updateProfile')
+                elif user.user_type == 'tailor':
+                    try:
+                        tailor = Tbl_tailor.objects.get(user=user)
+                        print("tailor: ", tailor)
+                        if tailor.admin_approval == 'pending':
+                            return redirect('tailor_updateProfile')
+                        elif tailor.admin_approval == 'approved':
+                            return redirect('tailor_dashboard')
+                        else:
+                            messages.error(request, 'Your tailor account has been rejected by the admin.')
+                            return redirect('signin')
+                    except Tbl_tailor.DoesNotExist:
+                        messages.error(request, 'Tailor account not found.')
+                        return redirect('tailor_updateProfile')
                 else:
                     return redirect('home')
              else:
@@ -310,6 +324,12 @@ def get_pincode_details(pincode):
 @never_cache
 def seller_dashboard(request):
     return render(request,'seller_dashboard.html')
+
+#tailor_dashboard
+@login_required(login_url='signin')
+@never_cache
+def tailor_dashboard(request):
+    return render(request,'tailor_dashboard.html')
 
 #admin_dashboard
 @login_required(login_url='signin')
@@ -602,152 +622,6 @@ def submit_review(request):
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 
-# def submit_review(request):
-#     if request.method == 'POST':
-#         product_id = request.POST.get('product_id')
-#         user = request.user
-#         text = request.POST.get('text')
-#         rating = request.POST.get('rating')
-
-#         try:
-#             # Check if a review already exists for the current user and product
-#             existing_review = Review.objects.filter(product_id=product_id, user=user).first()
-
-#             if existing_review:
-#                 # Update the existing review
-#                 existing_review.text = text
-#                 existing_review.rating = rating
-#                 existing_review.save()
-#                 return JsonResponse({'success': True, 'edit': True})
-#             else:
-#                 # Create a new review
-#                 product = get_object_or_404(Tbl_product, pk=product_id)
-#                 Review.objects.create(product=product, user=user, text=text, rating=rating)
-#                 return JsonResponse({'success': True, 'edit': False})
-#         except Exception as e:
-#             return JsonResponse({'success': False, 'error': str(e)})
-
-#     return JsonResponse({'success': False, 'error': 'Invalid request method'})
-
-
-# def order_history(request):
-#     user_orders = Tbl_order.objects.filter(user=request.user)
-
-#     # Fetch product images for all products in the order history
-#     product_images = Tbl_ProductImage.objects.filter(product__tbl_orderitem__order__user=request.user)
-
-#     # Create a dictionary to map product IDs to image URLs
-#     product_image_urls = {}
-#     for image in product_images:
-#         product_image_urls[image.product_id] = image.image.url
-
-#     return render(request, 'oredr_history.html', {'user_orders': user_orders, 'product_image_urls': product_image_urls})
-
-
-# def order_history(request):
-#     user_orders = Tbl_order.objects.filter(user=request.user)
-    
-#     # Retrieve product images for each order item
-#     product_image_urls = {}
-#     for order in user_orders:
-#         for order_item in order.tbl_orderitem_set.all():
-#             product_image_urls[order_item.product.id] = order_item.product.tbl_productimage_set.first().image.url
-    
-#     return render(request, 'oredr_history.html', {'user_orders': user_orders, 'product_image_urls': product_image_urls})
-
-# from django.db.models import F
-# def success(request):
-#     user_cart = Tbl_cart.objects.get(user=request.user)
-#     cart_items = user_cart.tbl_cartitem_set.all()  
-#     for cart_item in cart_items:
-#         stock_item = cart_item.cart_stock
-#         stock_item.stock_quantity -= cart_item.cart_quantity
-#         stock_item.save()
-#     cart_items.delete()
-#     return render(request, 'success.html')
-
-
-
-#     # Retrieve the payment ID associated with the current transaction
-#     try:
-#         payment= Tbl_payment.objects.filter(user=request.user)
-#         payment_id = payment.id  # Assuming the payment ID is stored in the ID field
-#     except Tbl_payment.DoesNotExist:
-#         payment_id = None
-
-#     if payment_id:
-#         # Render the success.html template with the payment_id
-#         return render(request, 'success.html', {'payment_id': payment_id})
-#     else:
-#         # Handle the case where payment_id is not available
-#         return HttpResponse("Payment ID not found.")
-
-
-# from django.http import HttpResponse
-# from reportlab.lib.pagesizes import letter
-# from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-# from reportlab.platypus import SimpleDocTemplate, Paragraph
-
-# def generate_pdf_bill(request, payment_id):
-#     # Retrieve payment details from the database based on the payment_id
-#     try:
-#         payment = Tbl_payment.objects.get(pk=payment_id)
-#     except Tbl_payment.DoesNotExist:
-#         return HttpResponse("Payment not found.")
-
-#     # Create a response object
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = f'attachment; filename="transaction_bill_{payment_id}.pdf"'
-
-#     # Create a PDF document
-#     doc = SimpleDocTemplate(response, pagesize=letter)
-#     styles = getSampleStyleSheet()
-#     style_heading = styles['Heading1']
-#     style_body = styles['BodyText']
-
-#     # Add Dreamdress heading
-#     heading = Paragraph("Dreamdress Transaction Bill", style_heading)
-
-#     # Add transaction details
-#     details = [
-#         f"Payment ID: {payment_id}",
-#         f"Amount: {payment.payment_amount}",
-#         f"Order Date: {payment.payment_date.strftime('%Y-%m-%d %H:%M:%S')}",  # Format date as needed
-#         f"Payment Method: {payment.payment_method}",
-#         f"Transaction ID: {payment.transaction_id}",
-#     ]
-#     paragraphs = [Paragraph(detail, style_body) for detail in details]
-
-#     # Build PDF content
-#     content = [heading] + paragraphs
-
-#     # Add content to the PDF document
-#     doc.build(content)
-
-#     return response
-
-
-# # from reportlab.pdfgen import canvas
-
-# def download_bill(request):
-#     # Create a PDF document
-#     response = HttpResponse(content_type='application/pdf')
-#     response['Content-Disposition'] = 'attachment; filename="bill.pdf"'
-
-#     # Generate the PDF content
-#     p = canvas.Canvas(response)
-#     p.drawString(100, 750, "Dreamdress Bill")
-#     # Add more content here as needed
-#     p.showPage()
-#     p.save()
-
-#     return response
-# from django.http import HttpResponse
-# from reportlab.lib.pagesizes import letter
-# from reportlab.lib import colors
-# from reportlab.platypus import SimpleDocTemplate, Table, TableStyle
-# from .models import Tbl_payment
-
 from django.http import HttpResponse
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
@@ -826,27 +700,17 @@ def delete_cartitem(request, cart_id):
 def get_colors(request, image_id=None):
     try:
         if image_id is None:
-            # If no image ID is provided, get the first product image
             product_image = Tbl_ProductImage.objects.filter(product=request.product).first()
         else:
-            # Get the product image object based on the provided image ID
             product_image = Tbl_ProductImage.objects.get(image_id=image_id)
         
-        # Get the corresponding product
         product = product_image.product
-        
-        # Get colors and sizes for the selected product image
         colors = list(Tbl_colour.objects.filter(tbl_stock__product=product).values_list('colour_name', flat=True).distinct())
-
         sizes = list(Tbl_size.objects.filter(tbl_stock__product=product).values_list('size_name', flat=True).distinct())
 
-        
-        # Return colors and sizes as JSON response
         return JsonResponse({'colors': colors, 'sizes': sizes})
     except Tbl_ProductImage.DoesNotExist:
         return JsonResponse({'error': 'Product image not found'}, status=404)
-
-
 
 
 #users List
@@ -859,10 +723,21 @@ def seller_list(request):
     sellers= Tbl_seller.objects.filter(admin_approval='approved')
     return render(request, 'seller_list.html', {'sellers': sellers})
 
+#tailors List 
+def tailor_list(request):
+    tailors = Tbl_tailor.objects.filter(admin_approval='approved')
+    return render(request, 'tailor_list.html', {'tailors': tailors})
+
 #admin approvals for display in dashboard
 def admin_approvals(request):
-     sellers = Tbl_seller.objects.filter(admin_approval=Tbl_seller.PENDING)
-     return render(request, 'admin_approvals.html', {'sellers': sellers})
+    pending_sellers = Tbl_seller.objects.filter(admin_approval=Tbl_seller.PENDING)
+    pending_tailors = Tbl_tailor.objects.filter(admin_approval=Tbl_tailor.PENDING)
+    context = {
+        'pending_sellers': pending_sellers,
+        'pending_tailors': pending_tailors,
+    }
+    return render(request, 'admin_approvals.html', context)
+
 
 # Approve Seller
 def approve_seller(request, seller_id):
@@ -1316,14 +1191,6 @@ def view_wishlist(request):
     return render(request, 'wishlist.html', context)
 
 
-# cart_item_count = 0
-#     wishlist_count = 0
-    
-#     if request.user.is_authenticated:
-#         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
-#         wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
-#     return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
-
 # fileter products
 def filter_products(request):
     # Retrieve cart item count and wishlist count
@@ -1460,62 +1327,6 @@ def deactivate_user(request, user_id):
     # Send an email to the user here
     return redirect('seller_approval')
 
-# #sellerview2
-# def sellviews(request):
-#     # Retrieve seller profiles with the role 'SELLER'
-#     user_profiles = Seller.objects.filter(user_type='seller')
-
-#     # Pass the data to the template
-#     context = {'user_profiles': user_profiles}
-#     return render(request, 'sellerList_admin.html', context)
-     
-
-
-
-
-
-
-# def sellor_approval(request):
-#     # Filter sellers with status equals 'Pending'
-#     unapproved_sellers = Seller.objects.filter(status='Pending')
-    
-#     return render(request, 'seller_approval.html', {'unapproved_sellers': unapproved_sellers})
-
-
-
-
-# def seller_approval(request, seller_id):
-#     seller = Seller.objects.get(pk=seller_id)
-
-#     # Update seller status to 'Approved'
-#     seller.status = Seller.APPROVED
-#     seller.save()
-
-#     # Send email notification
-#     subject = 'Account Activation'
-#     message = 'Your seller account has been activated successfully.'
-#     from_email = 'prxnv2832@gmail.com'  # Your email address
-#     to_email = seller.user.email
-#     send_mail(subject, message, from_email, [to_email])
-    
-
-    
-#     return redirect('seller_viewforapproval')
-
-
-#block_seller - to block the seller approvel
-# def block_seller(request, seller_id):
-#     seller = Seller.objects.get(pk=seller_id)
-#     seller.is_approved = False
-#     seller.save()
-#     subject = 'Your Seller Account Has Been blocked'
-#     message = 'Dear {},\n\nYour seller account has been blocked by the admin. You cannot  log in and  banned your account.'
-#     from_email = 'prxnv2832@gmail.com'  # Replace with your email address
-#     recipient_list = [seller.user.email]
-    
-#     send_mail(subject, message, from_email, recipient_list, fail_silently=False)
-    
-#     return redirect('sellor_approval')
 
 def delete_seller(request, seller_id):
     user = Tbl_user.objects.get(pk=seller_id)
@@ -1569,14 +1380,108 @@ def tailor_registeration(request):
         return render(request,'tailor_registeration.html')   
 
 
+#tailor Update Profile
+@login_required(login_url='signin')  
+@never_cache
+def tailor_updateProfile(request):
+    tailor = get_object_or_404(Tbl_tailor, user=request.user)
+    if request.method == 'POST':
+        firstname = request.POST.get('firstname')
+        lastname = request.POST.get('lastname')
+        pan_number = request.POST.get('panNumber')
+        brand_name = request.POST.get('brandName')
+        logo = request.FILES.get('logo')
+        address = request.POST.get('businessAddress')
+        pincode = request.POST.get('pincode')
+        district = request.POST.get('district')
+        state = request.POST.get('state')
+        phone = request.POST.get('businessPhone')
+        license_number = request.POST.get('businessRegistrationNumber')
+        gst_number = request.POST.get('vatNumber')
+        certificate_pdf = request.FILES.get('certificatePdf')
+        bank_name = request.POST.get('bankName')
+        bank_account_number = request.POST.get('bankAccountNumber')
+        ifsc_code = request.POST.get('ifscCode')
+        
+        # Update existing tailor instance
+        tailor.tailor_firstname = firstname
+        tailor.tailor_lastname = lastname
+        tailor.tailor_pan_number = pan_number
+        tailor.tailor_phone = phone
+        tailor.tailor_address = address
+        tailor.tailor_pincode = pincode
+        tailor.tailor_district = district
+        tailor.tailor_state = state
+        tailor.tailor_brand_name = brand_name
+        tailor.tailor_license_number = license_number
+        tailor.tailor_gst_number = gst_number
+        tailor.tailor_bank_name = bank_name
+        tailor.tailor_bank_account_number = bank_account_number
+        tailor.tailor_ifsc_code = ifsc_code
+        tailor.tailor_license_pdf = certificate_pdf
+        tailor.tailor_form_filled = True
 
+        # Handle file upload
+        if logo:
+            tailor.tailor_brand_logo = logo
+        if certificate_pdf:
+            tailor.tailor_license_pdf = certificate_pdf
+        
+        tailor.save()
 
+        return redirect('seller_waiting')  
 
-# def seller_viewforapproval(request):
-#     sellers = Seller.objects.filter(status='Pending')
-#     return render(request,'seller_approval.html',{'sellers': sellers})
+    return render(request,'tailor_updateProfile.html') # Replace 'your_template.html' with your actual template name
 
+# Approve Tailor
+def approve_tailor(request, tailor_id):
+    if request.method == 'GET':
+        try:
+            tailor = Tbl_tailor.objects.get(id=tailor_id)
+            # Update the admin_approval status to "Approved"
+            tailor.admin_approval = 'approved'
+            tailor.save()
 
+            # Retrieve the tailor's email from the associated user
+            user = tailor.user
+            tailor_email = user.email
+
+            # Send approval email
+            subject = 'Your tailor account for DreamDress has been approved.'
+            message = render_to_string('approval_email.html', {'tailor': tailor})
+            plain_message = strip_tags(message)
+            send_mail(subject, plain_message, 'prxnv2832@gmail.com', [tailor_email], html_message=message)
+            print(subject)
+            return JsonResponse({'success': True})
+        except Tbl_tailor.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Tailor not found'}, status=404)
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
+
+# Reject Tailor
+def reject_tailor(request, tailor_id):
+    if request.method == 'GET':
+        try:
+            tailor = Tbl_tailor.objects.get(id=tailor_id)
+            # Update the admin_approval status to "Rejected"
+            tailor.admin_approval = 'rejected'
+            tailor.save()
+
+            # Retrieve the tailor's email from the associated user
+            user = tailor.user
+            tailor_email = user.email
+
+            # Send rejection email
+            subject = 'Your tailor account for DreamDress has been rejected.'
+            message = render_to_string('rejection_email.html', {'tailor': tailor})
+            plain_message = strip_tags(message)
+            send_mail(subject, plain_message, 'prxnv2832@gmail.com', [tailor_email], html_message=message)
+            print(subject)
+            return JsonResponse({'success': True})
+        except Tbl_tailor.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'Tailor not found'}, status=404)
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'}, status=405)
 
     
     
@@ -1586,54 +1491,8 @@ def tailor_registeration(request):
 
 
 
-# def add_product(request):
-#     if request.method == 'POST':
-#         # Fetch data from the form
-#         brand_name = request.POST.get('brand_name')
-#         product_name = request.POST.get('product_name')
-#         product_number = request.POST.get('product_number')
-#         stock = request.POST.get('stock')
-#         about_product = request.POST.get('about_product')
-#         current_price = request.POST.get('current_price')
-#         category_name = request.POST.get('category_name')  # Assuming the category is submitted as a string
-#         seller_id = request.POST.get('seller_id')
-#         color = request.POST.get('colors')
-#         material = request.POST.get('material')
-#         image_1 = request.FILES.get('main_image')  # Assuming it's an image file
 
-#         category_instance, created = category.objects.get_or_create(category_name=category_name)
-        
-#         # Assuming sizes are submitted as a list
-#         selected_sizes = request.POST.getlist('sizes')
-#         sizes = []
-#         for size_name in selected_sizes:
-#             size, created = Size.objects.get_or_create(name=size_name)
-#             sizes.append(size)
 
-#         # Create the Product instance
-#         product = Product.objects.create(
-#             brand_name=brand_name,
-#             product_name=product_name,
-#             product_number=product_number,
-#             stock=stock,
-#             about_product=about_product,
-#             current_price=current_price,
-#             category_id=category_instance,
-#             seller_id=seller_id,
-#             color=color,
-#             material=material,
-#             image_1=image_1
-#         )
-        
-
-#         # Add sizes to the product
-#         product.save()
-#         product.sizes.set(sizes)
-#         # Redirect to a success page or do something else
-#         messages.success(request, 'Product added successfully!')
-#         return redirect('seller_dashboard')  # Replace '/success/' with your desired URL
-
-#     return render(request, 'add_prod.html')  # Assuming the template name is 'add_product.html'
 
 
 
