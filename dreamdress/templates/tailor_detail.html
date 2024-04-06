@@ -1,0 +1,105 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Favicon -->
+    <link href="{% static '/img/favicon.png' %}" rel="icon">
+    <title>{{ tailor.tailor_brand_name }} Profile - DreamDress</title>
+    <!-- Include Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Add your custom CSS styles here */
+        body {
+            background-color: #f8f9fa; /* Light grey background */
+            padding-top: 70px; /* Add padding to the top for the navbar */
+        }
+        .tailor-details {
+            background-image: url('/static/img/back.jpg');
+            background-size: cover; /* Cover the entire container */
+            background-repeat: no-repeat; /* Do not repeat the background image */
+            padding: 20px; /* Add padding to the container */
+            border-radius: 10px; /* Rounded corners */
+            box-shadow: 0 0 10px rgba(27, 21, 21, 0.1); /* Add shadow */
+            color: #272323; /* White text color */
+        }
+        .fancy-font {
+            font-family: 'Style Script', cursive;
+            /* Add any other styles as needed */
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#" style="font-weight: bold; color: #c20e74;">DreamDress</a>
+
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}"  style="font-weight: bold; color: #c20e74;">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{%  url 'tailor_profiles' %}"  style="font-weight: bold; color: #c20e74;"> Tailor Profile</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1 class="text-center mb-4 fancy-font"><i>{{ tailor.tailor_brand_name }}</i></h1>
+
+    <div class="tailor-details p-4">
+        <div class="row">
+            <div class="col-md-4">
+                <img src="{{ tailor.tailor_brand_logo.url }}" alt="{{ tailor.tailor_brand_name }} Logo"
+                     class="img-fluid mb-3">
+            </div>
+            <div class="col-md-8">
+                <p><strong>Brand Name:</strong> {{ tailor.tailor_brand_name }}</p>
+                <p><strong>Name:</strong> {{ tailor.tailor_firstname }} {{ tailor.tailor_lastname }}</p>
+                <p><strong>Phone:</strong> {{ tailor.tailor_phone }}</p>
+                <p><strong>Address:</strong></p>
+                <p>{{ tailor.tailor_address }}</p>
+                <p>{{ tailor.tailor_pincode }}</p>
+                <p>{{ tailor.tailor_district }}</p>
+                <p>{{ tailor.tailor_state }}</p>
+                <!-- Add more details here as needed -->
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="col-md-12">
+                <br>
+                <h2 class="mb-4" style="font-family: 'Arial', sans-serif; color: #333; font-weight: bold; text-transform: uppercase;">Demo Products</h2>
+            </div>
+        </div>
+        {% for demo_product in demo_products %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <img src="{{ demo_product.product_image.url }}" class="card-img-top" alt="{{ demo_product.product_name }}" style="height: 300px; object-fit: cover;">
+                <div class="card-body">
+                    <h5 class="card-title">{{ demo_product.product_name }}</h5>
+                    <p class="card-text">{{ demo_product.product_description }}</p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- Include Bootstrap JS (optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

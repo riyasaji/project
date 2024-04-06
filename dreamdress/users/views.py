@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout as auth_logout
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review,Tbl_tailorDemoProduct
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -57,8 +57,9 @@ def home(request):
     if request.user.is_authenticated:
         cart_item_count = Tbl_cartItem.objects.filter(cart__user=request.user).count()
         wishlist_count = Tbl_wishlist.objects.filter(user=request.user).count()
-    categories = Tbl_category.objects.all()  # Fetch all categories
-    return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count, 'categories': categories})
+    categories = Tbl_category.objects.all()
+    sizes = Tbl_size.objects.all()  # Fetch all categories
+    return render(request, 'home.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count, 'categories': categories,'sizes':sizes})
 
 # categories = Tbl_category.objects.all()
 # 'categories': categories
@@ -320,10 +321,26 @@ def get_pincode_details(pincode):
     return None
 
 #seller_dashboard
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 @login_required(login_url='signin')
 @never_cache
 def seller_dashboard(request):
-    return render(request,'seller_dashboard.html')
+    seller_products = request.user.tbl_seller.tbl_product_set.all()
+
+    product_sales = {}
+
+    # Calculate the number of products sold for each product
+    for product in seller_products:
+        # Filter order items related to the current product
+        order_items = Tbl_orderItem.objects.filter(product=product)
+        # Calculate total quantity sold for the current product
+        total_quantity_sold = sum(order_item.quantity for order_item in order_items)
+        # Store product sales data in dictionary with brand name and category
+        product_info = (product.brand.brand_name, product.category.category_name)
+        product_sales[product_info] = total_quantity_sold
+
+    return render(request, 'seller_dashboard.html', {'product_sales': product_sales})
 
 #tailor_dashboard
 @login_required(login_url='signin')
@@ -877,6 +894,7 @@ def add_product(request):
 def shop_view(request):
     products = Tbl_product.objects.all()
     categories = Tbl_category.objects.all()
+    sizes = Tbl_size.objects.all()
     cart_item_count = 0
     wishlist_count = 0
 
@@ -888,7 +906,10 @@ def shop_view(request):
         'products': products,
         'cart_item_count': cart_item_count,
         'wishlist_count': wishlist_count,
-        'categories': categories
+        'categories': categories,
+        'sizes': sizes
+        
+
     }
 
     return render(request, 'shop.html', context)
@@ -1202,13 +1223,18 @@ def filter_products(request):
 
     # Retrieve all categories
     categories = Tbl_category.objects.all()
+    sizes = Tbl_size.objects.all()
 
     # Filter products based on selected category
-    selected_category = request.GET.get('category')
-    if selected_category:
-        products = Tbl_product.objects.filter(category__category_id=selected_category)
-    else:
-        products = Tbl_product.objects.all()
+    selected_categories = request.GET.getlist('category')
+    if selected_categories:
+        products = Tbl_product.objects.filter(category__category_id__in=selected_categories)
+
+    selected_sizes = request.GET.getlist('size')
+    if selected_sizes:
+        products = products.filter(tbl_stock__size_id__in=selected_sizes)
+            
+
 
     # Filter products based on price range
     min_price = request.GET.get('min_price')
@@ -1216,7 +1242,7 @@ def filter_products(request):
     if min_price and max_price:
         products = products.filter(product_current_price__gte=min_price, product_current_price__lte=max_price)
 
-    return render(request, 'filter_page.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count, 'categories': categories, 'products': products})
+    return render(request, 'filter_page.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count, 'categories': categories, 'sizes': sizes, 'products': products})
 
 
 
@@ -1429,9 +1455,26 @@ def tailor_updateProfile(request):
         
         tailor.save()
 
+        product_names = request.POST.getlist('product_name')
+        product_descriptions = request.POST.getlist('product_description')
+        product_images = request.FILES.getlist('product_image')
+        
+        # Iterate over product details and create Tbl_tailorDemoProduct instances
+        for i in range(len(product_names)):
+            product_name = product_names[i]
+            product_description = product_descriptions[i]
+            product_image = product_images[i]
+
+            # Create a new Tbl_tailorDemoProduct instance
+            demo_product = Tbl_tailorDemoProduct.objects.create(
+                tailor=tailor,
+                product_name=product_name,
+                product_description=product_description,
+                product_image=product_image
+            )
         return redirect('seller_waiting')  
 
-    return render(request,'tailor_updateProfile.html') # Replace 'your_template.html' with your actual template name
+    return render(request,'tailor_updateProfile.html')
 
 # Approve Tailor
 def approve_tailor(request, tailor_id):
@@ -1513,7 +1556,15 @@ def contact(request):
     return render(request, 'contact.html', {'cart_item_count': cart_item_count, 'wishlist_count': wishlist_count})
    
 
+def tailor_profiles(request):
+    tailors = Tbl_tailor.objects.all()
+    
+    return render(request, 'tailor_profiles.html', {'tailors': tailors})
 
+def tailor_detail(request, tailor_id):
+    tailor = get_object_or_404(Tbl_tailor, id=tailor_id)
+    demo_products = Tbl_tailorDemoProduct.objects.filter(tailor=tailor)
+    return render(request, 'tailor_detail.html', {'tailor': tailor, 'demo_products': demo_products})
 
 
 

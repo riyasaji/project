@@ -1,0 +1,240 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title>DreamDress</title>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+
+   
+    <!-- Favicon -->
+    <link href=" {% static '/img/favicon.png' %}" rel="icon">
+
+    <!-- Google Web Fonts -->
+    <link rel="preconnect" href="https://fonts.gstatic.com">
+    <link href="{% static '/css/style1.css' %}" rel="stylesheet"> 
+
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.10.0/css/all.min.css" rel="stylesheet">
+
+    <!-- Libraries Stylesheet -->
+    <link href="{% static '/lib/owlcarousel/assets/owl.carousel.min.css' %}" rel="stylesheet">
+
+    <!-- Customized Bootstrap Stylesheet -->
+    <link href="{% static '/css/style.css' %}" rel="stylesheet">
+    <style>
+        
+        h2 {
+    font-style: italic;
+    font-family: cursive;
+    color: #cb1972; /* Pink color */
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 30px;
+}
+        .tailor-profiles {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            grid-gap: 20px;
+        }
+        .tailor-profile {
+            background-color: #dbd7d7;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .tailor-logo {
+            max-width: 100px;
+            margin-bottom: 20px;
+        }
+        .tailor-brand-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        .view-profile-btn {
+            background-color: #cb1972;;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            text-decoration: none;
+            font-size: 16px;
+        }
+        .view-profile-btn:hover {
+            background-color: #7e055e;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid #ccc;
+            margin: 20px 0;
+        }
+    </style>
+    
+</head>
+
+<body>
+    <!-- Topbar Start -->
+    <div class="container-fluid">
+        <!--<div class="row bg-secondary py-2 px-xl-5">
+            <div class="col-lg-6 d-none d-lg-block">
+                <div class="d-inline-flex align-items-center">
+                    <a class="text-dark" href="">FAQs</a>
+                    <span class="text-muted px-2">|</span>
+                    <a class="text-dark" href="">Help</a>
+                    <span class="text-muted px-2">|</span>
+                    <a class="text-dark" href="">Support</a>
+                </div>
+            </div>
+        </div>-->
+        <div class="row align-items-center py-3 px-xl-5">
+            
+            <div class="col-lg-3 d-none d-lg-block">
+                <a href="" class="text-decoration-none">
+                    <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Dream</span>Dress</h1>
+                </a>
+            </div>
+            <!-- search -->
+            <div class="col-lg-6 col-6 text-left">
+                <form action="{% url 'search_products' %}" method="get">
+                    <div class="input-group">
+                        <input type="text" class="form-control"  id="search-input"  name="q" placeholder="Search for products">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                <div id="autocomplete-dropdown" class="autocomplete-dropdown" style="background-color: #e5aaaa; color: black;"></div>
+            </div>
+            <!-- end search -->
+            <!-- <div class="col-lg-3 col-6 text-right">
+                <a href="{%url 'view_wishlist' %}" class="btn border">
+                    <i class="fas fa-heart text-primary"></i>
+                    <span class="badge">{{ wishlist_count }}</span>
+                </a>
+                <a href="{% url 'view_cart' %}" class="btn border">
+                    <i class="fas fa-shopping-cart text-primary"></i>
+                    <span class="badge">{{ cart_item_count }}</span>
+                </a>
+            </div> -->
+        </div>
+    </div>
+    <!-- Topbar End -->
+
+
+    <!-- Navbar Start -->
+    <div class="container-fluid">
+        <div class="row border-top px-xl-5">
+            <div class="col-lg-9">
+                <nav class="navbar navbar-expand-lg bg-light navbar-light py-3 py-lg-0 px-0">
+                    <a href="" class="text-decoration-none d-block d-lg-none">
+                        <h1 class="m-0 display-5 font-weight-semi-bold"><span class="text-primary font-weight-bold border px-3 mr-1">Dream</span>Dress</h1>
+                    </a>
+                    <button type="button" class="navbar-toggler" data-toggle="collapse" data-target="#navbarCollapse">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse justify-content-between" id="navbarCollapse">
+                        <div class="navbar-nav mr-auto py-0">
+                            <a href="{% url 'home' %}" class="nav-item nav-link">Home</a>
+                            <a href="{% url 'shop' %}" class="nav-item nav-link ">Shop</a>
+                            <a href="{% url 'contact' %}" class="nav-item nav-link">Contact</a>
+                            <a href="{%  url 'tailor_profiles' %}" class="nav-item nav-link active">Tailor Profiles</a>
+                        </div>
+                        <div class="navbar-nav ml-auto py-0">
+                        {% if user.is_authenticated %}
+                            <a href="" class="nav-item nav-link">{{ user.username }}</a>
+                            {% if user.user_type == 'seller' %}
+                                <a href="{% url 'seller_dashboard' %}" class="nav-item nav-link">Your Dashboard</a>
+                            {% elif user.user_type == 'tailor' %}
+                                <a href="{% url 'tailor_dashboard' %}" class="nav-item nav-link">Tailor Dashboard</a>
+                            {% elif user.is_superuser %}
+                                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Admin Dashboard</a>
+                            {% else %}
+                                <a href="{% url 'customer_dashboard' %}" class="nav-item nav-link">Your Profile</a>
+                            {% endif %}
+                            <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                        {% else %}
+                        <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+                        <a href="{% url 'registration' %}" class="nav-item nav-link">Register</a>
+                        <a href="{% url 'seller_registeration' %}" class="nav-item nav-link">Become a Seller</a>
+                        <a href="{% url 'tailor_registeration' %}" class="nav-item nav-link">Become a Tailor</a>
+                        {% endif %}
+                    </div>
+                    </div>
+                </nav>
+            </div>
+        </div>
+    </div>
+    <!-- Navbar End -->
+    <h2>Tailor Profiles</h2>
+    <!-- <div class="container-fluid pt-5">            
+        <div class="col-lg-10 col-md-12 order-lg-2 order-md-1">
+            <div class="row pb-3">
+                <div class="row">
+                {% for tailor in tailors %}
+                <div class="card product-item border-0 mb-4">
+                    <div class="card-header product-img position-relative overflow-hidden bg-transparent border p-0">
+                        <!-- Display the first image of the product
+                        <img class="img-fluid w-100" src="{{ tailor.tailor_brand_logo.url }}" alt="{{ tailor.tailor_brand_name }} Logo" style="max-width: 100px;">
+                        <p>Brand Name: {{ tailor.tailor_brand_name }}</p>
+                        <a href="" class="btn btn-primary">View Profile</a>
+                    </div>
+                <div>
+                 {% endfor %}
+            </div>
+        </div>
+    </div> -->
+    <div class="tailor-profiles">
+        {% for tailor in tailors %}
+            <div class="tailor-profile">
+                <img src="{{ tailor.tailor_brand_logo.url }}" alt="{{ tailor.tailor_brand_name }} Logo" class="tailor-logo">
+                <p class="tailor-brand-name"> {{ tailor.tailor_brand_name }}</p>
+                <a href="{% url 'tailor_detail' tailor.id %}" class="view-profile-btn">View Profile</a>
+            </div>
+        {% endfor %}
+    </div>
+            
+<!-- autocomplete search bar menu -->
+<script>
+
+    const searchInput = document.getElementById('search-input');
+    const autocompleteDropdown = document.getElementById('autocomplete-dropdown');
+    
+    searchInput.addEventListener('input', function() {
+        const inputValue = this.value.trim();
+        if (inputValue.length > 0) {
+            // Send AJAX request to fetch autocomplete suggestions
+            fetch(`/autocomplete/?q=${inputValue}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Update dropdown menu with suggestions
+                    autocompleteDropdown.innerHTML = '';
+                    data.forEach(suggestion => {
+                        const option = document.createElement('div');
+                        option.textContent = suggestion;
+                        option.addEventListener('click', function() {
+                            searchInput.value = suggestion;
+                            autocompleteDropdown.innerHTML = '';  // Clear dropdown after selection
+                        });
+                        autocompleteDropdown.appendChild(option);
+                    });
+                });
+        } else {
+            // Clear dropdown menu if input field is empty
+            autocompleteDropdown.innerHTML = '';
+        }
+    });
+    
+    
+    </script>
+     
+</body>
+</html>
