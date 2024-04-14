@@ -114,6 +114,8 @@
                         <div class="col-md-4">
                             <div class="product">
                                 <h2>{{ product.product_name }}</h2>
+                                <p><strong>Category:</strong> {{ product.category.category_name }}</p>
+                                <p><strong>Brand:</strong> {{ product.brand.brand_name }}</p>
                                 <div class="product-images">
                                     {% for image in product.tbl_productimage_set.all %}
                                         <a href="{% url 'product_detail' product_id=product.product_id %}">

@@ -1,0 +1,404 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DreamDress Customization</title>
+  <link href="{% static 'img/favicon.png' %}" rel="icon">
+  <!-- Bootstrap CSS -->
+  <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Custom CSS -->
+  <style>
+    /* Custom styles here */
+    .navbar {
+      background-color: #fff; /* White background */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow */
+    }
+
+    .navbar-brand img {
+      width: 50px; /* Adjust logo width as needed */
+    }
+
+    .navbar-nav .nav-link {
+      color: #4B0082; /* Indigo */
+      font-weight: bold;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #800080; /* Purple */
+    }
+
+    .header {
+      background-image: linear-gradient(to right, #D4AF37, #4B0082); /* Gradient from Gold to Indigo */
+      padding: 60px 0;
+      text-align: center;
+      color: #fff; /* Change text color to white */
+    }
+
+    .header h1 {
+      font-size: 48px;
+      color: #d4c8dc; /* Indigo */
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 24px;
+      color: #c7bfbf;
+    }
+
+    .header-btn {
+      background-color: #4B0082; /* Indigo */
+      color: #fff;
+      font-size: 18px;
+      padding: 12px 30px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-btn:hover {
+      background-color: #800080; /* Purple */
+    }
+
+    .logo-container {
+      background-color: #fff; /* White background */
+      padding: 10px; /* Adjust padding as needed */
+      width: 100px; /* Adjust width as needed */
+      height: 100px; /* Adjust height as needed */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+      margin: 0 auto; /* Center horizontally */
+    }
+    .main-content {
+  padding-top: 50px; /* Adjust top padding as needed */
+  padding-bottom: 50px; /* Adjust bottom padding as needed */
+}
+
+.clothing-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  margin-bottom: 40px; /* Adjust margin between items as needed */
+}
+
+.clothing-image {
+  max-width: 100%;
+  height: auto;
+  margin-right: 20px; /* Adjust margin between image and content as needed */
+}
+
+.clothing-content {
+  flex: 1;
+}
+
+.start-customization-btn {
+  background-color: #4B0082; /* Indigo */
+  color: #fff;
+  font-size: 18px;
+  padding: 12px 30px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.start-customization-btn:hover {
+  background-color: #800080; /* Purple */
+}
+.clothing-image {
+  max-height: 200px; /* Adjust the maximum height as needed */
+  object-fit: cover; /* Preserve aspect ratio while filling container */
+}
+
+
+  </style>
+</head>
+<body>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light">
+  <div class="container">
+    <a class="navbar-brand" href="#"><img src="{% static 'img/favicon.png' %}" alt="Dreamdress Logo"></a>
+    <a class="navbar-brand" href="#" style="font-weight: bold; background: linear-gradient(to right, #D4AF37, #4B0082); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DreamDress</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="#">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Profile</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="#">Logout</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>
+
+<!-- Header -->
+<header class="header">
+  <div class="container">
+    <div class="row">
+      <div class="col-md-6 mx-auto">
+        <div class="logo-container">
+          <img src="{% static 'img/favicon.png' %}" alt="Dreamdress Logo" class="img-fluid">
+        </div>
+        <h1 class="mt-4">DreamDress</h1>
+        <p>Get the perfect dress stitched for every occasion</p>
+        <button class="header-btn" onclick="scrollToMainContent()">Choose Your Style</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- Main Content Section -->
+<div id="main-content">
+<!-- Dress Section -->
+<section class="main-content">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <img src="{% static 'img/dressy.jpg' %}" alt="Dress" class="img-fluid clothing-image">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Dresses</h2>
+              <p>Dresses are versatile garments suitable for various occasions, from casual outings to formal events. They come in different styles, lengths, and fabrics, allowing you to express your personal style and flatter your figure.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Tops Section -->
+  <section class="main-content bg-light">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 order-md-2">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Tops</h2>
+              <p>Tops come in different styles and designs, offering a wide range of options to suit various preferences and body types. Whether you prefer casual t-shirts, elegant blouses, or trendy crop tops, there's a top for every occasion and mood.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 order-md-1">
+          <div class="clothing-item">
+            <img src="{% static 'img/top.jpeg' %}" alt="Tops" class="img-fluid clothing-image">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Gowns Section -->
+  <section class="main-content">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <img src="{% static 'img/le.jpg' %}" alt="Gowns" class="img-fluid clothing-image">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Gowns</h2>
+              <p>Gowns are typically floor-length dresses designed for special occasions, often featuring elegant fabrics and intricate details. Whether you're attending a wedding, gala, or formal dinner, a gown can make you feel like royalty.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Bottoms Section -->
+  <section class="main-content bg-light">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 order-md-1">
+          <div class="clothing-item">
+            <img src="{% static 'img/bottom.jpg' %}" alt="Bottoms" class="img-fluid clothing-image">
+          </div>
+        </div>
+        <div class="col-md-6 order-md-2">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Bottoms</h2>
+              <p>Bottoms include various types of garments worn on the lower half of the body, such as trousers, jeans, and skirts. They come in different styles, fits, and lengths, allowing you to create endless outfit combinations.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Skirts Section -->
+  <section class="main-content">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <img src="{% static 'img/skirt.jpeg' %}" alt="Skirts" class="img-fluid clothing-image">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Skirts</h2>
+              <p>Skirts are versatile garments that can be dressed up or down for various occasions. From mini skirts to maxi skirts, pencil skirts to A-line skirts, there's a skirt style to suit every body type and fashion preference.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Jumpsuits Section -->
+  <section class="main-content bg-light">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6 order-md-2">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Jumpsuits/Rompers</h2>
+              <p>Jumpsuits and rompers are one-piece garments that offer effortless style and comfort. They come in various styles, including wide-leg jumpsuits, fitted rompers, and playful designs, making them a versatile choice for any occasion.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-6 order-md-1">
+          <div class="clothing-item">
+            <img src="{% static 'img/jumpsuit.jpeg' %}" alt="Jumpsuits/Rompers" class="img-fluid clothing-image">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- Saree Blouse Section -->
+  <section class="main-content">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <img src="{% static 'img/saree.jpg' %}" alt="Saree Blouse" class="img-fluid clothing-image">
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="clothing-item">
+            <div class="clothing-content">
+              <h2>Saree Blouse</h2>
+              <p>A saree blouse complements the elegance of a saree, enhancing its overall appeal. From traditional designs to modern patterns, saree blouses offer endless possibilities to showcase your style and personality.</p>
+              <button class="start-customization-btn">Start Customization</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+   
+</div>
+
+<!-- scroll down to main -->
+<script>
+  function scrollToMainContent() {
+    // Get the position of the main content
+    const mainContent = document.getElementById('main-content');
+    const offsetTop = mainContent.offsetTop;
+    // Scroll to the main content
+    window.scrollTo({
+      top: offsetTop,
+      behavior: 'smooth' // Smooth scrolling effect
+    });
+  }
+</script>
+
+<!-- Bootstrap JS and jQuery (optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<!-- Main Content -->
+<!-- <div class="container mt-4">
+    <h2 class="text-center mb-4">Women's Clothing</h2>
+    <div class="row">
+      <div class="col-md-4">
+        <div class="clothing-item">
+          <h4>Dresses</h4>
+          <img src="dress.jpg" class="img-fluid" alt="Dresses">
+        </div>
+        <div class="clothing-item">
+          <h4>Tops</h4>
+          <img src="top.jpg" class="img-fluid" alt="Tops">
+        </div>
+        <div class="clothing-item">
+          <h4>Bottoms</h4>
+          <img src="bottom.jpg" class="img-fluid" alt="Bottoms">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="clothing-item">
+          <h4>Outerwear</h4>
+          <img src="outerwear.jpg" class="img-fluid" alt="Outerwear">
+        </div>
+        <div class="clothing-item">
+          <h4>Jumpsuits/Rompers</h4>
+          <img src="jumpsuit.jpg" class="img-fluid" alt="Jumpsuits/Rompers">
+        </div>
+        <div class="clothing-item">
+          <h4>Sets</h4>
+          <img src="sets.jpg" class="img-fluid" alt="Sets">
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="clothing-item">
+          <h4>Activewear</h4>
+          <img src="activewear.jpg" class="img-fluid" alt="Activewear">
+        </div>
+        <div class="clothing-item">
+          <h4>Sleepwear/Loungewear</h4>
+          <img src="sleepwear.jpg" class="img-fluid" alt="Sleepwear/Loungewear">
+        </div>
+        <div class="clothing-item">
+          <h4>Saree Blouse</h4>
+          <img src="saree-blouse.jpg" class="img-fluid" alt="Saree Blouse">
+        </div>
+      </div>
+    </div>
+  </div> -->

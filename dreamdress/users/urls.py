@@ -97,6 +97,8 @@ urlpatterns = [
     path('tailor_dashboard/',views.tailor_dashboard,name='tailor_dashboard'),
     path('tailor_profiles/',views.tailor_profiles,name='tailor_profiles'),
     path('tailor_detail/<int:tailor_id>/', views.tailor_detail, name='tailor_detail'),
+    path('cloth_type/', views.cloth_type, name='cloth_type'),
+   
     
     
 

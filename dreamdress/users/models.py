@@ -250,3 +250,28 @@ class Tbl_tailorDemoProduct(models.Model):
     def __str__(self):
         return self.product_name
 
+
+
+#measurements
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
+
+class Tbl_measurements(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='measurements')
+    tailor = models.ForeignKey('Tbl_tailor', on_delete=models.CASCADE, related_name='tailor_measurements')
+    bust_size = models.FloatField(null=True, blank=True)
+    waist_size = models.FloatField(null=True, blank=True)
+    hip_size = models.FloatField(null=True, blank=True)
+    shoulder_size = models.FloatField(null=True, blank=True)
+    inseam = models.FloatField(null=True, blank=True)
+    sleeve_length = models.FloatField(null=True, blank=True)
+    neck_width = models.FloatField(null=True, blank=True)
+    arm_size = models.FloatField(null=True, blank=True)
+    upper_body_length = models.FloatField(null=True, blank=True)
+    neck_depth = models.FloatField(null=True, blank=True)
+    arm_length = models.FloatField(null=True, blank=True)
+    arm_design = models.FloatField(null=True, blank=True)
+
+    def __str__(self):
+        return f"Measurements for {self.user.username} by {self.tailor.tailor_firstname} {self.tailor.tailor_lastname}"

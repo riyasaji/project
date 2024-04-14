@@ -157,7 +157,26 @@
                                     <form action="{% url 'update_stock' %}" method="post">
                                         {% csrf_token %}
                                         <input type="hidden" name="stock_id" value="{{ stock_entry.stock_id }}">
-                                        <input type="number" name="quantity" value="{{ stock_entry.stock_quantity }}">   
+                                        <input type="number" name="quantity" id="quantityInput" value="{{ stock_entry.stock_quantity }}" oninput="validateInput(event)">
+                                        <div id="error-message" style="color: red; display: none;">Please enter a non-negative number.</div>
+                                        <script>
+                                            function validateInput(event) {
+                                                const input = event.target;
+                                                const value = input.value;
+                                                const errorMessage = document.getElementById('error-message');
+                                        
+                                                // Check if the input is a valid number and not negative
+                                                if (isNaN(value) || value < 0) {
+                                                    // If the input is not valid, show the error message
+                                                    errorMessage.style.display = 'block';
+                                                    // Reset the value to 0
+                                                    input.value = 0;
+                                                } else {
+                                                    // If the input is valid, hide the error message
+                                                    errorMessage.style.display = 'none';
+                                                }
+                                            }
+                                        </script>
                                 </td>
                                 <td>
                                     <button type="submit">Update</button>

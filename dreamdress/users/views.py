@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout as auth_logout
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review,Tbl_tailorDemoProduct
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review,Tbl_tailorDemoProduct,Tbl_measurements
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -1528,7 +1528,9 @@ def reject_tailor(request, tailor_id):
 
     
     
-
+# dress-type page
+def cloth_type(request):
+    return render(request,'dresstype.html')
 
 
 
