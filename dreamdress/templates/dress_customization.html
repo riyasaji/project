@@ -1,0 +1,370 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Measurements Form</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+  <style>
+/* Custom CSS for Form */
+.form-container {
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-label {
+  font-weight: bold;
+  background: linear-gradient(90deg, #D4AF37, #4B0082);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.form-control {
+  border: 1px solid #ced4da;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+}
+
+.btn-primary {
+  background-color: #4B0082;
+  border-color: #4B0082;
+  border-radius: 25px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  color: white;
+  padding: 10px 20px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #800080;
+  border-color: #800080;
+}
+.navbar {
+      background-color: #fff; /* White background */
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Add shadow */
+    }
+
+    .navbar-brand img {
+      width: 50px; /* Adjust logo width as needed */
+    }
+
+    .navbar-nav .nav-link {
+      color: #4B0082; /* Indigo */
+      font-weight: bold;
+    }
+
+    .navbar-nav .nav-link:hover {
+      color: #800080; /* Purple */
+    }
+
+    .header {
+      background-image: linear-gradient(to right, #D4AF37, #4B0082); /* Gradient from Gold to Indigo */
+      padding: 60px 0;
+      text-align: center;
+      color: #fff; /* Change text color to white */
+    }
+
+    .header h1 {
+      font-size: 48px;
+      color: #d4c8dc; /* Indigo */
+      font-weight: bold;
+    }
+
+    .header p {
+      font-size: 24px;
+      color: #c7bfbf;
+    }
+
+    .header-btn {
+      background-color: #4B0082; /* Indigo */
+      color: #fff;
+      font-size: 18px;
+      padding: 12px 30px;
+      border-radius: 30px;
+      border: none;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .header-btn:hover {
+      background-color: #800080; /* Purple */
+    }
+    .logo-container {
+      background-color: #fff; /* White background */
+      padding: 10px; /* Adjust padding as needed */
+      width: 100px; /* Adjust width as needed */
+      height: 100px; /* Adjust height as needed */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 10px; /* Rounded corners */
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+      margin: 0 auto; /* Center horizontally */
+    }
+    .measurement-icon {
+            cursor: pointer;
+        }
+    #chart-container img {
+        max-width: 75%; /* 75% of the screen width */
+        max-height: 75vh; /* 75% of the viewport height */
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navbar -->
+  <nav class="navbar navbar-expand-lg navbar-light">
+    <div class="container">
+      <a class="navbar-brand" href="#"><img src="{% static 'img/favicon.png' %}" alt="Dreamdress Logo"></a>
+      <a class="navbar-brand" href="#" style="font-weight: bold; background: linear-gradient(to right, #D4AF37, #4B0082); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">DreamDress</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ml-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url 'home' %}">Home</a>
+          </li>
+          <li class="nav-item">
+              {% if user.is_authenticated %}
+              {% if user.user_type == 'seller' %}
+                  <a href="{% url 'seller_dashboard' %}" class="nav-item nav-link">YourDashboard</a>
+              {% elif user.user_type == 'tailor' %}
+                  <a href="{% url 'tailor_dashboard' %}" class="nav-item nav-link">TailorDashboard</a>
+              {% elif user.is_superuser %}
+                  <a href="{% url 'dashboard' %}" class="nav-item nav-link">Admin Dashboard</a>
+              {% else %}
+                  <a href="{% url 'customer_dashboard' %}" class="nav-item nav-link">YourProfile</a>
+              {% endif %}
+              <li class="nav-item">
+                  <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                  </li>
+              {% else %}
+              <li class="nav-item">
+                  <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+              </li>
+              <li class="nav-item"><a href="{% url 'registration' %}" class="nav-item nav-link">Register</a></li>
+              <li class="nav-item"><a href="{% url 'seller_registeration' %}" class="nav-item nav-link">Become a Seller</a></li>
+              <li class="nav-item"><a href="{% url 'tailor_registeration' %}" class="nav-item nav-link">Become a Tailor</a></li>  
+                  
+              {% endif %}
+          </li>
+          <!-- <li class="nav-item">
+            <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+          </li> -->
+        </ul>
+      </div>
+    </div>
+  </nav>
+  
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6 mx-auto">
+          <div class="logo-container">
+            <img src="{% static 'img/favicon.png' %}" alt="Dreamdress Logo" class="img-fluid">
+          </div>
+          <h1 class="mt-4">DreamDress</h1>
+          <p>Get the perfect dress stitched for every occasion</p>
+          <button class="header-btn" onclick="scrollToMainContent()">Choose Your Style</button>
+        </div>
+      </div>
+    </div>
+  </header>
+  
+<div class="container">
+    <h2>Measurements Form</h2>
+    <p class="text-muted">Please enter all measurements in inches.  
+      <i class="fas fa-info-circle measurement-icon" id="measurement-info"></i>
+      <!-- Hidden image container -->
+      <div id="chart-container" style="display: none;">
+        <img src="{% static 'img/measurement.png' %}" alt="Chart">
+      </div>
+    <form method="post" action="">
+      {% csrf_token %}
+      <div class="row">
+        <div class="col-md-6">
+          <div class="mb-3">
+            <label for="bust_size" class="form-label">Bust Size</label>
+            <input type="number" step="any" class="form-control" id="bust_size" name="bust_size">
+          </div>
+
+          <div class="mb-3">
+            <label for="waist_size" class="form-label">Waist Size</label>
+            <input type="number" step="any" class="form-control" id="waist_size" name="waist_size">
+          </div>
+
+          <div class="mb-3">
+            <label for="hip_size" class="form-label">Hip Size</label>
+            <input type="number" step="any" class="form-control" id="hip_size" name="hip_size">
+          </div>
+
+          <div class="mb-3">
+            <label for="shoulder_size" class="form-label">Shoulder Size</label>
+            <input type="number" step="any" class="form-control" id="shoulder_size" name="shoulder_size">
+          </div>
+
+            <div class="mb-3">
+              <label for="inseam" class="form-label">Inseam</label>
+              <input type="number" step="any" class="form-control" id="inseam" name="inseam">
+            </div>
+            <div class="mb-3">
+              <label for="sleeve_length" class="form-label">Sleeve Length</label>
+              <input type="number" step="any" class="form-control" id="sleeve_length" name="sleeve_length">
+            </div>
+    </div>
+    <div class="col-md-6">
+      
+      <div class="mb-3">
+        <label for="neck_width" class="form-label">Neck Width</label>
+        <input type="number" step="any" class="form-control" id="neck_width" name="neck_width">
+      </div>
+      <div class="mb-3">
+        <label for="arm_size" class="form-label">Arm Size</label>
+        <input type="number" step="any" class="form-control" id="arm_size" name="arm_size">
+      </div>
+      <div class="mb-3">
+        <label for="upper_body_length" class="form-label"> Upper Body Length </label>
+        <input type="number" step="any" class="form-control" id="upper_body_length" name="upper_body_length">
+      </div>
+      <div class="mb-3">
+        <label for="neck_depth" class="form-label">Neck Depth</label>
+        <input type="number" step="any" class="form-control" id="neck_depth" name="neck_depth">
+      </div>
+      <div class="mb-3">
+        <label for="arm_length" class="form-label">Arm Length</label>
+        <input type="number" step="any" class="form-control" id="arm_length" name="arm_length">
+      </div>
+      <div class="mb-3">
+        <label for="armhole_depth" class="form-label">ArmHole Depth</label>
+        <input type="number" step="any" class="form-control" id="armhole_depth" name="armhole_depth">
+      </div>
+    </div>
+  </div>
+      
+      <h2>Designs</h2>
+      <div class="mb-3">
+        <label for="neck_design" class="form-label">Neck Designs</label>
+        <select class="form-select" id="neck_design" name="neck_design">
+            <option value="">Select</option>
+            <option value="Halter">Halter</option>
+            <option value="Sabrina">Sabrina</option>
+            <option value="V-neck">V-neck</option>
+            <option value="Jewel">Jewel</option>
+            <option value="Illusion">Illusion</option>
+            <option value="High neck">High neck</option>
+            <option value="Scoop">Scoop</option>
+            <option value="Square">Square</option>
+            <option value="Queen Anne">Queen Anne</option>
+            <option value="Halter strap">Halter strap</option>
+            <option value="Spaghetti strap">Spaghetti strap</option>
+            <option value="Grecian">Grecian</option>
+            <option value="Keyhole">Keyhole</option>
+            <option value="Asymmetric">Asymmetric</option>
+            <option value="Sweetheart">Sweetheart</option>
+            <option value="Semi-sweetheart">Semi-sweetheart</option>
+            <option value="Straight across">Straight across</option>
+            <option value="Off-shoulders">Off-shoulders</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="sleeve_design" class="form-label">Sleeve Designs</label>
+        <select class="form-select" id="sleeve_design" name="sleeve_design">
+          <option value="">Select</option>
+          <option value="Shirt">Shirt</option>
+          <option value="Bishop">Bishop</option>
+          <option value="Bell">Bell</option>
+          <option value="Raglan">Raglan</option>
+          <option value="Poet">Poet</option>
+          <option value="Puffed">Puffed</option>
+          <option value="Kimono">Kimono</option>
+          <option value="Circular cup">Circular cup</option>
+          <option value="Marie">Marie</option>
+          <option value="Drop shoulder">Drop shoulder</option>
+          <option value="Peasant">Peasant</option>
+          <option value="Button tab">Button tab</option>
+          <option value="Bracelet">Bracelet</option>
+          <option value="Layered">Layered</option>
+          <option value="Batwing">Batwing</option>
+          <option value="Petal">Petal</option>
+          <option value="French">French</option>
+          <option value="Cape">Cape</option>
+          <option value="Juliet">Juliet</option>
+          <option value="Lantern">Lantern</option>
+          <option value="Leg of mutton">Leg of mutton</option>
+          <option value="Roll up">Roll up</option>
+          <option value="Butterfly">Butterfly</option>
+          <option value="Cowl">Cowl</option>
+        </select>
+      </div>
+      
+      <div class="mb-3">
+        <label for="skirt_design" class="form-label">Skirt Designs</label>
+        <select class="form-select" id="skirt_design" name="skirt_design">
+          <option value="">Select</option>
+          <option value="Straight">Straight</option>
+          <option value="Pencil">Pencil</option>
+          <option value="A Line">A Line</option>
+          <option value="Pegged">Pegged</option>
+          <option value="Slit">Slit</option>
+          <option value="Cowl">Cowl</option>
+          <option value="8-Panel Gore">8-Panel Gore</option>
+          <option value="Godet">Godet</option>
+          <option value="Flounce">Flounce</option>
+          <option value="Trumpet">Trumpet</option>
+          <option value="Pleat">Pleat</option>
+          <option value="Prairie">Prairie</option>
+          <option value="Layered">Layered</option>
+          <option value="Tulle">Tulle</option>
+          <option value="Round">Round</option>
+          <option value="Handkerchief">Handkerchief</option>
+          <option value="Wrap">Wrap</option>
+          <option value="Pareo">Pareo</option>
+          <option value="Sarong">Sarong</option>
+        </select>
+      </div>
+      
+     
+
+      <div class="mb-3">
+        <label for="note_to_tailor" class="form-label">Note to Tailor</label>
+        <textarea class="form-control" id="note_to_tailor" name="note_to_tailor" rows="3"></textarea>
+      </div>
+
+      <div class="mb-3">
+        <label for="material" class="form-label">Material</label>
+        <input type="text" class="form-control" id="material" name="material">
+      </div>
+
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const infoIcon = document.getElementById('measurement-info');
+      const chartContainer = document.getElementById('chart-container');
+
+      infoIcon.addEventListener('click', function() {
+          // Toggle the display of the chart container
+          chartContainer.style.display = chartContainer.style.display === 'none' ? 'block' : 'none';
+      });
+  });
+</script>
+
+<!-- Bootstrap JS and jQuery (optional) -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+</body>
+</html>

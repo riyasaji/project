@@ -271,7 +271,7 @@ class Tbl_measurements(models.Model):
     upper_body_length = models.FloatField(null=True, blank=True)
     neck_depth = models.FloatField(null=True, blank=True)
     arm_length = models.FloatField(null=True, blank=True)
-    arm_design = models.FloatField(null=True, blank=True)
+    armhole_depth= models.FloatField(null=True, blank=True)
 
     def __str__(self):
         return f"Measurements for {self.user.username} by {self.tailor.tailor_firstname} {self.tailor.tailor_lastname}"

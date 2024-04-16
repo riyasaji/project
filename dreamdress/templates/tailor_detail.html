@@ -28,6 +28,30 @@
             font-family: 'Style Script', cursive;
             /* Add any other styles as needed */
         }
+        .custom-button-link {
+    display: block;
+    margin: 0 auto;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(to right, #D4AF37, #4B0082);
+    border: none;
+    border-radius: 30px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background-color 0.3s, box-shadow 0.3s;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    text-align: center; /* Center text horizontally */
+    line-height: 30px; /* Adjust line height for vertical centering */
+}
+        .custom-button-link:hover {
+            background: linear-gradient(to right, #4B0082, #D4AF37);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /
+        }
+        
+        
     </style>
 </head>
 <body>
@@ -75,38 +99,19 @@
             </div>
         </div>
     </div>
+    <br>
+    <div class="container">
+        <!-- Button link with gradient -->
+        <a href="{% url 'cloth_type' %}" class="custom-button-link">Click for Your Customization</a>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="col-md-12">
-                <br>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-                
+                <br>                
                 <h2 class="mb-4" style="font-family: 'Arial', sans-serif; color: #333; font-weight: bold; text-transform: uppercase;">Demo Products</h2>
             </div>
         </div>
+        
         {% for demo_product in demo_products %}
         <div class="col-md-4 mb-4">
             <div class="card">

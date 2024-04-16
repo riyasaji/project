@@ -114,7 +114,14 @@
   max-height: 200px; /* Adjust the maximum height as needed */
   object-fit: cover; /* Preserve aspect ratio while filling container */
 }
-
+.btn.btn-primary {
+    border-radius: 25px; /* Make the button round */
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow */
+    background-color: #4B0082; /* Set the button color to purple */
+    color: white; /* Set text color to white */
+    padding: 10px 20px; /* Adjust padding as needed */
+    text-decoration: none; /* Remove default underline */
+}
 
   </style>
 </head>
@@ -131,14 +138,35 @@
     <div class="collapse navbar-collapse" id="navbarNav">
       <ul class="navbar-nav ml-auto">
         <li class="nav-item active">
-          <a class="nav-link" href="#">Home</a>
+          <a class="nav-link" href="{% url 'home' %}">Home</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="#">Profile</a>
+            {% if user.is_authenticated %}
+            {% if user.user_type == 'seller' %}
+                <a href="{% url 'seller_dashboard' %}" class="nav-item nav-link">YourDashboard</a>
+            {% elif user.user_type == 'tailor' %}
+                <a href="{% url 'tailor_dashboard' %}" class="nav-item nav-link">TailorDashboard</a>
+            {% elif user.is_superuser %}
+                <a href="{% url 'dashboard' %}" class="nav-item nav-link">Admin Dashboard</a>
+            {% else %}
+                <a href="{% url 'customer_dashboard' %}" class="nav-item nav-link">YourProfile</a>
+            {% endif %}
+            <li class="nav-item">
+                <a href="{% url 'logout' %}" class="nav-item nav-link">Logout</a>
+                </li>
+            {% else %}
+            <li class="nav-item">
+                <a href="{% url 'signin' %}" class="nav-item nav-link">Login</a>
+            </li>
+            <li class="nav-item"><a href="{% url 'registration' %}" class="nav-item nav-link">Register</a></li>
+            <li class="nav-item"><a href="{% url 'seller_registeration' %}" class="nav-item nav-link">Become a Seller</a></li>
+            <li class="nav-item"><a href="{% url 'tailor_registeration' %}" class="nav-item nav-link">Become a Tailor</a></li>  
+                
+            {% endif %}
         </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Logout</a>
-        </li>
+        <!-- <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout' %}">Logout</a>
+        </li> -->
       </ul>
     </div>
   </div>
@@ -176,7 +204,8 @@
             <div class="clothing-content">
               <h2>Dresses</h2>
               <p>Dresses are versatile garments suitable for various occasions, from casual outings to formal events. They come in different styles, lengths, and fabrics, allowing you to express your personal style and flatter your figure.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="{% url 'dress_customization' %}" class="btn btn-primary">Start Customization</a>
+              
             </div>
           </div>
         </div>
@@ -193,7 +222,7 @@
             <div class="clothing-content">
               <h2>Tops</h2>
               <p>Tops come in different styles and designs, offering a wide range of options to suit various preferences and body types. Whether you prefer casual t-shirts, elegant blouses, or trendy crop tops, there's a top for every occasion and mood.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="" class="btn btn-primary">Start Customization</a>
             </div>
           </div>
         </div>
@@ -220,7 +249,7 @@
             <div class="clothing-content">
               <h2>Gowns</h2>
               <p>Gowns are typically floor-length dresses designed for special occasions, often featuring elegant fabrics and intricate details. Whether you're attending a wedding, gala, or formal dinner, a gown can make you feel like royalty.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="" class="btn btn-primary">Start Customization</a>
             </div>
           </div>
         </div>
@@ -242,7 +271,7 @@
             <div class="clothing-content">
               <h2>Bottoms</h2>
               <p>Bottoms include various types of garments worn on the lower half of the body, such as trousers, jeans, and skirts. They come in different styles, fits, and lengths, allowing you to create endless outfit combinations.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="" class="btn btn-primary">Start Customization</a>
             </div>
           </div>
         </div>
@@ -264,7 +293,7 @@
             <div class="clothing-content">
               <h2>Skirts</h2>
               <p>Skirts are versatile garments that can be dressed up or down for various occasions. From mini skirts to maxi skirts, pencil skirts to A-line skirts, there's a skirt style to suit every body type and fashion preference.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="" class="btn btn-primary">Start Customization</a>
             </div>
           </div>
         </div>
@@ -281,7 +310,7 @@
             <div class="clothing-content">
               <h2>Jumpsuits/Rompers</h2>
               <p>Jumpsuits and rompers are one-piece garments that offer effortless style and comfort. They come in various styles, including wide-leg jumpsuits, fitted rompers, and playful designs, making them a versatile choice for any occasion.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="" class="btn btn-primary">Start Customization</a>
             </div>
           </div>
         </div>
@@ -308,7 +337,7 @@
             <div class="clothing-content">
               <h2>Saree Blouse</h2>
               <p>A saree blouse complements the elegance of a saree, enhancing its overall appeal. From traditional designs to modern patterns, saree blouses offer endless possibilities to showcase your style and personality.</p>
-              <button class="start-customization-btn">Start Customization</button>
+              <a href="" class="btn btn-primary">Start Customization</a>
             </div>
           </div>
         </div>

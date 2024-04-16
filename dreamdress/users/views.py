@@ -1533,6 +1533,10 @@ def cloth_type(request):
     return render(request,'dresstype.html')
 
 
+#dress_customization
+def dress_customization(request):
+    return render(request,'dress_customization.html')
+
 
 
 
