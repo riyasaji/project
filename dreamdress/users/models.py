@@ -275,3 +275,17 @@ class Tbl_measurements(models.Model):
 
     def __str__(self):
         return f"Measurements for {self.user.username} by {self.tailor.tailor_firstname} {self.tailor.tailor_lastname}"
+
+
+User = get_user_model()
+
+class ChatMessage(models.Model):
+    tailor = models.ForeignKey('Tbl_tailor', on_delete=models.CASCADE, related_name='chat_messages')
+    customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='chat_messages')
+    message_id = models.AutoField(primary_key=True)
+    message = models.TextField()
+    viewed = models.BooleanField(default=False)
+    send_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Message {self.message_id} from {self.customer.username} to {self.tailor.tailor_firstname}"

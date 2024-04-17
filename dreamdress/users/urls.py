@@ -99,12 +99,20 @@ urlpatterns = [
     path('tailor_detail/<int:tailor_id>/', views.tailor_detail, name='tailor_detail'),
     path('cloth_type/', views.cloth_type, name='cloth_type'),
     path('dress_customization/', views.dress_customization, name='dress_customization'),
+    path('chat_tailor_customer/<int:tailor_id>/', views.chat_tailor_customer, name='chat_tailor_customer'),
+    path('send_message/', views.send_message, name='send_message'),
+    path('send_message_tailor/', views.send_message_tailor, name='send_message_tailor'),
+    path('message_tailor/', views.message_tailor, name='message_tailor'),
+    path('user_chats/<int:user_id>/', views.tailor_chat_customer, name='user_chats'),
+    
+]
+   
     
    
     
     
 
-]
+
 
 from django.conf import settings
 from django.conf.urls.static import static

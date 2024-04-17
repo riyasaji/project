@@ -50,8 +50,29 @@
             background: linear-gradient(to right, #4B0082, #D4AF37);
             box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /
         }
-        
-        
+        .chat-link {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 1000; /* Ensure it appears above other content */
+        width: 120px; /* Increased width */
+        height: 120px; /* Increased height */
+        border-radius: 50%;
+        background-color: #4B0082;
+        color: #fff;
+        font-size: 14px; /* Decreased font size */
+        font-weight: bold;
+        text-align: center;
+        line-height: 1.5; /* Adjust line height for vertical centering */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        cursor: pointer;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+   
     </style>
 </head>
 <body>
@@ -125,6 +146,11 @@
         {% endfor %}
     </div>
 </div>
+
+<!-- Chat Link -->
+<a href="{% url 'chat_tailor_customer' tailor.id %}" class="btn btn-primary chat-link">Chat with Tailor</a>
+
+
 
 <!-- Include Bootstrap JS (optional) -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>

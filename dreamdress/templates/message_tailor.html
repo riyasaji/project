@@ -41,6 +41,7 @@
             font-size: 24px; /* Size of cloth icon */
             color: #28a745; /* Green color for cloth */
         }
+        
     </style>
 </head>
 <body>
@@ -75,7 +76,7 @@
                     <a class="nav-link" href="{% url 'tailor_dashboard' %}">Dashboard</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'message_tailor' %}">Messages</a>
+                    <a class="nav-link" href="">Messages</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="">Add Designs</a>
@@ -93,53 +94,31 @@
         </div>
     </div>
 </nav>
-
-<!-- Main Content -->
-<div class="container mt-4">
-    <div class="jumbotron">
-        <h1 class="display-4">Welcome to DreamDress Tailor Dashboard!</h1>
-        <p class="lead">Manage your designs, orders, and customers here.</p>
-        <hr class="my-4">
-        <p>
-            {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-danger alert-dismissible fade show" role="alert" id="successMessage">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                    <div id="success-message" style="display: none;">
-                        Design added successfully.
-                    </div>
-                    <script>
-                        $(document).ready(function() {
-                            setTimeout(function() {
-                                $('.alert').alert('close');
-                            }, 3000); // 3000 milliseconds = 3 seconds
-                        });
-                    </script>
-                {% endfor %}
-            {% endif %}
-        </p>
-        
-    </div>
-
+<h1 style="color: #333; text-align: center; margin-top: 20px;">Messages Sent to You</h1>
+    <table style="width: 100%; max-width: 600px; margin: 20px auto; border-collapse: collapse;">
+        <thead>
+            <tr style="background-color: #f8f9fa; border-bottom: 2px solid #dee2e6;">
+                <th style="padding: 10px; text-align: left;">From</th>
+                <th style="padding: 10px; text-align: left;">Order ID</th>
+                <th style="padding: 10px; text-align: left;">Message</th>
+                <th style="padding: 10px; text-align: left;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for message in tailor_messages %}
+            <tr style="border-bottom: 1px solid #dee2e6;">
+                <td style="padding: 10px;">{{ message.customer.username }}</td>
+                <td style="padding: 10px;">{% if message.order %}{{ message.order.id }}{% endif %}</td>
+                <td style="padding: 10px;">{{ message.message }}</td>
+                <td style="padding: 10px;"><a href="{% url 'user_chats' user_id=message.customer.id %}" style="color: #007bff; text-decoration: none; font-weight: bold;">View Chats</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 <!-- Bootstrap JS and jQuery -->
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script>
-    // Show success message and hide after 3 seconds
-    document.addEventListener('DOMContentLoaded', function() {
-        var successMessage = document.getElementById('success-message');
-        if (successMessage) {
-            successMessage.style.display = 'block';
-            setTimeout(function() {
-                successMessage.style.display = 'none';
-            }, 3000);  // Hide after 3 seconds (3000 milliseconds)
-        }
-    });
-</script>
-
 </body>
 </html>

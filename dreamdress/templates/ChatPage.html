@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat with Tailor</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+        integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+    <style>
+        .chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+        }
+
+        .incoming-message {
+            background-color: #f1f0f0;
+            text-align: left;
+        }
+
+        .outgoing-message {
+            background-color: #c20e74;
+            color: #fff;
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="#" style="font-weight: bold; color: #c20e74;">DreamDress</a>
+
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ml-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{% url 'home' %}" style="font-weight: bold; color: #c20e74;">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="{%  url 'tailor_profiles' %}"
+                            style="font-weight: bold; color: #c20e74;"> Tailor Profile</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container mt-5">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                Chat with {{ tailor.tailor_brand_name }}
+
+            </div>
+            <div class="card-body chat-box" id="chatBox">
+                <!-- Messages will be displayed here -->
+                {% for message in chat_messages %}
+                    <div class="message {% if message.customer == request.user %}outgoing-message{% else %}incoming-message{% endif %}">
+                        {% if message.customer == request.user %}
+                            <strong>You:</strong> <!-- Display "You" for customer's messages -->
+                        {% else %}
+                            <strong>{{ tailor.tailor_brand_name }}:</strong> <!-- Display tailor's name for their messages -->
+                        {% endif %}
+                        {{ message.message }}
+                    </div>
+                {% endfor %}
+            </div>
+            
+            
+            <div class="card-footer">
+                <form id="sendMessageForm" method="post">
+                    {% csrf_token %}
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="messageInput" name="message" placeholder="Type your message here...">
+                        <div class="input-group-append">
+                            <button class="btn btn-primary" type="submit">Send</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- Include Bootstrap JS (optional) -->
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Get the URL for sending messages
+            var sendMessageUrl = "{% url 'send_message' %}";
+    
+            // Submit message form via AJAX
+            $('#sendMessageForm').on('submit', function(event) {
+                event.preventDefault();
+                $.ajax({
+                    type: 'POST',
+                    url: sendMessageUrl, // Use the dynamically obtained URL
+                    data: {
+                        message: $('#messageInput').val(),
+                        tailor_id: '{{ tailor.id }}',
+                        csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                    },
+                    success: function(response) {
+                        // Refresh chat box after sending message
+                        $('#chatBox').load(location.href + ' #chatBox');
+                    },
+                    error: function(xhr, status, error) {
+                        console.error(xhr.responseText);
+                    }
+                });
+            });
+        });
+    </script>
+    
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"
+        integrity="sha384-Bp4jgiwFfOCtsVB5Zy5z4fQ7w6/0v8on4K8OwB1a3hclfXbQ+6K+cdd2SezW0t2l"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"
+        integrity="sha384-b4gt1jrGC7Jh4AgTPSdUtOBvfO8shCk5W8vYy3X4jz/YooB3Zp5ymJX6uz4+o3lg"
+        crossorigin="anonymous"></script>
+</body>
+
+</html>

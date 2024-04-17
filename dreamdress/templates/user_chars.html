@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tailor Dashboard - DreamDress</title>
+    <link href="/static/img/favicon.png" rel="icon">
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Your custom styles -->
+    <style>
+        /* Custom styles */
+        body {
+            background-color: #fff; /* White background */
+            color: #333; /* Dark text */
+            font-family: 'Arial', sans-serif; /* Font style */
+        }
+        header {
+            background-color: #ff69b4; /* Pink header */
+            color: #fff; /* White text */
+        }
+        header img {
+            max-height: 50px;
+        }
+        header h4 {
+            font-size: 1.2em;
+        }
+        .navbar-dark .navbar-nav .nav-link {
+            color: #fff; /* White navigation links */
+            font-weight: bold; /* Bold font for navigation links */
+        }
+        .navbar-dark .navbar-toggler-icon {
+            background-color: #fff; /* White hamburger icon */
+        }
+        /* Chat box styles */
+        .chat-box {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .message {
+            padding: 5px 10px;
+            margin-bottom: 5px;
+            border-radius: 10px;
+        }
+
+        .incoming-message {
+            background-color: #f1f0f0;
+            text-align: left;
+        }
+
+        .outgoing-message {
+            background-color: #c20e74;
+            color: #fff;
+            text-align: right;
+        }
+        /* Message input form styles */
+        #sendMessageForm {
+            margin-top: 20px;
+        }
+
+        #sendMessageForm textarea {
+            width: calc(100% - 72px); /* Adjust for button width */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            resize: vertical;
+        }
+
+        #sendMessageForm button {
+            width: 70px;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+        }
+        /* Chat box styles */
+.chat-box {
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.message {
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    word-wrap: break-word;
+}
+
+.incoming-message {
+    background-color: #f0f0f0;
+}
+
+.outgoing-message {
+    background-color: #007bff;
+    color: #fff;
+    text-align: right;
+}
+
+    </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="bg-light p-3">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-md-4">
+                <img src="/static/img/favicon.png" alt="DreamDress Logo" class="img-fluid" style="max-height: 50px;">
+                <span style="color: crimson;">DreamDress</span>
+            </div>
+            <div class="col-md-4">
+                <h4 style="color:rgb(226, 32, 32)">Welcome, <span id="username">{{ user.username }}</span></h4>
+            </div>
+            <div class="col-md-4 text-right">
+                <a href="{% url 'logout' %}" class="btn btn-danger">Logout</a>
+            </div>
+        </div>
+    </div>
+</header>
+
+<!-- Navigation Bar -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'tailor_dashboard' %}">Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'message_tailor' %}">Messages</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="">Add Designs</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Orders</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Customers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'home' %}">Home</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Chat Box -->
+<div class="container mt-5">
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            Chat with {{ customer.email }}
+        </div>
+        <div class="card-body chat-box" id="chatBox">
+            <!-- Messages will be displayed here -->
+            {% for message in chat_messages %}
+                <div class="message {% if message.customer != customer %}incoming-message{% else %}outgoing-message{% endif %}">
+                    {% if message.customer != customer %}
+                        <strong>{{ customer.email }}:</strong> <!-- Display customer's email for the tailor's messages -->
+                    {% else %}
+                        <strong>You:</strong> <!-- Display "You" for the customer's messages -->
+                    {% endif %}
+                    {{ message.message }}
+                </div>
+            {% endfor %}
+        </div>
+        
+        
+        
+        <div class="card-footer">
+            <form id="sendMessageForm" method="post">
+                {% csrf_token %}
+                <div class="input-group">
+                    <input type="text" class="form-control" id="messageInput" name="message" placeholder="Type your message here...">
+                    <input type="hidden" name="customer_id" value="{{ customer.id }}">
+                    <div class="input-group-append">
+                        <button class="btn btn-primary" type="submit">Send</button>
+                    </div>
+                </div>
+            </form>
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+<!-- Include Bootstrap JS (optional) -->
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+<!-- Include jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+$(document).ready(function() {
+    // Get the URL for sending messages
+    var sendMessageUrl = "{% url 'send_message_tailor' %}";
+
+    // Submit message form via AJAX
+    $('#sendMessageForm').on('submit', function(event) {
+        event.preventDefault();
+        var messageInput = $('#messageInput').val().trim(); // Trim whitespace
+        if (messageInput === "") {
+            // If message input is empty, show an alert or provide feedback to the user
+            alert("Please enter a message.");
+            return;
+        }
+        $.ajax({
+            type: 'POST',
+            url: sendMessageUrl, // Use the dynamically obtained URL
+            data: {
+                message: messageInput,
+                customer_id: $('input[name="customer_id"]').val(), // Retrieve customer ID from the hidden input field
+                csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+            },
+            success: function(response) {
+                // Refresh chat box after sending message
+                $('#chatBox').load(location.href + ' #chatBox');
+            },
+            error: function(xhr, status, error) {
+                console.error(xhr.responseText);
+            }
+        });
+    });
+});
+
+
+</script>
+
+</body>
+</html>

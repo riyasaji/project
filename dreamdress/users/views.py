@@ -2,7 +2,7 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth.models import auth
 from django.contrib.auth import login,authenticate,logout as auth_logout
-from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review,Tbl_tailorDemoProduct,Tbl_measurements
+from .models import Tbl_user,Tbl_seller,Tbl_category,Tbl_colour,Tbl_product,Tbl_ProductImage,Tbl_size,Tbl_stock,Tbl_tailor,Tbl_cart,Tbl_cartItem,Tbl_payment,Tbl_wishlist,Tbl_orderItem,Tbl_order,Tbl_brand,Review,Tbl_tailorDemoProduct,Tbl_measurements,ChatMessage
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required 
 from django.http import HttpResponse,JsonResponse
@@ -1537,8 +1537,150 @@ def cloth_type(request):
 def dress_customization(request):
     return render(request,'dress_customization.html')
 
+#tailor_message
+from django.db.models import Max
+
+def message_tailor(request):
+    # Get the newest message for each customer
+    latest_messages = ChatMessage.objects.filter(
+        tailor=request.user.tbl_tailor,
+        customer__user_type='customer',  # Filter messages from customers
+        viewed=False  # Filter only new messages
+    ).values('customer').annotate(latest_message=Max('send_at'))
+
+    # Retrieve the full ChatMessage objects for the newest messages
+    tailor_messages = ChatMessage.objects.filter(
+        tailor=request.user.tbl_tailor,
+        customer__user_type='customer',  # Filter messages from customers
+        viewed=False,  # Filter only new messages
+        send_at__in=[msg['latest_message'] for msg in latest_messages]
+    )
+
+    return render(request, 'message_tailor.html', {'tailor_messages': tailor_messages})
 
 
+
+from django.db.models import Q
+from django.contrib.auth import get_user_model
+# def user_chats(request, user_id):
+#     # Get the specified customer
+#     customer = get_user_model().objects.get(pk=user_id)
+    
+#     # Fetch all chat messages between the customer and the logged-in tailor
+#     user_messages = ChatMessage.objects.filter(
+#         customer=customer, tailor=request.user
+#     ).order_by('send_at')
+    
+#     return render(request, 'user_chars.html', {'customer': customer, 'user_messages': user_messages})
+# from .models import ChatMessage
+
+# def user_chats(request, user_id):
+#     # Get the specified customer and tailor
+#     customer = Tbl_user.objects.get(pk=user_id)
+#     tailor = request.user.tbl_tailor
+    
+#     # Fetch all chat messages between the tailor and customer
+#     user_messages = ChatMessage.objects.filter(
+#         (Q(customer=customer) & Q(tailor=tailor)) |  # Messages from customer to tailor
+#         (Q(customer=tailor) & Q(tailor=customer))    # Messages from tailor to customer
+#     ).order_by('send_at')
+    
+#     return render(request, 'user_chars.html', {'customer': customer, 'user_messages': user_messages})
+
+
+# def user_chats(request, user_id):
+#     current_tailor = request.user.tbl_tailor  # Retrieve current tailor
+
+#     # Retrieve all messages between the current tailor and the specified user
+#     messages = ChatMessage.objects.filter(tailor=current_tailor, customer__id=user_id)
+
+#     context = {
+#         'messages': messages
+#     }
+#     return render(request, 'user_chars.html', context)
+
+
+@login_required
+def tailor_chat_customer(request, user_id):
+    customer = Tbl_user.objects.get(id=user_id)
+    tailor = request.user.tbl_tailor
+    
+    if request.method == 'POST':
+        message = request.POST.get('message', '')
+        ChatMessage.objects.create(tailor=tailor, customer=customer, message=message)
+    
+    chat_messages = ChatMessage.objects.filter(Q(tailor=tailor, customer=customer) | Q(tailor=tailor, customer=request.user)).order_by('send_at')
+    
+    return render(request, 'user_chars.html', {'customer': customer, 'chat_messages': chat_messages})
+
+@login_required
+def send_message_tailor(request):
+    if request.method == 'POST':
+        message = request.POST.get('message', '')
+        customer_id = request.POST.get('customer_id', '')
+        customer = Tbl_user.objects.get(id=customer_id)
+        tailor = request.user.tbl_tailor
+        ChatMessage.objects.create(tailor=tailor, customer=customer, message=message)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+@login_required
+def get_tailor_messages(request, customer_id):
+    customer = Tbl_user.objects.get(id=customer_id)
+    tailor = request.user.tbl_tailor
+    chat_messages = ChatMessage.objects.filter(tailor=tailor, customer=customer, viewed=False).order_by('send_at')
+    messages = [{'message': msg.message, 'sender': 'tailor' if msg.tailor == tailor else 'customer'} for msg in chat_messages]
+    chat_messages.update(viewed=True)
+    return JsonResponse({'messages': messages})
+
+
+
+
+
+
+
+#Chating tailor and customer
+from django.db.models import Q
+@login_required
+def chat_tailor_customer(request, tailor_id):
+    # Get the tailor object
+    tailor = Tbl_tailor.objects.get(id=tailor_id)
+    
+    if request.method == 'POST':
+        # If it's a POST request, create a new chat message
+        message = request.POST.get('message', '')
+        customer = request.user
+        ChatMessage.objects.create(tailor=tailor, customer=customer, message=message)
+    
+    # Filter customers and tailors from Tbl_user
+    customers = Tbl_user.objects.filter(user_type='customer')
+    tailors = Tbl_user.objects.filter(user_type='tailor')
+
+    # Fetch all chat messages between the tailor and customers
+    chat_messages = ChatMessage.objects.filter(Q(tailor=tailor, customer__in=customers) | Q(tailor=tailor, customer__in=tailors)).order_by('send_at')
+    
+    return render(request, 'ChatPage.html', {'tailor': tailor, 'chat_messages': chat_messages})
+
+
+
+@login_required
+def send_message(request):
+    if request.method == 'POST':
+        message = request.POST.get('message', '')
+        tailor_id = request.POST.get('tailor_id', '')
+        tailor = Tbl_tailor.objects.get(id=tailor_id)
+        customer = request.user
+        ChatMessage.objects.create(tailor=tailor, customer=customer, message=message)
+        return JsonResponse({'status': 'success'})
+    return JsonResponse({'status': 'error', 'message': 'Invalid request method'})
+
+@login_required
+def get_messages(request, tailor_id):
+    tailor = Tbl_tailor.objects.get(id=tailor_id)
+    chat_messages = ChatMessage.objects.filter(tailor=tailor, customer=request.user, viewed=False).order_by('send_at')
+    messages = [{'message': msg.message, 'sender': 'tailor' if msg.tailor == tailor else 'customer'} for msg in chat_messages]
+    chat_messages.update(viewed=True)
+    return JsonResponse({'messages': messages})
 
 
 
